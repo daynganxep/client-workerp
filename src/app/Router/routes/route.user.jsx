@@ -2,8 +2,8 @@ import { Fragment } from "react";
 import MainLayout from "@layouts/user/MainLayout";
 import AuthLayout from "@layouts/user/AuthLayout";
 
-import NotFound from "@pages/user/NotFound";
-import Home from "@pages/user/Home";
+import NotFound from "@pages/user/common/NotFound";
+import Home from "@pages/user/common/Home";
 import Login from "@pages/user/auth/Login";
 import Register from "@pages/user/auth/Register";
 import ReceiveTokens from "@pages/user/auth/ReceiveTokens";
