@@ -1,5 +1,12 @@
+import { useSelector } from "react-redux";
 import "./Home.scss";
 
-export default function Home() {
-    return <div>HOME PAGE</div>;
-}
+const Home = () => {
+  const auth = useSelector((state) => state.auth);
+
+  console.log(auth);
+
+  return <div>{JSON.stringify(auth)}</div>;
+};
+
+export default Home;

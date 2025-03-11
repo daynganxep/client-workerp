@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Form, Field, SubmitButton, ErrorMessage } from "@components/Form";
-import registerSchema from "@validations/user/registerChema";
+import { registerSchema } from "@validations/authSchema";
 import AuthService from "@services/auth.service";
+import HeaderForm from "./components/HeaderForm";
 import useMessageByApiCode from "@hooks/useMessageByApiCode";
-import { toast } from "react-toastify";
+import toast from "@hooks/toast";
 import { SERVER_URL } from "@configs/const.config";
 import { FcGoogle } from "react-icons/fc";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setRedirect } from "@redux/slices/auth.slice";
-import HeaderForm from "./components/HeaderForm";
 
 const Register = () => {
   const [errorMessage, setErrorMessage] = useState();

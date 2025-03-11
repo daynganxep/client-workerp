@@ -1,6 +1,10 @@
 #header {
     .logo {
         grid-area: logo;
+
+        .logo-icon{
+            background-color: red;
+        }
     }
 
     .menuAction {
