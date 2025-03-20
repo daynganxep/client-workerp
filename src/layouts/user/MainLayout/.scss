@@ -1,0 +1,15 @@
+.main-layout {
+  padding: 0;
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 32px;
+    border-bottom: 1px solid black;
+  }
+
+  .content {
+    padding: 12px;
+  }
+}

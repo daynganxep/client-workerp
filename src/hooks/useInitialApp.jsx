@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import AuthService from "@services/auth.service";
+import AuthService from "@services/auth-service/auth.service";
 import {
   setAccessToken,
   setTokens,

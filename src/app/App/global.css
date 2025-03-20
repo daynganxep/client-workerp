@@ -1,39 +1,41 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@100..900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Bagel+Fat+One&display=swap");
-
+@import url("https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Monoton&family=Plaster&family=Tiny5&family=Zen+Tokyo+Zoo&display=swap");
 * {
-    font-family: "Noto Sans Mono", monospace;
-    font-optical-sizing: auto;
-    font-weight: 100px;
-    font-style: normal;
-    transition: color 0.25s, background-color 0.25s;
+  font-family: "Noto Sans Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 100px;
+  font-style: normal;
+  transition: color 0.25s, background-color 0.25s;
+}
+
+body {
+  margin: 0;
 }
 .tooltip-scroll {
-    max-height: 80vh; /* Chiều cao tối đa là 80% chiều cao màn hình */
-    overflow-y: auto; /* Cho phép cuộn theo chiều dọc */
+  max-height: 80vh;
+  overflow-y: auto;
 }
-/* Tùy chỉnh thanh cuộn cho toàn bộ trang */
 ::-webkit-scrollbar {
-    width: 8px; /* Chiều rộng của thanh cuộn dọc */
-    height: 8px; /* Chiều cao của thanh cuộn ngang */
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1; /* Màu nền của thanh cuộn */
-    border-radius: 10px; /* Bo góc cho thanh cuộn */
+  background: #f1f1f1;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #888; /* Màu của thanh cuộn */
-    border-radius: 10px; /* Bo góc cho thanh cuộn */
+  background: #888;
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555; /* Màu của thanh cuộn khi hover */
-    background: #000000; /* Màu của thanh cuộn khi hover */
+  background: #555;
+  background: #000000;
 }
 .error-validate-message {
-    text-align: end;
-    color: red;
-    margin-top: 4px;
+  text-align: end;
+  color: red;
+  margin-top: 4px;
 }

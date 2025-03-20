@@ -1,4 +1,4 @@
-import { SERVER_URL } from "@configs/const.config";
+import { SERVER_URL } from "@configs/const.config.jsx";
 
 const getApiUrl = (path) => {
     return `${SERVER_URL.API}${path}`;

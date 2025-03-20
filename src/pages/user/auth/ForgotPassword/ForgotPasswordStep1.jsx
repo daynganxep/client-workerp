@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Form, Field, SubmitButton, ErrorMessage } from "@components/Form";
-import AuthService from "@services/auth.service";
+import AuthService from "@services/auth-service/auth.service";
 import useMessageByApiCode from "@hooks/useMessageByApiCode";
 import { forgotPasswordStep1Schema } from "@validations/authSchema";
 import toast from "@hooks/toast";

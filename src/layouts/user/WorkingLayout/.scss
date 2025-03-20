@@ -1,0 +1,103 @@
+.working-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+
+    .sidebar {
+        transition: width 0.3s ease;
+
+        &.expanded {
+            width: 250px;
+        }
+
+        &.collapsed {
+            width: 60px;
+        }
+
+        .sidebar-paper {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            overflow-x: hidden;
+
+            &.expanded {
+                width: 250px;
+            }
+
+            &.collapsed {
+                width: 60px;
+            }
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+
+            .company-name {
+                margin-left: 10px;
+            }
+        }
+
+        .module-list {
+            flex-grow: 1;
+            padding: 0;
+
+            .MuiListItem-button {
+                padding: 10px 20px;
+
+                &.active {
+                    background-color: #e0e0e0;
+                }
+
+                &:hover {
+                    background-color: #f5f5f5;
+                }
+
+                .module-link {
+                    text-decoration: none;
+                    color: #333;
+                    font-weight: 500;
+                    width: 100%;
+                    display: block;
+                }
+            }
+        }
+
+        .sidebar-footer {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            justify-content: space-around;
+        }
+    }
+
+    .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .appbar {
+            background-color: #1976d2; /* Màu mặc định của MUI AppBar */
+        }
+
+        .role-switcher {
+            margin: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+
+            .MuiTab-root {
+                text-transform: capitalize;
+                font-weight: 500;
+            }
+        }
+
+        .module-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #fafafa;
+        }
+    }
+}

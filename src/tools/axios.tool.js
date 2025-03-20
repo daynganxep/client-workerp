@@ -1,6 +1,6 @@
 import axios from "axios";
 import store from "@redux/store.redux";
-import { SERVER_URL } from "@configs/const.config";
+import { SERVER_URL } from "@configs/const.config.jsx";
 
 import _ from "lodash";
 
@@ -11,8 +11,12 @@ axiosInstance.interceptors.request.use(
     (config) => {
         const { accessToken } = store.getState().auth.tokens;
         const isLoging = store.getState().auth.isLoging || false;
+        const companyId = store.getState().company.id;
         if (isLoging && accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+        if (isLoging && companyId) {
+            config.headers.set("Xxx-Company-Id", companyId);
         }
         return config;
     },
