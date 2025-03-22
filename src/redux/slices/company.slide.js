@@ -56,6 +56,12 @@ const companySlice = createSlice({
                 state.companyModuleRolesMap[moduleCode] = moduleRole;
             }
         },
+        setCompanyInfo: (state, { payload }) => {
+            state.name = payload.name;
+            state.domain = payload.domain;
+            state.avatar = payload.avatar;
+            state.active = payload.active;
+        },
     },
 });
 
