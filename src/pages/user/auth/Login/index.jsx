@@ -57,15 +57,14 @@ const LogIn = () => {
 
             if (error) {
                 setErrorMessage(getMessage(error.code));
-                toast.error(getMessage(error.code));
+                toast.error(error.code);
                 return;
             }
 
-            toast.success(getMessage(result.code));
+            toast.success(result.code);
             dispatch(setTokens(result.data));
             navigate(redirect);
         } catch (err) {
-            console.error("Login error:", err);
             toast.error("Đã xảy ra lỗi không mong muốn");
         } finally {
             finishSubmitting();

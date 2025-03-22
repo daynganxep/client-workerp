@@ -6,6 +6,8 @@ const apiCode = {
     "user-f-03-01": "Email chưa đăng ký",
     "user-f-03-02": "Sai mật khẩu",
     "company-app-company-05": "Cập nhật thông tin công ty thành công",
+    "hr-app-employee-01": "Mời nhân viên thành công",
+    "hr-app-employee-f-01-01": "Đã là nhân viên của công ty",
 };
 
 export default apiCode;

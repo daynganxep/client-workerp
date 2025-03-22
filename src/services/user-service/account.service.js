@@ -20,7 +20,6 @@ const AccountService = {
             }),
             true,
         );
-        console.log("Update response:", response);
         return response;
     },
 };

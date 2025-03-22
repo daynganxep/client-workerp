@@ -15,11 +15,7 @@ function CompanyModuleRolesTab() {
     // Lấy dữ liệu từ API
     async function fetchCmrs() {
         const [res, err] = await CompanyModuleRolesService.getAllByManager();
-        console.log({ res, err });
-        if (err) {
-            toast.error("Failed to fetch company module roles");
-            return;
-        }
+        if (err) return toast.error(err.code);
         const data = res.data;
 
         // Nhóm dữ liệu theo userId và moduleCode
@@ -73,12 +69,7 @@ function CompanyModuleRolesTab() {
             moduleRoles: cmr.moduleRoles,
         }));
         const [res, err] = await CompanyModuleRolesService.modifyMany(requests);
-        if (err) {
-            console.log(err);
-            toast.error("Failed to save changes");
-            return;
-        }
-
+        if (err) return toast.error(err.code);
         toast.success("Roles updated successfully");
         fetchCmrs();
     };
