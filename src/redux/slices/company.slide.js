@@ -45,6 +45,7 @@ const companySlice = createSlice({
             state.employeesMap = {};
             for (let employee of payload) {
                 state.employeesMap[employee.id] = employee;
+                state.employeesMap[employee.userId] = employee;
             }
         },
         setCompanyModuleRoles: (state, { payload }) => {

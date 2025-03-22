@@ -71,9 +71,9 @@ export default [
         title: "Không tìm thấy trang",
     },
     {
-        path: "/working/*",
-        Layout: WorkingLayout,
+        path: "/working/:moduleCode/*",
         Page: Fragment,
+        Layout: WorkingLayout,
         type: USER_ROUTE_TYPES.PRIVATE,
         title: "Work-ERP",
     },
