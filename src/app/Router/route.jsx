@@ -1,5 +1,4 @@
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
-import { Fragment } from 'react';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Title from '@components/Title';
 // Route Type
 import PublicRoute from '@app/Router/routeTypes/PublicRoute';
@@ -11,7 +10,6 @@ import AuthLayout from '@layouts/user/AuthLayout';
 import WorkingLayout from '@layouts/user/WorkingLayout';
 // Page
 import NotFound from '@pages/user/common/NotFound';
-// import Home from '@pages/user/common/Home';
 import Home from '@pages/user/common/Home';
 import Companies from '@pages/user/common/Companies';
 import Login from '@pages/user/auth/Login';
@@ -23,12 +21,27 @@ import Logout from '@pages/user/auth/Logout';
 
 import CompanyManagerModule from '@pages/user/modules/company/CompanyManagerModule';
 import CompanyUserModule from '@pages/user/modules/company/CompanyUserModule';
-// import CompanyInfoTab from '@pages/user/modules/company/CompanyInfoTab';
-// import CompanyRolesTab from '@pages/user/modules/company/CompanyModuleRolesTab';
+import CompanyInfoTab from '@pages/user/modules/company/CompanyManagerModule/CompanyInfoTab';
+import CompanyModuleRolesTab from '@pages/user/modules/company/CompanyManagerModule/CompanyModuleRolesTab';
+// import CompanyDashboard from '@pages/user/modules/company/CompanyDashboard';
+// import CompanyEmployeesTab from '@pages/user/modules/company/CompanyEmployeesTab';
 import HrManagerModule from '@pages/user/modules/hr/HrManagerModule';
 import HrUserModule from '@pages/user/modules/hr/HrUserModule';
+// import HrDashboard from '@pages/user/modules/hr/HrDashboard';
+// import EmployeeList from '@pages/user/modules/hr/EmployeeList';
+// import DepartmentList from '@pages/user/modules/hr/DepartmentList';
 import ProjectManagerModule from '@pages/user/modules/project/ProjectManagerModule';
 import ProjectUserModule from '@pages/user/modules/project/ProjectUserModule';
+//import ProjectDashboard from '@pages/user/modules/project/ProjectDashboard';
+// import ProjectList from '@pages/user/modules/project/ProjectList';
+// import ProjectDetail from '@pages/user/modules/project/ProjectDetail';
+// import ProjectOverview from '@pages/user/modules/project/ProjectOverview';
+// import ProjectTasks from '@pages/user/modules/project/ProjectTasks';
+// import ProjectMembers from '@pages/user/modules/project/ProjectMembers';
+// import ProjectSettings from '@pages/user/modules/project/ProjectSettings';
+// import TaskDetail from '@pages/user/modules/project/TaskDetail';
+// import UserTasks from '@pages/user/modules/project/UserTasks';
+// import UserProjects from '@pages/user/modules/project/UserProjects';
 
 const router = createBrowserRouter([
     {
@@ -170,130 +183,179 @@ const router = createBrowserRouter([
                     {
                         path: ':role',
                         children: [
+                            // Default redirect
                             {
                                 path: '',
-                                element: <Navigate to="user" replace />, // Mặc định role user
+                                element: <Navigate to="user" replace />,
                             },
+                            // Company Module Routes
                             {
                                 path: 'company',
-                                element: (
-                                    <>
-                                        <Title>Company Module</Title>
-                                        <Outlet />
-                                    </>
-                                ),
                                 children: [
                                     {
                                         path: 'manager',
                                         element: <CompanyManagerModule />,
                                         children: [
                                             {
+                                                index: true,
+                                                element: <Navigate to="dashboard" replace />
+                                            },
+                                            // {
+                                            //     path: 'dashboard',
+                                            //     element: <CompanyDashboard />
+                                            // },
+                                            {
                                                 path: 'info',
-                                                element: (
-                                                    <>
-                                                        <Title>Company Info</Title>
-                                                        {/* <CompanyInfoTab /> */}
-                                                    </>
-                                                ),
+                                                element: <CompanyInfoTab />
                                             },
                                             {
                                                 path: 'roles',
-                                                element: (
-                                                    <>
-                                                        <Title>Company Roles</Title>
-                                                        {/* <CompanyRolesTab /> */}
-                                                    </>
-                                                ),
+                                                element: <CompanyModuleRolesTab />
                                             },
-                                        ],
+                                            // {
+                                            //     path: 'employees',
+                                            //     element: <CompanyEmployeesTab />
+                                            // }
+                                        ]
                                     },
                                     {
                                         path: 'user',
-                                        element: (
-                                            <>
-                                                <Title>Company User</Title>
-                                                <CompanyUserModule />
-                                            </>
-                                        ),
-                                    },
-                                ],
+                                        element: <CompanyUserModule />
+                                    }
+                                ]
                             },
-                            {
-                                path: 'hr',
-                                element: (
-                                    <>
-                                        <Title>HR Module</Title>
-                                        {/* <Outlet /> */}
-                                    </>
-                                ),
-                                children: [
-                                    {
-                                        path: 'manager',
-                                        element: (
-                                            <>
-                                                <Title>HR Manager</Title>
-                                                <HrManagerModule />
-                                            </>
-                                        ),
-                                    },
-                                    {
-                                        path: 'user',
-                                        element: (
-                                            <>
-                                                <Title>HR User</Title>
-                                                <HrUserModule />
-                                            </>
-                                        ),
-                                    },
-                                ],
-                            },
+                            // Project Module Routes
                             {
                                 path: 'project',
-                                element: (
-                                    <>
-                                        <Title>Project Module</Title>
-                                        {/* <Outlet /> */}
-                                    </>
-                                ),
                                 children: [
                                     {
                                         path: 'manager',
                                         element: <ProjectManagerModule />,
                                         children: [
                                             {
-                                                path: 'dashboard',
-                                                element: (
-                                                    <>
-                                                        <Title>Project Dashboard</Title>
-                                                        {/* <ProjectDashboard /> */}
-                                                    </>
-                                                ),
+                                                index: true,
+                                                element: <Navigate to="dashboard" replace />
                                             },
-                                            {
-                                                path: 'task/:id',
-                                                element: (
-                                                    <>
-                                                        <Title>Task Detail</Title>
-                                                        {/* <TaskDetail /> */}
-                                                    </>
-                                                ),
-                                            },
-                                        ],
+                                        ]
                                     },
                                     {
                                         path: 'user',
-                                        element: (
-                                            <>
-                                                <Title>Project User</Title>
-                                                <ProjectUserModule />
-                                            </>
-                                        ),
-                                    },
-                                ],
+                                        element: <ProjectUserModule />,
+                                        children: [
+                                            {
+                                                index: true,
+                                                element: <Navigate to="my-tasks" replace />
+                                            },
+                                        ]
+                                    }
+                                ]
                             },
-                        ],
-                    },
-                ],
+                            /*{
+                                path: 'project',
+                                children: [
+                                    {
+                                        path: 'manager',
+                                        element: <ProjectManagerModule />,
+                                        children: [
+                                            {
+                                                index: true,
+                                                element: <Navigate to="dashboard" replace />
+                                            },
+                                            {
+                                                path: 'dashboard',
+                                                element: <ProjectDashboard />
+                                            },
+                                            {
+                                                path: 'projects',
+                                                element: <ProjectList />,
+                                            },
+                                            {
+                                                path: 'projects/:projectId',
+                                                element: <ProjectDetail />,
+                                                children: [
+                                                    {
+                                                        index: true,
+                                                        element: <Navigate to="overview" replace />
+                                                    },
+                                                    {
+                                                        path: 'overview',
+                                                        element: <ProjectOverview />
+                                                    },
+                                                    {
+                                                        path: 'tasks',
+                                                        element: <ProjectTasks />
+                                                    },
+                                                    {
+                                                        path: 'members',
+                                                        element: <ProjectMembers />
+                                                    },
+                                                    {
+                                                        path: 'settings',
+                                                        element: <ProjectSettings />
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                path: 'tasks/:taskId',
+                                                element: <TaskDetail />
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        path: 'user',
+                                        element: <ProjectUserModule />,
+                                        children: [
+                                            {
+                                                index: true,
+                                                element: <Navigate to="my-tasks" replace />
+                                            },
+                                            {
+                                                path: 'my-tasks',
+                                                element: <UserTasks />
+                                            },
+                                            {
+                                                path: 'my-projects',
+                                                element: <UserProjects />
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },*/
+                            // HR Module Routes
+                            {
+                                path: 'hr',
+                                children: [
+                                    {
+                                        path: 'manager',
+                                        element: <HrManagerModule />,
+                                        children: [
+                                            {
+                                                index: true,
+                                                element: <Navigate to="dashboard" replace />
+                                            },
+                                            // {
+                                            //     path: 'dashboard',
+                                            //     element: <HrDashboard />
+                                            // },
+                                            // {
+                                            //     path: 'employees',
+                                            //     element: <EmployeeList />
+                                            // },
+                                            // {
+                                            //     path: 'departments',
+                                            //     element: <DepartmentList />
+                                            // }
+                                        ]
+                                    },
+                                    {
+                                        path: 'user',
+                                        element: <HrUserModule />
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
             },
         ],
     },
