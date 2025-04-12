@@ -12,7 +12,8 @@ import WorkingLayout from '@layouts/user/WorkingLayout';
 // Page
 import NotFound from '@pages/user/common/NotFound';
 // import Home from '@pages/user/common/Home';
-import Home from '@pages/user/common/Home2';
+import Home from '@pages/user/common/Home';
+import Companies from '@pages/user/common/Companies';
 import Login from '@pages/user/auth/Login';
 import Register from '@pages/user/auth/Register';
 import ReceiveTokens from '@pages/user/auth/ReceiveTokens';
@@ -148,6 +149,20 @@ const router = createBrowserRouter([
     {
         element: <PrivateRoute AccessDeniedLayout={UserMainLayout} />,
         children: [
+            {
+                element: <UserMainLayout />,
+                children: [
+                    {
+                        path: '/companies',
+                        element: (
+                            <>
+                                <Title>Danh sach cong ty</Title>
+                                <Companies />
+                            </>
+                        ),
+                    },
+                ],
+            },
             {
                 path: '/working/:moduleCode',
                 element: <WorkingLayout />,
