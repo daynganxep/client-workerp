@@ -12,11 +12,15 @@ axiosInstance.interceptors.request.use(
         const { accessToken } = store.getState().auth.tokens;
         const isLoging = store.getState().auth.isLoging || false;
         const companyId = store.getState().company.id;
+        const employeeId = store.getState().company?.employee?.id;
         if (isLoging && accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
         }
         if (isLoging && companyId) {
             config.headers.set("Xxx-Company-Id", companyId);
+            if (employeeId) {
+                config.headers.set("Xxx-Employee-Id", employeeId);
+            }
         }
         return config;
     },

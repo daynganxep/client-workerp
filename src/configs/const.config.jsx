@@ -61,3 +61,9 @@ export const MODULE_OPTIONS_MAP = {
 export const MODULE_OPTIONS = Object.keys(MODULE_OPTIONS_MAP).map(
     (module_key) => MODULE_OPTIONS_MAP[module_key],
 );
+
+export const TASK_STATUSES = {
+    TO_DO: "TO_DO",
+    IN_PROGRESS: "IN_PROGRESS",
+    DONE: "DONE",
+};

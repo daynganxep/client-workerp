@@ -1,0 +1,28 @@
+.project-detail {
+    .task-controls {
+        margin-bottom: 16px;
+    }
+
+    .task-card,
+    .member-card,
+    .milestone-card {
+        transition: transform 0.2s;
+        &:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    }
+
+    .task-card ul {
+        padding-left: 16px;
+        margin: 0;
+    }
+
+    .member-card {
+        background-color: #f0f4c3;
+    }
+
+    .milestone-card {
+        background-color: #ffebee;
+    }
+}

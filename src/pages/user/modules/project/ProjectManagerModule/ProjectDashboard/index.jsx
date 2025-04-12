@@ -1,0 +1,175 @@
+import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import ProjectService from "@services/project-module-service/project.service";
+import {
+    Typography,
+    Button,
+    Card,
+    CardContent,
+    CardActions,
+    Grid,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    TextField,
+} from "@mui/material";
+import { Folder, Add } from "@mui/icons-material";
+import useFormValidation from "@hooks/useForm";
+import { projectSchema } from "@validations/projectSchema";
+import toast from "@hooks/toast";
+import ".scss";
+import { Link } from "react-router-dom";
+
+function ProjectDashboard() {
+    const [projects, setProjects] = useState([]);
+    const [openCreate, setOpenCreate] = useState(false);
+    const { id: companyId } = useSelector((state) => state.company);
+
+    const {
+        data,
+        errors,
+        handleChange,
+        validate,
+        startSubmitting,
+        finishSubmitting,
+        isSubmitting,
+    } = useFormValidation(projectSchema, {
+        name: "",
+        description: "",
+        startDate: "",
+        endDate: "",
+        companyId,
+    });
+
+    const fetchProjects = async () => {
+        const [res, err] = await ProjectService.getProjectsByCompanyId(
+            companyId,
+        );
+        if (err) return toast.error(err.code);
+        setProjects(res.data);
+    };
+
+    const handleCreate = async () => {
+        if (!validate()) return;
+        startSubmitting();
+        const [res, err] = await ProjectService.createProject(data);
+        finishSubmitting();
+        if (err) return toast.error(err.code);
+        toast.success("Created project successfully");
+        setOpenCreate(false);
+        fetchProjects();
+    };
+
+    useEffect(() => {
+        fetchProjects();
+        handleChange("companyId", companyId);
+    }, [companyId]);
+
+    return (
+        <div className="project-dashboard">
+            <Typography variant="h5" gutterBottom>
+                Tổng quan dự án
+            </Typography>
+            <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() => setOpenCreate(true)}
+                sx={{ mb: 2 }}
+            >
+                Create Project
+            </Button>
+            <Grid container spacing={2}>
+                {projects.map((project) => (
+                    <Grid item xs={12} sm={6} md={4} key={project.id}>
+                        <Link to={`/working/project/${project.id}`}>
+                            <Card className="project-card">
+                                <CardContent>
+                                    <Typography variant="h6">
+                                        <Folder
+                                            sx={{
+                                                verticalAlign: "middle",
+                                                mr: 1,
+                                            }}
+                                        />
+                                        {project.name}
+                                    </Typography>
+                                    <Typography color="textSecondary">
+                                        Trạng thái: {project.status}
+                                    </Typography>
+                                    <Typography>
+                                        Bắt đầu:{" "}
+                                        {new Date(
+                                            project.startDate,
+                                        ).toLocaleDateString()}
+                                    </Typography>
+                                    <Typography>
+                                        Kết thúc:{" "}
+                                        {new Date(
+                                            project.endDate,
+                                        ).toLocaleDateString()}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    </Grid>
+                ))}
+            </Grid>
+
+            {/* Create Dialog */}
+            <Dialog open={openCreate} onClose={() => setOpenCreate(false)}>
+                <DialogTitle>Tạo dự án mới</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        fullWidth
+                        label="Tên dự án"
+                        value={data.name}
+                        onChange={(e) => handleChange("name", e.target.value)}
+                        error={!!errors.name}
+                        helperText={errors.name}
+                        sx={{ mt: 1 }}
+                    />
+                    <TextField
+                        fullWidth
+                        label="Mô tả"
+                        value={data.description}
+                        onChange={(e) =>
+                            handleChange("description", e.target.value)
+                        }
+                        sx={{ mt: 2 }}
+                    />
+                    <TextField
+                        fullWidth
+                        label="Ngày bắt đầu"
+                        type="date"
+                        value={data.startDate}
+                        onChange={(e) =>
+                            handleChange("startDate", e.target.value)
+                        }
+                        InputLabelProps={{ shrink: true }}
+                        sx={{ mt: 2 }}
+                    />
+                    <TextField
+                        fullWidth
+                        label="Ngày kết thúc"
+                        type="date"
+                        value={data.endDate}
+                        onChange={(e) =>
+                            handleChange("endDate", e.target.value)
+                        }
+                        InputLabelProps={{ shrink: true }}
+                        sx={{ mt: 2 }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenCreate(false)}>Hủy</Button>
+                    <Button onClick={handleCreate} disabled={isSubmitting}>
+                        {isSubmitting ? "Đang tạo..." : "Tạo"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </div>
+    );
+}
+
+export default ProjectDashboard;

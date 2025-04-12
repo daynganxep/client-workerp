@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getLS } from "@tools/localStorage.tool";
+
 const companySlice = createSlice({
     name: "company",
     initialState: getLS("company", {
@@ -8,6 +9,7 @@ const companySlice = createSlice({
         name: "",
         domain: "",
         active: true,
+        employee: {},
         modules: [
             {
                 id: "67c1f51d27ab50405cd4ce7d",
@@ -61,6 +63,9 @@ const companySlice = createSlice({
             state.domain = payload.domain;
             state.avatar = payload.avatar;
             state.active = payload.active;
+        },
+        setEmployeeInfo: (state, { payload }) => {
+            state.employee = payload;
         },
     },
 });

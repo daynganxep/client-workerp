@@ -48,17 +48,19 @@ function WorkingLayout() {
     const handleRoleChange = (event, newRole) => setSelectedRole(newRole);
 
     const handleComeInCompany = async () => {
-        const [[res1, err1], [res2, err2]] = await Promise.all([
+        const [[res1, err1], [res2, err2], [res3, err3]] = await Promise.all([
             EmployeeService.getCompanyEmployees(companyId),
             CompanyModuleRolesService.getByEmployee(companyId),
+            EmployeeService.getMyEmployeeInfo(),
         ]);
 
-        if (err1 || err2) {
+        if (err1 || err2 || err3) {
             return;
         }
 
         dispatch(companyActions.setEmployees(res1.data));
         dispatch(companyActions.setCompanyModuleRoles(res2.data));
+        dispatch(companyActions.setEmployeeInfo(res3.data));
     };
 
     useEffect(() => {
@@ -90,16 +92,10 @@ function WorkingLayout() {
 
     return (
         <div className="working-layout">
-            <Drawer
-                variant="permanent"
+            <div
                 className={`sidebar ${
                     isSidebarOpen ? "expanded" : "collapsed"
-                }`}
-                classes={{
-                    paper: `sidebar-paper ${
-                        isSidebarOpen ? "expanded" : "collapsed"
-                    }`,
-                }}
+                } layout-part`}
             >
                 <Box className="sidebar-header">
                     <IconButton onClick={handleToggleSidebar}>
@@ -111,7 +107,6 @@ function WorkingLayout() {
                         </Typography>
                     )}
                 </Box>
-                <Divider />
                 <List className="module-list">
                     {modules.map((module) => {
                         const moduleConfig =
@@ -141,7 +136,6 @@ function WorkingLayout() {
                         );
                     })}
                 </List>
-                <Divider />
                 <Box className="sidebar-footer">
                     <IconButton color="inherit">
                         <NotificationsIcon />
@@ -150,11 +144,9 @@ function WorkingLayout() {
                         <Avatar alt="Employee Name" src="/path/to/avatar.jpg" />
                     )}
                 </Box>
-            </Drawer>
-
-            {/* Main Content */}
+            </div>
             <Box className="main-content">
-                <Box className="content-header">
+                <Box className="content-header layout-part">
                     <Breadcrumbs
                         separator={<NavigateNextIcon fontSize="small" />}
                         className="breadcrumb"
@@ -177,7 +169,9 @@ function WorkingLayout() {
                         </Tabs>
                     )}
                 </Box>
-                <Box className="module-content">{renderModuleContent()}</Box>
+                <Box className="module-content layout-part">
+                    {renderModuleContent()}
+                </Box>
             </Box>
         </div>
     );

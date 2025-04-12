@@ -1,45 +1,35 @@
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    TextField,
-    FormControl,
-    FormLabel,
-    FormGroup,
-    FormControlLabel,
-    Checkbox,
     Alert,
+    Button,
+    Checkbox,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+    FormLabel,
+    TextField,
 } from "@mui/material";
 import useFormValidation from "@hooks/useForm";
 import CompanyService from "@services/compay-module-service/company.service";
 import useMessageByApiCode from "@hooks/useMessageByApiCode";
-import { createCompanySchema } from "@validations/companySchema.js";
+import {createCompanySchema} from "@validations/companySchema.js";
 import toast from "@hooks/toast";
-import { MODULE_OPTIONS } from "@configs/const.config.jsx";
+import {MODULE_OPTIONS} from "@configs/const.config.jsx";
 
-const CreateCompanyDialog = ({ open, onClose, onSuccess }) => {
+const CreateCompanyDialog = ({open, onClose, onSuccess}) => {
     const getMessage = useMessageByApiCode();
     const {
-        data,
-        errors,
-        isSubmitting,
-        handleChange,
-        validate,
-        startSubmitting,
-        finishSubmitting,
+        data, errors, isSubmitting, handleChange, validate, startSubmitting, finishSubmitting,
     } = useFormValidation(createCompanySchema, {
-        name: "",
-        domain: "",
-        moduleCodes: [MODULE_OPTIONS[0].code, MODULE_OPTIONS[1].code],
+        name: "", domain: "", moduleCodes: [MODULE_OPTIONS[0].code, MODULE_OPTIONS[1].code],
     });
 
     const handleModuleChange = (moduleCode) => {
         const currentModules = data.moduleCodes || [];
-        const newModules = currentModules.includes(moduleCode)
-            ? currentModules.filter((code) => code !== moduleCode)
-            : [...currentModules, moduleCode];
+        const newModules = currentModules.includes(moduleCode) ? currentModules.filter((code) => code !== moduleCode) : [...currentModules, moduleCode];
         handleChange("moduleCodes", newModules);
     };
 
@@ -62,8 +52,7 @@ const CreateCompanyDialog = ({ open, onClose, onSuccess }) => {
         }
     };
 
-    return (
-        <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    return (<Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
             <DialogTitle>Tạo công ty mới</DialogTitle>
             <form onSubmit={handleSubmit}>
                 <DialogContent>
@@ -94,32 +83,19 @@ const CreateCompanyDialog = ({ open, onClose, onSuccess }) => {
                     >
                         <FormLabel component="legend">Các MODULE</FormLabel>
                         <FormGroup>
-                            {MODULE_OPTIONS.map((module) => (
-                                <FormControlLabel
+                            {MODULE_OPTIONS.map((module) => (<FormControlLabel
                                     key={module.code}
-                                    control={
-                                        <Checkbox
-                                            checked={data.moduleCodes?.includes(
-                                                module.code,
-                                            )}
-                                            onChange={() =>
-                                                handleModuleChange(module.code)
-                                            }
-                                            disabled={[
-                                                MODULE_OPTIONS[0].code,
-                                                MODULE_OPTIONS[1].code,
-                                            ].includes(module.code)}
-                                        />
-                                    }
+                                    control={<Checkbox
+                                        checked={data.moduleCodes?.includes(module.code,)}
+                                        onChange={() => handleModuleChange(module.code)}
+                                        disabled={[MODULE_OPTIONS[0].code, MODULE_OPTIONS[1].code,].includes(module.code)}
+                                    />}
                                     label={module.label}
-                                />
-                            ))}
+                                />))}
                         </FormGroup>
-                        {errors.moduleCodes && (
-                            <Alert severity="error" sx={{ mt: 1 }}>
+                        {errors.moduleCodes && (<Alert severity="error" sx={{mt: 1}}>
                                 {errors.moduleCodes}
-                            </Alert>
-                        )}
+                            </Alert>)}
                     </FormControl>
                 </DialogContent>
                 <DialogActions>
@@ -133,8 +109,7 @@ const CreateCompanyDialog = ({ open, onClose, onSuccess }) => {
                     </Button>
                 </DialogActions>
             </form>
-        </Dialog>
-    );
+        </Dialog>);
 };
 
 export default CreateCompanyDialog;

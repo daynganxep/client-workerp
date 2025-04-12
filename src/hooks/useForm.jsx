@@ -49,6 +49,8 @@ const useFormValidation = (schema, initialValues = {}) => {
             newErrors[detail.path[0]] = detail.message;
         });
 
+        console.log(newErrors);
+
         setErrors(newErrors);
         return false;
     }, [data, schema]);

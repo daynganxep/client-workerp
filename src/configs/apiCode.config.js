@@ -8,6 +8,7 @@ const apiCode = {
     "company-app-company-05": "Cập nhật thông tin công ty thành công",
     "hr-app-employee-01": "Mời nhân viên thành công",
     "hr-app-employee-f-01-01": "Đã là nhân viên của công ty",
+    "project-05-f-02": "Đã là thành viên của dự án",
 };
 
 export default apiCode;

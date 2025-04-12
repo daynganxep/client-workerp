@@ -12,8 +12,7 @@ function BrandName() {
       }}
       className="xxx-brand"
     >
-      <span className="work">Work</span>
-      <span className="erp">ERP</span>
+      <span className="work">WORKERP</span>
     </Typography>
   );
 }
