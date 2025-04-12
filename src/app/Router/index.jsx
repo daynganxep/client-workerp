@@ -1,29 +1,9 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Title from "@components/Title";
-import routes from "@app/Router/routes";
+import { RouterProvider } from "react-router-dom";
+import routes from "@app/Router/route";
 
 function Router() {
     return (
-        <BrowserRouter>
-            <Routes>
-                {routes.map((route) => {
-                    const { path, element, title } = route;
-                    const RouteType = route.type;
-                    return (
-                        <Route
-                            key={path}
-                            path={path}
-                            element={
-                                <RouteType>
-                                    <Title>{title}</Title>
-                                    {element}
-                                </RouteType>
-                            }
-                        ></Route>
-                    );
-                })}
-            </Routes>
-        </BrowserRouter>
+        <RouterProvider router={routes} />
     );
 }
 

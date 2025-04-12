@@ -1,11 +1,11 @@
 import { CardContent } from "@mui/material";
 import BrandName from "@components/BandName";
-import { Link } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import bg from "@assets/images/nnnoise.svg";
 import logo from "@assets/images/logo.svg";
 import ".scss";
 
-function AuthLayout({ children }) {
+function AuthLayout() {
   return (
     <div className="auth-layout">
       <img src={bg} alt="Background" className="auth-layout__background" />
@@ -15,7 +15,7 @@ function AuthLayout({ children }) {
             <img src={logo} alt="work-erp" />
             <BrandName></BrandName>
           </Link>
-          <CardContent>{children}</CardContent>
+          <CardContent><Outlet></Outlet></CardContent>
         </div>
       </div>
     </div>

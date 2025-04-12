@@ -1,18 +1,25 @@
 .main-layout {
-  padding: 0 24px;
-
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 32px;
-    border-radius: 0 0 12px 12px;
-    backdrop-filter: blur(2px);
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  }
-
-  .content {
     display: none;
-    padding: 12px;
-  }
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 16px;
+    padding: 8px;
+
+    &__header {
+        position: fixed;
+        border-radius: 8px;
+    }
+
+    &__content {
+        border-radius: 8px;
+        margin: 0 8px 8px 8px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__container {
+        flex-grow: 1;
+        padding: 24px;
+    }
 }

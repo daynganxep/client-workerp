@@ -93,9 +93,8 @@ function WorkingLayout() {
     return (
         <div className="working-layout">
             <div
-                className={`sidebar ${
-                    isSidebarOpen ? "expanded" : "collapsed"
-                } layout-part`}
+                className={`sidebar ${isSidebarOpen ? "expanded" : "collapsed"
+                    } layout-part`}
             >
                 <Box className="sidebar-header">
                     <IconButton onClick={handleToggleSidebar}>
@@ -119,7 +118,7 @@ function WorkingLayout() {
                                 to={`/working/${module.moduleCode.toLowerCase()}`}
                                 className={
                                     module.moduleCode.toLowerCase() ===
-                                    moduleCode
+                                        moduleCode
                                         ? "active"
                                         : ""
                                 }

@@ -12,7 +12,7 @@ function LogoAndBrandName({ size = 1 }) {
       style={{ transform: `scale(${size})` }}
     >
       <img src={logo} alt="work-erp" />
-      <BrandName></BrandName>
+      {/* <BrandName></BrandName> */}
     </Link>
   );
 }
