@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import TaskService from "@services/project-module-service/task.service";
 import ProjectService from "@services/project-module-service/project.service";
 import {
@@ -19,10 +18,11 @@ import {
     Box,
     List,
     ListItem,
-    ListItemText,
     IconButton,
     ToggleButton,
     ToggleButtonGroup,
+    Divider,
+    Chip,
 } from "@mui/material";
 import {
     Assignment,
@@ -31,11 +31,14 @@ import {
     Delete,
     ViewList,
     ViewKanban,
+    CalendarToday,
 } from "@mui/icons-material";
 import useFormValidation from "@hooks/useForm";
 import { taskSchema } from "@validations/projectSchema";
 import toast from "@hooks/toast";
 import useEmployee from "@hooks/useEmployee";
+import { Link } from "react-router-dom";
+import { formatDateForBackend, formatDateForInput } from "@tools/date.tool";
 import "./project-tasks.scss";
 
 function ProjectTasks({ projectId }) {
@@ -47,6 +50,7 @@ function ProjectTasks({ projectId }) {
     const [editTask, setEditTask] = useState(null);
     const [viewMode, setViewMode] = useState("kanban");
     const [members, setMembers] = useState([]);
+    const [deleteConfirm, setDeleteConfirm] = useState({ open: false, taskId: null });
 
     const {
         data,
@@ -87,18 +91,6 @@ function ProjectTasks({ projectId }) {
         setMembers(res.data.members || []);
     };
 
-    const formatDateForInput = (dateString) => {
-        if (!dateString) return "";
-        const date = new Date(dateString);
-        return isNaN(date) ? "" : date.toISOString().split("T")[0]; // Trả về YYYY-MM-DD hoặc rỗng nếu không hợp lệ
-    };
-
-    const formatDateForBackend = (dateString) => {
-        if (!dateString) return null; // Gửi null nếu không có ngày
-        const date = new Date(dateString);
-        return isNaN(date) ? null : date.toISOString(); // Trả về ISO 8601 đầy đủ hoặc null nếu không hợp lệ
-    };
-
     const handleCreateTask = async () => {
         if (!validate()) return;
         startSubmitting();
@@ -106,7 +98,7 @@ function ProjectTasks({ projectId }) {
             ...data,
             dueDate: formatDateForBackend(data.dueDate), // Xử lý an toàn trước khi gửi BE
         };
-        const [res, err] = await TaskService.createTask(projectId, taskData);
+        const [, err] = await TaskService.createTask(projectId, taskData);
         finishSubmitting();
         if (err) return toast.error(err.code);
         toast.success("Task created successfully");
@@ -128,9 +120,9 @@ function ProjectTasks({ projectId }) {
         startSubmitting();
         const taskData = {
             ...data,
-            dueDate: formatDateForBackend(data.dueDate), // Xử lý an toàn trước khi gửi BE
+            dueDate: formatDateForBackend(data.dueDate),
         };
-        const [res, err] = await TaskService.updateTask(editTask.id, taskData);
+        const [, err] = await TaskService.updateTask(editTask.id, taskData);
         finishSubmitting();
         if (err) return toast.error(err.code);
         toast.success("Task updated successfully");
@@ -139,9 +131,10 @@ function ProjectTasks({ projectId }) {
     };
 
     const handleDeleteTask = async (taskId) => {
-        const [res, err] = await TaskService.deleteTask(taskId);
+        setDeleteConfirm({ open: false, taskId: null });
+        const [, err] = await TaskService.deleteTask(taskId);
         if (err) return toast.error(err.code);
-        toast.success("Task deleted successfully");
+        toast.success("Xóa task thành công");
         fetchTasks();
     };
 
@@ -151,169 +144,270 @@ function ProjectTasks({ projectId }) {
 
     const renderKanbanView = () => {
         const statusColumns = {
-            TO_DO: [],
-            IN_PROGRESS: [],
-            DONE: [],
+            TO_DO: { title: 'To Do', color: 'info.light' },
+            IN_PROGRESS: { title: 'In Progress', color: 'warning.light' },
+            DONE: { title: 'Done', color: 'success.light' }
         };
 
-        tasks.forEach((task) => {
-            statusColumns[task.status].push(task);
-        });
+        const getPriorityColor = (priority) => {
+            switch (priority) {
+                case 'HIGH': return 'error.main';
+                case 'MEDIUM': return 'warning.main';
+                case 'LOW': return 'success.main';
+                default: return 'text.secondary';
+            }
+        };
 
         return (
-            <Grid container spacing={2}>
-                {Object.entries(statusColumns).map(
-                    ([status, tasksInStatus]) => (
-                        <Grid item xs={12} md={4} key={status}>
-                            <Typography variant="h6" gutterBottom>
-                                {status.replace("_", " ")}
+            <Grid container spacing={3}>
+                {Object.entries(statusColumns).map(([status, { title, color }]) => (
+                    <Grid item xs={12} md={4} key={status}>
+                        <Box
+                            sx={{
+                                bgcolor: color,
+                                borderRadius: 2,
+                                p: 2,
+                                minHeight: 'calc(100vh - 250px)',
+                            }}
+                        >
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    mb: 2,
+                                    fontWeight: 'medium',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1
+                                }}
+                            >
+                                {title}
+                                <Chip
+                                    label={tasks.filter(t => t.status === status).length}
+                                    size="small"
+                                    sx={{ ml: 1 }}
+                                />
                             </Typography>
-                            <Box sx={{ minHeight: 200 }}>
-                                {tasksInStatus.map((task) => (
+
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {tasks.filter(task => task.status === status).map((task) => (
                                     <Card
-                                        className="task-card"
                                         key={task.id}
-                                        sx={{ mb: 2 }}
+                                        elevation={1}
+                                        sx={{
+                                            '&:hover': {
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: 3,
+                                            },
+                                            transition: 'all 0.2s'
+                                        }}
                                     >
-                                        <CardContent>
-                                            <Typography variant="h6">
-                                                <Assignment
-                                                    sx={{
-                                                        verticalAlign: "middle",
-                                                        mr: 1,
-                                                    }}
-                                                />
+                                        <CardContent sx={{ pb: 1 }}>
+                                            <Typography variant="h6" sx={{ fontSize: '1rem', mb: 1 }}>
+                                                <Assignment sx={{ fontSize: 20, mr: 1, verticalAlign: 'text-bottom' }} />
                                                 {task.title}
                                             </Typography>
-                                            <Typography>
-                                                Ưu tiên: {task.priority}
-                                            </Typography>
-                                            <Typography>
-                                                Hạn:{" "}
-                                                {formatDateForInput(
-                                                    task.dueDate,
-                                                ) || "N/A"}
-                                            </Typography>
-                                            <Typography>
-                                                Người thực hiện:{" "}
-                                                {task?.assignees
-                                                    ?.map(
-                                                        (a) =>
-                                                            employeeInfo(a)
-                                                                ?.name || a,
-                                                    )
-                                                    .join(", ") || "N/A"}
-                                            </Typography>
+
+                                            <Box sx={{ mb: 2, color: 'text.secondary', fontSize: '0.875rem' }}>
+                                                {task.description}
+                                            </Box>
+
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                                                <Chip
+                                                    label={task.priority}
+                                                    size="small"
+                                                    sx={{
+                                                        bgcolor: getPriorityColor(task.priority),
+                                                        color: 'white',
+                                                        fontWeight: 'medium'
+                                                    }}
+                                                />
+                                                {task.dueDate && (
+                                                    <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        <CalendarToday sx={{ fontSize: 16, mr: 0.5 }} />
+                                                        {formatDateForInput(task.dueDate)}
+                                                    </Typography>
+                                                )}
+                                            </Box>
+
+                                            {task.assignees?.length > 0 && (
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                    {task.assignees.map((assignee) => (
+                                                        <Chip
+                                                            key={assignee}
+                                                            label={employeeInfo(assignee)?.name}
+                                                            size="small"
+                                                            variant="outlined"
+                                                            sx={{ maxWidth: 120 }}
+                                                        />
+                                                    )).slice(0, 2)}
+                                                    {task.assignees.length > 2 && (
+                                                        <Chip
+                                                            label={`+${task.assignees.length - 2}`}
+                                                            size="small"
+                                                            variant="outlined"
+                                                        />
+                                                    )}
+                                                </Box>
+                                            )}
                                         </CardContent>
-                                        <CardActions>
+
+                                        <CardActions sx={{ px: 2, py: 1, borderTop: 1, borderColor: 'divider' }}>
                                             <Button
                                                 size="small"
-                                                href={`/working/project/task/${task.id}`}
+                                                component={Link}
+                                                to={`/working/project/task/${task.id}`}
+                                                sx={{ mr: 'auto' }}
                                             >
-                                                View
+                                                Chi tiết
                                             </Button>
-                                            <Button
+                                            <IconButton size="small" onClick={() => {
+                                                setValues({
+                                                    title: task.title,
+                                                    description: task.description || "",
+                                                    projectId,
+                                                    assignees: task.assignees || [],
+                                                    priority: task.priority,
+                                                    status: task.status,
+                                                    dueDate: formatDateForInput(task.dueDate),
+                                                });
+                                                setEditTask(task);
+                                            }}>
+                                                <Edit fontSize="small" />
+                                            </IconButton>
+                                            <IconButton
                                                 size="small"
-                                                startIcon={<Edit />}
-                                                onClick={() => {
-                                                    setValues({
-                                                        title: task.title,
-                                                        description:
-                                                            task.description ||
-                                                            "",
-                                                        projectId,
-                                                        assignees:
-                                                            task.assignees ||
-                                                            [],
-                                                        priority: task.priority,
-                                                        status: task.status,
-                                                        dueDate:
-                                                            formatDateForInput(
-                                                                task.dueDate,
-                                                            ),
-                                                    });
-                                                    setEditTask(task);
-                                                }}
+                                                onClick={() => setDeleteConfirm({ open: true, taskId: task.id })}
                                             >
-                                                Edit
-                                            </Button>
-                                            <Button
-                                                size="small"
-                                                startIcon={<Delete />}
-                                                onClick={() =>
-                                                    handleDeleteTask(task.id)
-                                                }
-                                            >
-                                                Delete
-                                            </Button>
+                                                <Delete fontSize="small" />
+                                            </IconButton>
                                         </CardActions>
                                     </Card>
                                 ))}
                             </Box>
-                        </Grid>
-                    ),
-                )}
+                        </Box>
+                    </Grid>
+                ))}
             </Grid>
         );
     };
 
     const renderListView = () => (
-        <List>
-            {tasks.map((task) => (
-                <ListItem key={task.id} className="task-list-item">
-                    <ListItemText
-                        primary={
-                            <Typography variant="h6">
-                                <Assignment
-                                    sx={{ verticalAlign: "middle", mr: 1 }}
-                                />
-                                {task.title}
-                            </Typography>
-                        }
-                        secondary={
-                            <>
-                                <Typography>
-                                    Trạng thái: {task.status}
-                                </Typography>
-                                <Typography>
-                                    Ưu tiên: {task.priority}
-                                </Typography>
-                                <Typography>
-                                    Hạn:{" "}
-                                    {formatDateForInput(task.dueDate) || "N/A"}
-                                </Typography>
-                                <Typography>
-                                    Người thực hiện:{" "}
-                                    {task?.assignees
-                                        ?.map((a) => employeeInfo(a)?.name || a)
-                                        .join(", ") || "N/A"}
-                                </Typography>
-                            </>
-                        }
-                    />
-                    <IconButton href={`/working/project/task/${task.id}`}>
-                        View
-                    </IconButton>
-                    <IconButton
-                        onClick={() => {
-                            setValues({
-                                title: task.title,
-                                description: task.description || "",
-                                projectId,
-                                assignees: task.assignees || [],
-                                priority: task.priority,
-                                status: task.status,
-                                dueDate: formatDateForInput(task.dueDate),
-                            });
-                            setEditTask(task);
+        <List sx={{ bgcolor: 'background.paper', borderRadius: 2, p: 0 }}>
+            {tasks.map((task, index) => (
+                <>
+                    <ListItem
+                        key={task.id}
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'stretch', sm: 'center' },
+                            gap: 2,
+                            py: 2,
+                            px: 3,
+                            '&:hover': {
+                                bgcolor: 'action.hover'
+                            }
                         }}
                     >
-                        <Edit />
-                    </IconButton>
-                    <IconButton onClick={() => handleDeleteTask(task.id)}>
-                        <Delete />
-                    </IconButton>
-                </ListItem>
+                        <Box sx={{ flex: 1 }}>
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    fontSize: '1rem',
+                                    mb: 1
+                                }}
+                            >
+                                <Assignment sx={{ mr: 1 }} />
+                                {task.title}
+                            </Typography>
+
+                            <Grid container spacing={2} sx={{ color: 'text.secondary', mb: 1 }}>
+                                <Grid item xs={12} sm={6}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <Chip
+                                            label={task.status}
+                                            size="small"
+                                            color={
+                                                task.status === 'DONE' ? 'success' :
+                                                    task.status === 'IN_PROGRESS' ? 'warning' : 'info'
+                                            }
+                                        />
+                                        <Chip
+                                            label={task.priority}
+                                            size="small"
+                                            color={
+                                                task.priority === 'HIGH' ? 'error' :
+                                                    task.priority === 'MEDIUM' ? 'warning' : 'success'
+                                            }
+                                        />
+                                    </Box>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                    <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <CalendarToday sx={{ fontSize: 16, mr: 1 }} />
+                                        {formatDateForInput(task.dueDate) || "Chưa có hạn"}
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+
+                            {task.assignees?.length > 0 && (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                    {task.assignees.map(assignee => (
+                                        <Chip
+                                            key={assignee}
+                                            label={employeeInfo(assignee)?.name}
+                                            size="small"
+                                            variant="outlined"
+                                        />
+                                    ))}
+                                </Box>
+                            )}
+                        </Box>
+
+                        <Box sx={{
+                            display: 'flex',
+                            gap: 1,
+                            alignItems: 'center',
+                            alignSelf: { xs: 'stretch', sm: 'center' }
+                        }}>
+                            <Button
+                                component={Link}
+                                to={`/working/project/task/${task.id}`}
+                                variant="outlined"
+                                size="small"
+                                sx={{ minWidth: 100 }}
+                            >
+                                Chi tiết
+                            </Button>
+                            <IconButton
+                                size="small"
+                                onClick={() => {
+                                    setValues({
+                                        title: task.title,
+                                        description: task.description || "",
+                                        projectId,
+                                        assignees: task.assignees || [],
+                                        priority: task.priority,
+                                        status: task.status,
+                                        dueDate: formatDateForInput(task.dueDate),
+                                    });
+                                    setEditTask(task);
+                                }}
+                            >
+                                <Edit />
+                            </IconButton>
+                            <IconButton
+                                size="small"
+                                onClick={() => setDeleteConfirm({ open: true, taskId: task.id })}
+                            >
+                                <Delete />
+                            </IconButton>
+                        </Box>
+                    </ListItem>
+                    {index < tasks.length - 1 && <Divider />}
+                </>
             ))}
         </List>
     );
@@ -354,7 +448,7 @@ function ProjectTasks({ projectId }) {
                     onClick={() => setOpenTask(true)}
                     sx={{ ml: 2 }}
                 >
-                    New Task
+                    Task mới
                 </Button>
             </div>
 
@@ -426,7 +520,7 @@ function ProjectTasks({ projectId }) {
                         <MenuItem value="MEDIUM">Medium</MenuItem>
                         <MenuItem value="HIGH">High</MenuItem>
                     </Select>
-                    <Select
+                    {/* <Select
                         fullWidth
                         value={data.status}
                         onChange={(e) => handleChange("status", e.target.value)}
@@ -435,7 +529,7 @@ function ProjectTasks({ projectId }) {
                         <MenuItem value="TO_DO">To Do</MenuItem>
                         <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
                         <MenuItem value="DONE">Done</MenuItem>
-                    </Select>
+                    </Select> */}
                     <TextField
                         fullWidth
                         label="Hạn"
@@ -464,8 +558,44 @@ function ProjectTasks({ projectId }) {
                         {isSubmitting
                             ? "Đang xử lý..."
                             : editTask
-                            ? "Cập nhật"
-                            : "Tạo"}
+                                ? "Cập nhật"
+                                : "Tạo"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Remove Task Dialog */}
+            <Dialog
+                open={deleteConfirm.open}
+                onClose={() => setDeleteConfirm({ open: false, taskId: null })}
+            >
+                <DialogTitle>
+                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'error.main' }}>
+                        <Delete sx={{ mr: 1 }} />
+                        Xác nhận xóa
+                    </Box>
+                </DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Bạn có chắc chắn muốn xóa task này không?
+                        Hành động này không thể hoàn tác.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ p: 2, gap: 1 }}>
+                    <Button
+                        onClick={() => setDeleteConfirm({ open: false, taskId: null })}
+                        variant="outlined"
+                        color="inherit"
+                    >
+                        Hủy
+                    </Button>
+                    <Button
+                        onClick={() => handleDeleteTask(deleteConfirm.taskId)}
+                        variant="contained"
+                        color="error"
+                        startIcon={<Delete />}
+                    >
+                        Xóa
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -19,6 +19,12 @@ const ProjectService = {
     getMyProjects: () => service(axios.get(`/project-app/projects/me`)),
     getProjectById: (projectId) =>
         service(axios.get(`/project-app/projects/${projectId}`)),
+    updateMemberRole: (projectId, employeeId, role) =>
+        service(
+            axios.put(
+                `/project-app/projects/${projectId}/members/${employeeId}/${role}`,
+            ),
+        ),
 };
 
 export default ProjectService;
