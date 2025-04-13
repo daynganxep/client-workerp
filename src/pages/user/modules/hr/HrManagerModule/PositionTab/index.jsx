@@ -12,6 +12,8 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    Typography,
+    Box,
 } from "@mui/material";
 import PositionService from "@services/hr-module-service/position.service";
 import useFormValidation from "@hooks/useForm";
@@ -75,14 +77,23 @@ function PositionTab() {
 
     return (
         <div className="position-tab">
-            <h3>Quản lý vị trí</h3>
-            <Button
-                variant="contained"
-                onClick={() => setOpenCreate(true)}
-                sx={{ mb: 2 }}
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2
+                }}
             >
-                Thêm vị trí
-            </Button>
+                <Typography variant="h6">Quản lý vị trí</Typography>
+                <Button
+                    variant="contained"
+                    onClick={() => setOpenCreate(true)}
+                >
+                    Thêm vị trí
+                </Button>
+            </Box>
+
             <Table>
                 <TableHead>
                     <TableRow>
@@ -170,8 +181,8 @@ function PositionTab() {
                         {isSubmitting
                             ? "Đang xử lý..."
                             : editingId
-                            ? "Cập nhật"
-                            : "Thêm"}
+                                ? "Cập nhật"
+                                : "Thêm"}
                     </Button>
                 </DialogActions>
             </Dialog>

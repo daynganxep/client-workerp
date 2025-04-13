@@ -3,7 +3,7 @@ import { setLS } from "@tools/localStorage.tool";
 
 import authReducer from "./slices/auth.slice";
 import { settingReducer } from "./slices/setting.slice";
-import { companyReducer } from "./slices/company.slide";
+import { companyReducer } from "./slices/company.slice";
 
 const localStorageMiddleware = (store) => (next) => (action) => {
     const result = next(action);

@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import CompanyService from '@services/compay-module-service/company.service';
 import EmployeeService from '@services/hr-module-service/employee.service';
 import CompanyModuleRolesService from '@services/compay-module-service/company-module-roles.service';
-import { companyActions } from '@redux/slices/company.slide';
+import { companyActions } from '@redux/slices/company.slice';
 import CreateCompanyDialog from './CreateCompanyDialog';
 import { stringToColor } from '@tools/string.tool';
 import './.scss';

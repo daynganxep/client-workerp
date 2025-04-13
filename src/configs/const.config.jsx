@@ -1,9 +1,9 @@
 import env from "@configs/env.config";
-import BusinessIcon from "@mui/icons-material/Business";
-import PeopleIcon from "@mui/icons-material/People";
-import ChatIcon from "@mui/icons-material/Chat";
-import AssignmentIcon from "@mui/icons-material/Assignment";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import ApartmentIcon from '@mui/icons-material/Apartment';
+import GroupsIcon from '@mui/icons-material/Groups';
+import ForumIcon from '@mui/icons-material/Forum';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 export const ROUTE_TYPES = {
     PUBLIC: "PUBLIC",
@@ -47,14 +47,30 @@ export const MODULE_ROLES = {
 };
 
 export const MODULE_OPTIONS_MAP = {
-    COMPANY: { code: "COMPANY", label: "Công ty", icon: <BusinessIcon /> },
-    HR: { code: "HR", label: "Nhân sự", icon: <PeopleIcon /> },
-    CHAT: { code: "CHAT", label: "Trò chuyện", icon: <ChatIcon /> },
-    PROJECT: { code: "PROJECT", label: "Dự án", icon: <AssignmentIcon /> },
+    COMPANY: {
+        code: "COMPANY",
+        label: "Công ty",
+        icon: <ApartmentIcon />
+    },
+    HR: {
+        code: "HR",
+        label: "Nhân sự",
+        icon: <GroupsIcon />
+    },
+    CHAT: {
+        code: "CHAT",
+        label: "Thảo luận",
+        icon: <ForumIcon />
+    },
+    PROJECT: {
+        code: "PROJECT",
+        label: "Dự án",
+        icon: <AccountTreeIcon />
+    },
     TIMEKEEPING: {
         code: "TIMEKEEPING",
         label: "Chấm công",
-        icon: <AccessTimeIcon />,
+        icon: <CalendarMonthIcon />,
     },
 };
 

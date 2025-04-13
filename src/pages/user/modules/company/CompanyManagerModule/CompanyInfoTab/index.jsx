@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     TextField,
     Button,
-    Typography,
     Stack,
     Alert,
     Switch,
@@ -14,7 +13,7 @@ import CompanyService from "@services/compay-module-service/company.service";
 import useMessageByApiCode from "@hooks/useMessageByApiCode";
 import useFormValidation from "@hooks/useForm";
 import { updateCompanyInforSchema } from "@validations/companySchema";
-import { companyActions } from "@redux/slices/company.slide";
+import { companyActions } from "@redux/slices/company.slice";
 import "./.scss";
 
 function CompanyInfoTab() {
@@ -45,7 +44,7 @@ function CompanyInfoTab() {
         handleChange("domain", domain || "");
         handleChange("avatar", avatar || "");
         handleChange("active", active !== undefined ? active : true);
-    }, [name, domain, avatar, active]);
+    }, [name, domain, avatar, active, handleChange]);
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -68,10 +67,6 @@ function CompanyInfoTab() {
 
     return (
         <div className="company-info-tab">
-            <Typography variant="h5" gutterBottom>
-                Quản lý thông tin công ty
-            </Typography>
-
             <Stack spacing={3}>
                 {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
 

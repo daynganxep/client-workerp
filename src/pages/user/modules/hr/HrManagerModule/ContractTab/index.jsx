@@ -14,6 +14,8 @@ import {
     DialogActions,
     MenuItem,
     Select,
+    Box,
+    Typography,
 } from "@mui/material";
 import ContractService from "@services/hr-module-service/contract.service";
 import EmployeeService from "@services/hr-module-service/employee.service";
@@ -101,28 +103,37 @@ function ContractTab() {
 
     return (
         <div className="contract-tab">
-            <h3>Quản lý hợp đồng</h3>
-            <Select
-                fullWidth
-                value={selectedEmployeeId}
-                onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                displayEmpty
-                sx={{ mb: 2, maxWidth: 300 }}
+            <Box
+                sx={{
+
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'start',
+                    mb: 2
+                }}
             >
-                <MenuItem value="">Chọn nhân viên</MenuItem>
-                {employees.map((emp) => (
-                    <MenuItem key={emp.id} value={emp.id}>
-                        {emp.name}
-                    </MenuItem>
-                ))}
-            </Select>
-            <Button
-                variant="contained"
-                onClick={() => setOpenCreate(true)}
-                sx={{ mb: 2 }}
-            >
-                Thêm hợp đồng
-            </Button>
+                <Typography variant="h6">Quản lý hợp đồng</Typography>
+                <Select
+                    fullWidth
+                    value={selectedEmployeeId}
+                    onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                    displayEmpty
+                    sx={{ maxWidth: 300 }}
+                >
+                    <MenuItem value="">Chọn nhân viên</MenuItem>
+                    {employees.map((emp) => (
+                        <MenuItem key={emp.id} value={emp.id}>
+                            {emp.name}
+                        </MenuItem>
+                    ))}
+                </Select>
+                <Button
+                    variant="contained"
+                    onClick={() => setOpenCreate(true)}
+                >
+                    Thêm hợp đồng
+                </Button>
+            </Box>
             <Table>
                 <TableHead>
                     <TableRow>
@@ -151,8 +162,8 @@ function ContractTab() {
                             <TableCell>
                                 {contract.endDate
                                     ? new Date(
-                                          contract.endDate,
-                                      ).toLocaleDateString()
+                                        contract.endDate,
+                                    ).toLocaleDateString()
                                     : "N/A"}
                             </TableCell>
                             <TableCell>{contract.type}</TableCell>
@@ -284,8 +295,8 @@ function ContractTab() {
                         {isSubmitting
                             ? "Đang xử lý..."
                             : editingId
-                            ? "Cập nhật"
-                            : "Thêm"}
+                                ? "Cập nhật"
+                                : "Thêm"}
                     </Button>
                 </DialogActions>
             </Dialog>

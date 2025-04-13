@@ -134,7 +134,6 @@ function CompanyModuleRolesTab() {
 
     return (
         <div className="company-roles-tab">
-            <h3>Quản lý Company Module Role</h3>
             <div style={{ height: 400, width: "100%" }}>
                 <DataGrid
                     rows={rows}
@@ -150,7 +149,7 @@ function CompanyModuleRolesTab() {
                 color="primary"
                 sx={{ mt: 2 }}
             >
-                Save Changes
+                Lưu thay đổi
             </Button>
         </div>
     );

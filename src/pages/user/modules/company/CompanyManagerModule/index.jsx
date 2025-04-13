@@ -1,19 +1,14 @@
-import ModuleTabLayout from "@layouts/user/ModuleTabLayout";
-import "./.scss";
-import CompanyModuleRolesTab from "./CompanyModuleRolesTab";
-import CompanyInfoTab from "./CompanyInfoTab";
+import CompanyInfoTab from './CompanyInfoTab';
+import CompanyModuleRolesTab from './CompanyModuleRolesTab';
+import TabNavigation from '@layouts/user/WorkingLayout/TabNavigation';
 
-function CompanyManagerModule() {
+const CompanyManagerModule = () => {
     const tabs = [
-        { label: "Quản lý quyền", content: <CompanyModuleRolesTab /> },
-        { label: "Thông tin công ty", content: <CompanyInfoTab /> },
+        { label: 'Phân quyền', value: 'roles', element: <CompanyModuleRolesTab /> },
+        { label: 'Thông tin', value: 'info', element: <CompanyInfoTab /> },
     ];
+    const basePath = `/working/company/manager`;
 
-    return (
-        <div className="company-manager-module">
-            <ModuleTabLayout tabs={tabs} />
-        </div>
-    );
-}
-
+    return <TabNavigation tabs={tabs} basePath={basePath} />;
+};
 export default CompanyManagerModule;

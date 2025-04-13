@@ -12,6 +12,8 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
+    Box,
+    Typography,
 } from "@mui/material";
 import DepartmentService from "@services/hr-module-service/department.service";
 import useFormValidation from "@hooks/useForm";
@@ -77,14 +79,22 @@ function DepartmentTab() {
 
     return (
         <div className="department-tab">
-            <h3>Quản lý phòng ban</h3>
-            <Button
-                variant="contained"
-                onClick={() => setOpenCreate(true)}
-                sx={{ mb: 2 }}
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2
+                }}
             >
-                Thêm phòng ban
-            </Button>
+                <Typography variant="h6">Danh sách phòng ban</Typography>
+                <Button
+                    variant="contained"
+                    onClick={() => setOpenCreate(true)}
+                >
+                    Thêm phòng ban
+                </Button>
+            </Box>
             <Table>
                 <TableHead>
                     <TableRow>
@@ -172,8 +182,8 @@ function DepartmentTab() {
                         {isSubmitting
                             ? "Đang xử lý..."
                             : editingId
-                            ? "Cập nhật"
-                            : "Thêm"}
+                                ? "Cập nhật"
+                                : "Thêm"}
                     </Button>
                 </DialogActions>
             </Dialog>

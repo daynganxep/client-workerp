@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import {
     Box,
     Drawer,
@@ -11,13 +11,12 @@ import {
     ListItemIcon,
     ListItemText,
     Breadcrumbs,
-    Tabs,
-    Tab,
     Container,
     Avatar,
     useTheme,
     useMediaQuery,
     Tooltip,
+    Button,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -26,9 +25,9 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { MODULE_OPTIONS_MAP } from '@configs/const.config';
 import CompanyModuleRolesService from '@services/compay-module-service/company-module-roles.service';
 import EmployeeService from '@services/hr-module-service/employee.service';
-import { companyActions } from '@redux/slices/company.slide';
-import '.scss';
 import ThemeToggleButton from '@components/ThemeToggleButton';
+import { companyActions } from '@redux/slices/company.slice';
+import '.scss';
 
 function WorkingLayout() {
     const theme = useTheme();
@@ -38,11 +37,10 @@ function WorkingLayout() {
         name,
         companyModuleRoles: modules,
     } = useSelector((state) => state.company);
-    const { moduleCode, role } = useParams();
+    const location = useLocation();
+    const [, , moduleCode, role, tab] = location.pathname.split("/");
     const [isSidebarOpen, setIsSidebarOpen] = useState(!isMobile);
     const dispatch = useDispatch();
-    const location = useLocation();
-
 
     // Module và role hiện tại
     const currentModule = modules.find(
@@ -81,27 +79,22 @@ function WorkingLayout() {
         }
     }, [isMobile]);
 
-    useEffect(() => {
-        // Check for duplicate role in URL
-        const pathParts = location.pathname.split('/');
-        const lastTwo = pathParts.slice(-2);
-
-        if (lastTwo[0] === lastTwo[1]) {
-            // Remove duplicate by navigating to correct path
-            const newPath = pathParts.slice(0, -1).join('/');
-            navigate(newPath, { replace: true });
-        }
-    }, [location.pathname]);
-
-
     // Breadcrumbs
     const breadcrumbs = [
         <Typography
             key="module"
             sx={{ color: theme.palette.text.primary }}
         >
-            {MODULE_OPTIONS_MAP[moduleCode?.toUpperCase()]?.label || 'Working'}
+            {moduleCode?.charAt(0).toUpperCase() + moduleCode?.slice(1).replace('-', ' ') || 'Working'}
         </Typography>,
+        tab && (
+            <Typography
+                key="tab"
+                sx={{ color: theme.palette.text.primary }}
+            >
+                {tab.charAt(0).toUpperCase() + tab.slice(1).replace('-', ' ')}
+            </Typography>
+        ),
     ];
 
     // Drawer content
@@ -111,10 +104,10 @@ function WorkingLayout() {
                 display: 'flex',
                 flexDirection: 'column',
                 height: '100%',
-                width: '100%', // Thêm width 100%
+                width: '100%',
                 bgcolor: theme.palette.background.paper,
                 borderRadius: theme.shape.borderRadius,
-                overflow: 'hidden', // Thêm overflow hidden
+                overflow: 'hidden',
             }}
         >
             {/* Sidebar header */}
@@ -149,77 +142,75 @@ function WorkingLayout() {
             </Box>
 
             {/* Module list */}
-            < List
+            <List
                 sx={{
                     flexGrow: 1,
-                    px: isSidebarOpen ? 1.5 : 1, // Giảm padding khi thu nhỏ
+                    px: isSidebarOpen ? 1.5 : 1,
                     py: 1,
                     overflow: 'hidden',
                     '& .MuiListItem-root': {
-                        width: isSidebarOpen ? 'auto' : '40px', // Cố định width khi thu nhỏ
-                        height: isSidebarOpen ? 'auto' : '40px', // Cố định height khi thu nhỏ
-                        mx: isSidebarOpen ? 0 : 'auto', // Căn giữa item khi thu nhỏ
-                    }
+                        width: isSidebarOpen ? 'auto' : '40px',
+                        height: isSidebarOpen ? 'auto' : '40px',
+                        mx: isSidebarOpen ? 0 : 'auto',
+                    },
                 }}
             >
-                {
-                    modules.map((module) => {
-                        const moduleConfig = MODULE_OPTIONS_MAP[module.moduleCode.toUpperCase()];
-                        const isActive = module.moduleCode.toLowerCase() === moduleCode?.toLowerCase();
-                        return (
-                            <ListItem
-                                key={module.id}
-                                button
-                                component={Link}
-                                to={`/working/${module.moduleCode.toLowerCase()}/${module.moduleRoles[0].toLowerCase()}`} // Use module's roles directly
+                {modules.map((module) => {
+                    const moduleConfig = MODULE_OPTIONS_MAP[module.moduleCode.toUpperCase()];
+                    const isActive = module.moduleCode.toLowerCase() === moduleCode?.toLowerCase();
+                    return (
+                        <ListItem
+                            key={module.id}
+                            button
+                            component={Link}
+                            to={`/working/${module.moduleCode.toLowerCase()}/${module.moduleRoles[0].toLowerCase()}`}
+                            sx={{
+                                borderRadius: theme.shape.borderRadius,
+                                color: theme.palette.text.primary,
+                                mb: 1,
+                                transition: 'all 0.3s ease',
+                                bgcolor: isActive ? theme.palette.primary.main : 'transparent',
+                                p: isSidebarOpen ? undefined : '12px',
+                                justifyContent: 'center',
+                                '&:hover': {
+                                    bgcolor: isActive
+                                        ? theme.palette.primary.dark
+                                        : theme.palette.action.hover,
+                                    transform: 'scale(1.02)',
+                                },
+                            }}
+                        >
+                            <ListItemIcon
                                 sx={{
-                                    borderRadius: theme.shape.borderRadius,
-                                    color: theme.palette.text.primary,
-                                    mb: 1,
-                                    transition: 'all 0.3s ease',
-                                    bgcolor: isActive ? theme.palette.primary.main : 'transparent',
-                                    p: isSidebarOpen ? undefined : '12px', // Điều chỉnh padding khi thu nhỏ
-                                    justifyContent: 'center', // Căn giữa khi thu nhỏ
-                                    '&:hover': {
-                                        bgcolor: isActive
-                                            ? theme.palette.primary.dark
-                                            : theme.palette.action.hover,
-                                        transform: 'scale(1.02)',
-                                    },
+                                    color: isActive
+                                        ? theme.palette.primary.contrastText
+                                        : theme.palette.text.primary,
+                                    minWidth: isSidebarOpen ? 40 : 'auto',
+                                    mr: isSidebarOpen ? undefined : 0,
+                                    justifyContent: 'center',
                                 }}
                             >
-                                <ListItemIcon
-                                    sx={{
+                                {moduleConfig?.icon}
+                            </ListItemIcon>
+                            {isSidebarOpen && (
+                                <ListItemText
+                                    primary={moduleConfig?.label}
+                                    primaryTypographyProps={{
                                         color: isActive
                                             ? theme.palette.primary.contrastText
                                             : theme.palette.text.primary,
-                                        minWidth: isSidebarOpen ? 40 : 'auto', // Bỏ minWidth khi thu nhỏ
-                                        mr: isSidebarOpen ? undefined : 0, // Bỏ margin khi thu nhỏ
-                                        justifyContent: 'center', // Căn giữa icon
                                     }}
-                                >
-                                    {moduleConfig?.icon}
-                                </ListItemIcon>
-                                {isSidebarOpen && (
-                                    <ListItemText
-                                        primary={moduleConfig?.label}
-                                        primaryTypographyProps={{
-                                            color: isActive
-                                                ? theme.palette.primary.contrastText
-                                                : theme.palette.text.primary,
-                                        }}
-                                    />
-                                )}
-                            </ListItem>
-                        );
-                    })
-                }
-            </List >
+                                />
+                            )}
+                        </ListItem>
+                    );
+                })}
+            </List>
 
             {/* Sidebar footer */}
-            < Box
+            <Box
                 sx={{
-                    px: 1.5, // Padding đồng nhất với List
+                    px: 1.5,
                     py: 2,
                     borderTop: `1px solid ${theme.palette.divider}`,
                     display: 'flex',
@@ -230,18 +221,12 @@ function WorkingLayout() {
                 <IconButton sx={{ color: theme.palette.text.primary }}>
                     <NotificationsIcon />
                 </IconButton>
-                {
-                    isSidebarOpen && (
-                        <ThemeToggleButton></ThemeToggleButton>
-                    )
-                }
-                {
-                    isSidebarOpen && (
-                        <Avatar alt="Employee Name" src="/path/to/avatar.jpg" />
-                    )
-                }
-            </Box >
-        </Box >
+                {isSidebarOpen && <ThemeToggleButton />}
+                {isSidebarOpen && (
+                    <Avatar alt="Employee Name" src="/path/to/avatar.jpg" />
+                )}
+            </Box>
+        </Box>
     );
 
     return (
@@ -287,55 +272,72 @@ function WorkingLayout() {
                         p: 2,
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 2,
+                        justifyContent: 'space-between',
                     }}
                 >
-                    <Breadcrumbs
-                        separator={<NavigateNextIcon fontSize="small" />}
-                        sx={{ color: theme.palette.text.primary }}
-                    >
-                        {breadcrumbs}
-                    </Breadcrumbs>
+                    {/* Left side - Breadcrumbs */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Breadcrumbs
+                            separator={<NavigateNextIcon fontSize="small" />}
+                            sx={{ color: theme.palette.text.primary }}
+                        >
+                            {breadcrumbs}
+                        </Breadcrumbs>
+                    </Box>
+
+                    {/* Right side - Role Switcher */}
                     {hasMultipleRoles && (
-                        <Tabs
-                            value={role?.toUpperCase() || moduleRoles[0]}
-                            indicatorColor="primary"
-                            textColor="primary"
+                        <Box
                             sx={{
-                                '& .MuiTabs-indicator': {
-                                    height: '4px',
-                                    borderRadius: '4px 4px 0 0',
-                                    transition: 'all 0.3s ease',
-                                },
+                                display: 'flex',
+                                alignItems: 'center',
+                                bgcolor: theme.palette.action.hover,
+                                borderRadius: '20px',
+                                p: 0.5,
                             }}
                         >
-                            {moduleRoles.map((r) => (
-                                <Tab
-                                    key={r}
-                                    label={r}
-                                    value={r}
-                                    component={Link}
-                                    to={`/working/${moduleCode}/${r.toLowerCase()}`}
-                                    sx={{
-                                        borderRadius: theme.shape.borderRadius,
-                                        textTransform: 'none',
-                                        color: theme.palette.text.primary,
-                                        mx: 0.5,
-                                        transition: 'all 0.3s ease',
-                                        bgcolor:
-                                            role?.toUpperCase() === r
-                                                ? theme.palette.primary.main
-                                                : 'transparent',
-                                        '&:hover': {
-                                            transform: 'scale(1.05)',
-                                            bgcolor: role?.toUpperCase() === r
-                                                ? theme.palette.primary.dark
-                                                : theme.palette.action.hover,
-                                        },
-                                    }}
-                                />
-                            ))}
-                        </Tabs>
+                            {moduleRoles.map((r) => {
+                                const isActive = role?.toUpperCase() === r;
+                                return (
+                                    <Button
+                                        key={r}
+                                        component={Link}
+                                        to={`/working/${moduleCode}/${r.toLowerCase()}`}
+                                        variant={isActive ? 'contained' : 'text'}
+                                        size="small"
+                                        sx={{
+                                            minWidth: 100,
+                                            borderRadius: '16px',
+                                            textTransform: 'none',
+                                            px: 2,
+                                            py: 0.75,
+                                            color: isActive
+                                                ? theme.palette.primary.contrastText
+                                                : theme.palette.text.primary,
+                                            bgcolor: isActive ? theme.palette.primary.main : 'transparent',
+                                            '&:hover': {
+                                                bgcolor: isActive
+                                                    ? theme.palette.primary.dark
+                                                    : theme.palette.action.focus,
+                                                transform: 'translateY(-1px)',
+                                            },
+                                            transition: theme.transitions.create(
+                                                ['background-color', 'transform', 'box-shadow'],
+                                                { duration: 200 }
+                                            ),
+                                            ...(isActive && {
+                                                boxShadow: theme.shadows[2],
+                                                '&:hover': {
+                                                    boxShadow: theme.shadows[4],
+                                                },
+                                            }),
+                                        }}
+                                    >
+                                        {r == "MANAGER" ? "QUẢN LÝ" : "NGƯỜI DÙNG"}
+                                    </Button>
+                                );
+                            })}
+                        </Box>
                     )}
                 </Box>
 
@@ -347,9 +349,8 @@ function WorkingLayout() {
                         borderRadius: theme.shape.borderRadius,
                     }}
                 >
-                    <Container maxWidth="lg" sx={{ py: 3 }}>
-                        <Outlet />
-                        {/* Placeholder nếu Outlet trống */}
+                    <Container maxWidth="100%" sx={{ py: 3 }}>
+                        <Outlet context={{ moduleCode, role, tab }} />
                         {!Outlet && (
                             <Typography
                                 variant="h6"

@@ -14,6 +14,8 @@ import {
     DialogActions,
     Select,
     MenuItem,
+    Typography,
+    Box,
 } from "@mui/material";
 import EmployeeService from "@services/hr-module-service/employee.service";
 import DepartmentService from "@services/hr-module-service/department.service";
@@ -21,7 +23,6 @@ import PositionService from "@services/hr-module-service/position.service";
 import useFormValidation from "@hooks/useForm";
 import { employeeSchema, inviteEmployeeSchema } from "@validations/hrSchema";
 import toast from "@hooks/toast";
-import "./.scss";
 
 function EmployeeTab() {
     const { id: companyId } = useSelector((state) => state.company);
@@ -90,7 +91,7 @@ function EmployeeTab() {
     const handleInvite = async () => {
         if (!validateInvite()) return;
         startInviteSubmitting();
-        const [res, err] = await EmployeeService.inviteToCompany(inviteData);
+        const [, err] = await EmployeeService.inviteToCompany(inviteData);
         finishInviteSubmitting();
         if (err) return toast.error(err.code);
         toast.success("Invited employee successfully");
@@ -106,8 +107,7 @@ function EmployeeTab() {
             departmentId: editData.department || null,
             positionId: editData.position || null,
         };
-        console.log({ editingEmployee, requestData });
-        const [res, err] = await EmployeeService.updateEmployee(
+        const [, err] = await EmployeeService.updateEmployee(
             editingEmployee.id,
             requestData,
         );
@@ -134,14 +134,22 @@ function EmployeeTab() {
 
     return (
         <div className="employee-tab">
-            <h3>Danh sách nhân viên</h3>
-            <Button
-                variant="contained"
-                onClick={() => setOpenInvite(true)}
-                sx={{ mb: 2 }}
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2
+                }}
             >
-                Mời nhân viên
-            </Button>
+                <Typography variant="h6">Danh sách nhân viên</Typography>
+                <Button
+                    variant="contained"
+                    onClick={() => setOpenInvite(true)}
+                >
+                    Mời nhân viên mới
+                </Button>
+            </Box>
             <Table>
                 <TableHead>
                     <TableRow>
@@ -159,8 +167,8 @@ function EmployeeTab() {
                             <TableCell>
                                 {employee.dob
                                     ? new Date(
-                                          employee.dob,
-                                      ).toLocaleDateString()
+                                        employee.dob,
+                                    ).toLocaleDateString()
                                     : "N/A"}
                             </TableCell>
                             <TableCell>
@@ -187,7 +195,7 @@ function EmployeeTab() {
                 <DialogContent>
                     <TextField
                         fullWidth
-                        label="UserId"
+                        label="UserId nhân viên mới"
                         value={inviteData.userId}
                         onChange={(e) =>
                             handleInviteChange("userId", e.target.value)
