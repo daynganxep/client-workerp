@@ -1,55 +1,59 @@
 import { useState, useEffect } from "react";
+import { Typography, Grid, Box } from "@mui/material";
 import ProjectService from "@services/project-module-service/project.service";
-import { Typography, Card, CardContent, Grid, Button } from "@mui/material";
-import { Folder } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import ProjectCard from "@components/ProjectCard";
 import toast from "@hooks/toast";
 
 function UserProjectDashboard() {
     const [projects, setProjects] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchProjects = async () => {
+        setIsLoading(true);
+        const [res, err] = await ProjectService.getMyProjects();
+        setIsLoading(false);
+        if (err) return toast.error(err.code);
+        setProjects(res.data);
+    };
 
     useEffect(() => {
         fetchProjects();
     }, []);
 
-    const fetchProjects = async () => {
-        const [res, err] = await ProjectService.getMyProjects();
-        if (err) return toast.error(err.code);
-        setProjects(res.data);
-    };
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
 
     return (
-        <div>
-            <Typography variant="h5" gutterBottom>
-                Dự án đang tham gia
-            </Typography>
-            <Grid container spacing={2}>
+        <div className="user-project-dashboard">
+            <Box sx={{ mb: 3 }}>
+                <Typography variant="h5" sx={{ fontWeight: 'medium' }}>
+                    Dự án đang tham gia ({projects.length})
+                </Typography>
+            </Box>
+
+            <Grid container spacing={3}>
                 {projects.map((project) => (
                     <Grid item xs={12} sm={6} md={4} key={project.id}>
-                        <Card>
-                            <CardContent>
-                                <Typography variant="h6">
-                                    <Folder
-                                        sx={{ verticalAlign: "middle", mr: 1 }}
-                                    />
-                                    {project.name}
-                                </Typography>
-                                <Typography>
-                                    Trạng thái: {project.status}
-                                </Typography>
-                                <Button
-                                    variant="outlined"
-                                    component={Link}
-                                    to={`/working/project/${project.id}`}
-                                    sx={{ mt: 1 }}
-                                >
-                                    Xem chi tiết
-                                </Button>
-                            </CardContent>
-                        </Card>
+                        <ProjectCard
+                            project={project}
+                            linkPath={`/working/project/user/${project.id}`}
+                        />
                     </Grid>
                 ))}
             </Grid>
+
+            {projects.length === 0 && (
+                <Box sx={{
+                    textAlign: 'center',
+                    py: 8,
+                    color: 'text.secondary'
+                }}>
+                    <Typography>
+                        Bạn chưa tham gia dự án nào
+                    </Typography>
+                </Box>
+            )}
         </div>
     );
 }

@@ -25,6 +25,9 @@ import ProjectUserModule from '@pages/user/modules/project/ProjectUserModule';
 import ProjectDashboard from '@pages/user/modules/project/ProjectManagerModule/ProjectDashboard';
 import ProjectDetail from '@pages/user/modules/project/ProjectManagerModule/ProjectDetail';
 import TaskDetail from '@pages/user/modules/project/ProjectManagerModule/TaskDetail';
+import UserProjectDashboard from '@pages/user/modules/project/ProjectUserModule/UserProjectDashboard';
+import UserProjectDetail from '@pages/user/modules/project/ProjectUserModule/UserProjectDetail';
+import UserTaskDetail from '@pages/user/modules/project/ProjectUserModule/UserTaskDetail';
 
 const router = createBrowserRouter([
     {
@@ -102,8 +105,22 @@ const router = createBrowserRouter([
                         ]
                     },
                     {
-                        path: 'roject/user/:tab?',
+                        path: 'project/user/*',
                         element: <ProjectUserModule />,
+                        children: [
+                            {
+                                index: true,
+                                element: <UserProjectDashboard />,
+                            },
+                            {
+                                path: ":projectId/:tab?",
+                                element: <UserProjectDetail />,
+                            },
+                            {
+                                path: "task/:taskId",
+                                element: <UserTaskDetail />,
+                            }
+                        ]
                     },
                     {
                         path: 'hr/manager/:tab?',

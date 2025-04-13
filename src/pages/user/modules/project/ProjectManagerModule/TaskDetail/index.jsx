@@ -12,17 +12,23 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    Select,
-    MenuItem,
+    IconButton,
+    CardActions,
+    Box,
+    Stack,
+    Chip,
+    Avatar,
 } from "@mui/material";
 import {
     Assignment,
-    Comment,
     Add,
     Edit,
     Delete,
-    Link,
-    LinkOff,
+    CalendarToday,
+    People,
+    Send,
+    AccessTime,
+    Update,
 } from "@mui/icons-material";
 import useFormValidation from "@hooks/useForm";
 import toast from "@hooks/toast";
@@ -33,6 +39,9 @@ function TaskDetail() {
     const [task, setTask] = useState(null);
     const [openSubtask, setOpenSubtask] = useState(false);
     const [openEditComment, setOpenEditComment] = useState(null);
+    const [openDelete, setOpenDelete] = useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const {
         data: commentData,
@@ -44,6 +53,7 @@ function TaskDetail() {
         handleChange: handleSubtaskChange,
         resetForm: resetSubtaskForm,
     } = useFormValidation(null, { title: "", dueDate: "" });
+
 
     useEffect(() => {
         const fetchTask = async () => {
@@ -121,195 +131,298 @@ function TaskDetail() {
 
     return (
         <div className="task-detail">
-            <Card className="task-card">
+            {/* Header with Actions */}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                <Button
+                    startIcon={<Edit />}
+                    variant="contained"
+                    color="primary"
+                    sx={{ mr: 1 }}
+                    onClick={() => setOpenEdit(true)}
+                >
+                    Chỉnh sửa
+                </Button>
+                <Button
+                    startIcon={<Delete />}
+                    variant="outlined"
+                    color="error"
+                    onClick={() => setOpenDelete(true)}
+                >
+                    Xóa
+                </Button>
+            </Box>
+
+            {/* Main Task Card */}
+            <Card elevation={2} sx={{ mb: 4 }}>
                 <CardContent>
-                    <Typography variant="h5">
-                        <Assignment sx={{ verticalAlign: "middle", mr: 1 }} />
-                        {task.title}
-                    </Typography>
-                    <Typography>Mô tả: {task.description}</Typography>
-                    <Typography>Trạng thái: {task.status}</Typography>
-                    <Typography>Ưu tiên: {task.priority}</Typography>
-                    <Typography>Hạn: {task.dueDate}</Typography>
-                    <Typography>
-                        Người thực hiện: {task?.assignees?.join(", ")}
-                    </Typography>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 3 }}>
+                        <Box>
+                            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                <Assignment sx={{ mr: 1, color: 'primary.main' }} />
+                                {task.title}
+                            </Typography>
+                            <Typography color="text.secondary" sx={{ mb: 2 }}>
+                                {task.description || "Chưa có mô tả"}
+                            </Typography>
+                        </Box>
+                        <Stack direction="row" spacing={1}>
+                            <Chip
+                                label={task.status}
+                                color={
+                                    task.status === 'DONE' ? 'success' :
+                                        task.status === 'IN_PROGRESS' ? 'warning' : 'info'
+                                }
+                            />
+                            <Chip
+                                label={task.priority}
+                                color={
+                                    task.priority === 'HIGH' ? 'error' :
+                                        task.priority === 'MEDIUM' ? 'warning' : 'success'
+                                }
+                            />
+                        </Stack>
+                    </Box>
+
+                    <Grid container spacing={3}>
+                        <Grid item xs={12} md={6}>
+                            <Stack spacing={2}>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <CalendarToday sx={{ mr: 1, color: 'text.secondary' }} />
+                                    <Typography>
+                                        Hạn: {new Date(task.dueDate).toLocaleDateString()}
+                                    </Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <People sx={{ mr: 1, color: 'text.secondary' }} />
+                                    <Typography>Người thực hiện:</Typography>
+                                </Box>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, pl: 4 }}>
+                                    {task.assignees?.map(assignee => (
+                                        <Chip
+                                            key={assignee}
+                                            label={assignee}
+                                            size="small"
+                                            variant="outlined"
+                                        />
+                                    ))}
+                                </Box>
+                            </Stack>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <Stack spacing={2}>
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <AccessTime sx={{ mr: 1, color: 'text.secondary' }} />
+                                    <Typography>
+                                        Tạo lúc: {new Date(task.createdAt).toLocaleString()}
+                                    </Typography>
+                                </Box>
+                                {task.updatedAt && (
+                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                        <Update sx={{ mr: 1, color: 'text.secondary' }} />
+                                        <Typography>
+                                            Cập nhật: {new Date(task.updatedAt).toLocaleString()}
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </Stack>
+                        </Grid>
+                    </Grid>
                 </CardContent>
             </Card>
 
-            <Typography variant="h6" sx={{ mt: 2 }}>
-                Subtasks
-                <Button
-                    startIcon={<Add />}
-                    onClick={() => setOpenSubtask(true)}
-                    sx={{ ml: 2 }}
-                >
-                    Add Subtask
-                </Button>
-            </Typography>
-            <Grid container spacing={2}>
-                {task?.subTasks?.map((subTask) => (
-                    <Grid item xs={12} sm={6} md={4} key={subTask.id}>
-                        <Card className="subtask-card">
-                            <CardContent>
-                                <Typography>{subTask.title}</Typography>
-                                <Typography>
-                                    Trạng thái: {subTask.status}
-                                </Typography>
-                                <Typography>Hạn: {subTask.dueDate}</Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
+            {/* Subtasks Section */}
+            <Box sx={{ mb: 4 }}>
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    mb: 2,
+                    bgcolor: 'background.paper',
+                    p: 2,
+                    borderRadius: 1
+                }}>
+                    <Typography variant="h6">
+                        Công việc con ({task?.subTasks?.length || 0})
+                    </Typography>
+                    <Button
+                        variant="contained"
+                        startIcon={<Add />}
+                        onClick={() => setOpenSubtask(true)}
+                    >
+                        Thêm công việc con
+                    </Button>
+                </Box>
 
-            <Typography variant="h6" sx={{ mt: 2 }}>
-                Dependencies
-                <Button
-                    startIcon={<Link />}
-                    onClick={() => handleAddDependency("someTaskId")} // Thay bằng logic chọn task
-                    sx={{ ml: 2 }}
-                >
-                    Add Dependency
-                </Button>
-            </Typography>
-            <Grid container spacing={2}>
-                {task?.dependencies?.map((dep) => (
-                    <Grid item xs={12} sm={6} md={4} key={dep.id}>
-                        <Card className="dependency-card">
-                            <CardContent>
-                                <Typography>{dep.title}</Typography>
-                                <Typography>
-                                    Trạng thái: {dep.status}
-                                </Typography>
-                            </CardContent>
-                            <CardActions>
-                                <Button
-                                    startIcon={<LinkOff />}
-                                    onClick={() =>
-                                        handleRemoveDependency(dep.id)
+                <Grid container spacing={2}>
+                    {task?.subTasks?.map((subTask) => (
+                        <Grid item xs={12} sm={6} md={4} key={subTask.id}>
+                            <Card
+                                sx={{
+                                    height: '100%',
+                                    transition: 'all 0.2s',
+                                    '&:hover': {
+                                        transform: 'translateY(-4px)',
+                                        boxShadow: 3
                                     }
-                                >
-                                    Remove
-                                </Button>
-                            </CardActions>
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
+                                }}
+                            >
+                                <CardContent>
+                                    <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'medium' }}>
+                                        {subTask.title}
+                                    </Typography>
+                                    <Stack spacing={1}>
+                                        <Chip
+                                            label={subTask.status}
+                                            size="small"
+                                            color={subTask.status === 'DONE' ? 'success' : 'default'}
+                                        />
+                                        <Typography variant="body2" color="text.secondary">
+                                            Hạn: {new Date(subTask.dueDate).toLocaleDateString()}
+                                        </Typography>
+                                    </Stack>
+                                </CardContent>
+                                <CardActions sx={{ justifyContent: 'flex-end' }}>
+                                    <IconButton size="small" onClick={() => handleEditSubtask(subTask)}>
+                                        <Edit fontSize="small" />
+                                    </IconButton>
+                                    <IconButton size="small" onClick={() => handleDeleteSubtask(subTask.id)}>
+                                        <Delete fontSize="small" />
+                                    </IconButton>
+                                </CardActions>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Box>
 
-            <Typography variant="h6" sx={{ mt: 2 }}>
-                Comments
-            </Typography>
-            <Grid container spacing={2}>
-                {task?.comments?.map((cmt) => (
-                    <Grid item xs={12} key={cmt.id}>
-                        <Card className="comment-card">
+            {/* Comments Section */}
+            <Box sx={{ mb: 4 }}>
+                <Typography variant="h6" sx={{ mb: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+                    Bình luận
+                </Typography>
+
+                {/* Add Comment */}
+                <Card sx={{ mb: 2, p: 2 }}>
+                    <TextField
+                        value={commentData.content}
+                        onChange={(e) => handleCommentChange("content", e.target.value)}
+                        placeholder="Thêm bình luận..."
+                        multiline
+                        rows={2}
+                        fullWidth
+                        variant="outlined"
+                        sx={{ mb: 1 }}
+                    />
+                    <Button
+                        onClick={handleAddComment}
+                        variant="contained"
+                        startIcon={<Send />}
+                        disabled={!commentData.content.trim()}
+                    >
+                        Gửi
+                    </Button>
+                </Card>
+
+                {/* Comments List */}
+                <Stack spacing={2}>
+                    {task?.comments?.map((cmt) => (
+                        <Card key={cmt.id} sx={{ bgcolor: 'background.paper' }}>
                             <CardContent>
-                                <Typography>
-                                    <Comment
-                                        sx={{ verticalAlign: "middle", mr: 1 }}
-                                    />
+                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                                    <Avatar sx={{ width: 32, height: 32, mr: 1 }}>
+                                        {cmt.createdBy[0]}
+                                    </Avatar>
+                                    <Box>
+                                        <Typography variant="subtitle2">
+                                            {cmt.createdBy}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            {new Date(cmt.createdAt).toLocaleString()}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                                <Typography sx={{ ml: 5 }}>
                                     {cmt.content}
                                 </Typography>
-                                <Typography color="textSecondary">
-                                    {cmt.createdBy} -{" "}
-                                    {new Date(
-                                        cmt.createdAt,
-                                    ).toLocaleDateString()}
-                                </Typography>
                             </CardContent>
-                            <CardActions>
-                                <Button
-                                    startIcon={<Edit />}
+                            <CardActions sx={{ justifyContent: 'flex-end', p: 1 }}>
+                                <IconButton
+                                    size="small"
                                     onClick={() => {
-                                        handleCommentChange(
-                                            "content",
-                                            cmt.content,
-                                        );
+                                        handleCommentChange("content", cmt.content);
                                         setOpenEditComment(cmt);
                                     }}
                                 >
-                                    Edit
-                                </Button>
-                                <Button
-                                    startIcon={<Delete />}
+                                    <Edit fontSize="small" />
+                                </IconButton>
+                                <IconButton
+                                    size="small"
                                     onClick={() => handleDeleteComment(cmt.id)}
                                 >
-                                    Delete
-                                </Button>
+                                    <Delete fontSize="small" />
+                                </IconButton>
                             </CardActions>
                         </Card>
-                    </Grid>
-                ))}
-            </Grid>
-            <TextField
-                value={commentData.content}
-                onChange={(e) => handleCommentChange("content", e.target.value)}
-                placeholder="Thêm bình luận"
-                fullWidth
-                sx={{ mt: 2 }}
-            />
-            <Button
-                onClick={handleAddComment}
-                variant="contained"
-                sx={{ mt: 1 }}
-            >
-                Gửi
-            </Button>
+                    ))}
+                </Stack>
+            </Box>
 
-            {/* Subtask Dialog */}
+            {/* Dialogs */}
             <Dialog open={openSubtask} onClose={() => setOpenSubtask(false)}>
-                <DialogTitle>Thêm Subtask</DialogTitle>
-                <DialogContent>
+                <DialogTitle>Thêm công việc con</DialogTitle>
+                <DialogContent dividers>
                     <TextField
                         fullWidth
                         label="Tiêu đề"
                         value={subtaskData.title}
-                        onChange={(e) =>
-                            handleSubtaskChange("title", e.target.value)
-                        }
-                        sx={{ mt: 1 }}
+                        onChange={(e) => handleSubtaskChange("title", e.target.value)}
                     />
                     <TextField
                         fullWidth
                         label="Hạn"
                         type="date"
                         value={subtaskData.dueDate}
-                        onChange={(e) =>
-                            handleSubtaskChange("dueDate", e.target.value)
-                        }
+                        onChange={(e) => handleSubtaskChange("dueDate", e.target.value)}
                         InputLabelProps={{ shrink: true }}
                         sx={{ mt: 2 }}
                     />
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenSubtask(false)}>Hủy</Button>
-                    <Button onClick={handleAddSubtask}>Thêm</Button>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button variant="outlined" onClick={() => setOpenSubtask(false)}>
+                        Hủy
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleAddSubtask}
+                        disabled={!subtaskData.title || !subtaskData.dueDate}
+                    >
+                        Thêm
+                    </Button>
                 </DialogActions>
             </Dialog>
 
-            {/* Edit Comment Dialog */}
-            <Dialog
-                open={!!openEditComment}
-                onClose={() => setOpenEditComment(null)}
-            >
+            <Dialog open={!!openEditComment} onClose={() => setOpenEditComment(null)}>
                 <DialogTitle>Chỉnh sửa bình luận</DialogTitle>
-                <DialogContent>
+                <DialogContent dividers>
                     <TextField
                         fullWidth
+                        multiline
+                        rows={3}
                         value={commentData.content}
-                        onChange={(e) =>
-                            handleCommentChange("content", e.target.value)
-                        }
-                        sx={{ mt: 1 }}
+                        onChange={(e) => handleCommentChange("content", e.target.value)}
                     />
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenEditComment(null)}>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button variant="outlined" onClick={() => setOpenEditComment(null)}>
                         Hủy
                     </Button>
-                    <Button onClick={handleEditComment}>Cập nhật</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleEditComment}
+                        disabled={!commentData.content.trim()}
+                    >
+                        Cập nhật
+                    </Button>
                 </DialogActions>
             </Dialog>
         </div>

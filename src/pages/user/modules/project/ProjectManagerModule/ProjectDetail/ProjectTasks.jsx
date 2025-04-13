@@ -252,14 +252,14 @@ function ProjectTasks({ projectId }) {
                                         </CardContent>
 
                                         <CardActions sx={{ px: 2, py: 1, borderTop: 1, borderColor: 'divider' }}>
-                                            <Button
+                                            {/* <Button
                                                 size="small"
                                                 component={Link}
-                                                to={`/working/project/task/${task.id}`}
+                                                to={`/working/project/manager/task/${task.id}`}
                                                 sx={{ mr: 'auto' }}
                                             >
                                                 Chi tiết
-                                            </Button>
+                                            </Button> */}
                                             <IconButton size="small" onClick={() => {
                                                 setValues({
                                                     title: task.title,
@@ -372,15 +372,15 @@ function ProjectTasks({ projectId }) {
                             alignItems: 'center',
                             alignSelf: { xs: 'stretch', sm: 'center' }
                         }}>
-                            <Button
+                            {/* <Button
                                 component={Link}
-                                to={`/working/project/task/${task.id}`}
+                                to={`/working/project/manager/task/${task.id}`}
                                 variant="outlined"
                                 size="small"
                                 sx={{ minWidth: 100 }}
                             >
                                 Chi tiết
-                            </Button>
+                            </Button> */}
                             <IconButton
                                 size="small"
                                 onClick={() => {
