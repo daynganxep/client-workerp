@@ -5,6 +5,6 @@ export default function useMessageByApiCode() {
         if (!apiCode[key]) {
             console.log(`useMessageByApiCode :: key :: ${key} :: notfound`);
         }
-        return apiCode[key] || "No code";
+        return apiCode[key] || key;
     };
 }

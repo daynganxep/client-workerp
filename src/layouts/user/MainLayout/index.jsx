@@ -1,57 +1,97 @@
-import React, { useEffect, useState } from "react";
-import SearchBox from "./components/SearchBox";
-import Avatar from "./components/Avatar";
-import Actions from "./components/Actions";
-import AuthActions from "./components/AuthActions";
-import logo from "@assets/images/logo.svg";
-import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import "./MainLayout.scss";
+import { useSelector } from 'react-redux';
+import { Link, Outlet } from 'react-router-dom';
+import {
+    AppBar,
+    Toolbar,
+    Container,
+    Box,
+    Button,
+    Avatar,
+    Typography,
+} from '@mui/material';
+import LogoAndBrandName from '@components/LogoAndBrandName';
+import ThemeToggleButton from '@components/ThemeToggleButton';
+import '.scss';
 
-const MainLayout = ({ children }) => {
-  const isLoging = useSelector((state) => state.auth.isLoging);
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const updateHeaderHeight = () => {
-    const headerElement = document.getElementById("header");
-    if (headerElement) {
-      setHeaderHeight(headerElement.offsetHeight);
-    }
-  };
+function MainLayout() {
+    const { isLoging, user } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    updateHeaderHeight();
-    window.addEventListener("resize", updateHeaderHeight);
-    return () => {
-      window.removeEventListener("resize", updateHeaderHeight);
-    };
-  }, []);
+    return (
+        <Box className="main-layout">
+            {/* Header */}
+            <AppBar position="static" className="main-layout__header" elevation={0}>
+                <Toolbar>
+                    {/* Logo */}
+                    <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
+                        <LogoAndBrandName size={0.7} />
+                    </Box>
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <header className="fixed top-0 left-0 right-0 bg-white shadow-md z-50">
-        <div
-          id="header"
-          className="mx-auto flex items-center justify-between py-4 px-8 space-x-8"
-        >
-          <Link to="/" className="logo flex items-center space-x-4">
-            <img src={logo} alt="Logo" className="h-10 w-10" />
-            <span className="font-bold text-xl whitespace-nowrap">CHỢ MỚI</span>
-          </Link>
-          <SearchBox className="searchBox" />
-          <Actions />
-          <div className="flex items" content="Avatar">
-            {isLoging ? <Avatar /> : <AuthActions />}
-          </div>
-        </div>
-      </header>
-      <main
-        style={{ marginTop: headerHeight }}
-        className="bg-gray-100 flex-grow px-6 py-4"
-      >
-        {children}
-      </main>
-    </div>
-  );
-};
+                    {/* Auth */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        {isLoging ? (
+                            <>
+                                <Button
+                                    variant="outlined"
+                                    color="inherit"
+                                    component={Link}
+                                    to="/companies"
+                                    sx={{ borderRadius: '8px' }}
+                                >
+                                    Công ty
+                                </Button>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Avatar
+                                        src={user?.avatar}
+                                        srcSet={user?.avatar}
+                                        sx={{ width: 32, height: 32 }}
+                                    />
+                                    <Typography variant="body1">{user?.fullName || 'User'}</Typography>
+                                </Box>
+                                <Button
+                                    variant="outlined"
+                                    color="inherit"
+                                    component={Link}
+                                    to="/auth/logout"
+                                    sx={{ borderRadius: '8px' }}
+                                >
+                                    Đăng xuất
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button
+                                    variant="outlined"
+                                    color="inherit"
+                                    component={Link}
+                                    to="/auth/login"
+                                    sx={{ borderRadius: '8px' }}
+                                >
+                                    Đăng nhập
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    component={Link}
+                                    to="/auth/register"
+                                    sx={{ borderRadius: '8px' }}
+                                >
+                                    Đăng ký
+                                </Button>
+                            </>
+                        )}
+                        <ThemeToggleButton />
+                    </Box>
+                </Toolbar>
+            </AppBar>
+
+            {/* Main content */}
+            <Box className="main-layout__content">
+                <Container maxWidth="xl" className="main-layout__container">
+                    <Outlet />
+                </Container>
+            </Box>
+        </Box>
+    );
+}
 
 export default MainLayout;

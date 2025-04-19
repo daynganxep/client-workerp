@@ -1,9 +1,10 @@
 import { Fragment } from "react";
 import MainLayout from "@layouts/user/MainLayout";
 import AuthLayout from "@layouts/user/AuthLayout";
+import WorkingLayout from "@layouts/user/WorkingLayout";
 
-import NotFound from "@pages/user/NotFound";
-import Home from "@pages/user/Home";
+import NotFound from "@pages/user/common/NotFound";
+import Home from "@pages/user/common/Home";
 import Login from "@pages/user/auth/Login";
 import Register from "@pages/user/auth/Register";
 import ReceiveTokens from "@pages/user/auth/ReceiveTokens";
@@ -28,21 +29,21 @@ export default [
         title: "Trang chủ",
     },
     {
-        path: "/login",
+        path: "/auth/login",
         Page: Login,
         Layout: AuthLayout,
         type: USER_ROUTE_TYPES.PUBLIC,
         title: "Đăng nhập",
     },
     {
-        path: "/register",
+        path: "/auth/register",
         Page: Register,
         Layout: AuthLayout,
         type: USER_ROUTE_TYPES.PUBLIC,
         title: "Đăng ký",
     },
     {
-        path: "/logout",
+        path: "/auth/logout",
         Page: Logout,
         Layout: Fragment,
         type: USER_ROUTE_TYPES.PUBLIC,
@@ -56,7 +57,7 @@ export default [
         title: "Nhận tokens",
     },
     {
-        path: "/forgot-password",
+        path: "/auth/forgot-password",
         Page: ForgotPassword,
         Layout: AuthLayout,
         type: USER_ROUTE_TYPES.PUBLIC,
@@ -68,6 +69,13 @@ export default [
         Layout: MainLayout,
         type: USER_ROUTE_TYPES.PUBLIC,
         title: "Không tìm thấy trang",
+    },
+    {
+        path: "/working/:moduleCode/*",
+        Page: Fragment,
+        Layout: WorkingLayout,
+        type: USER_ROUTE_TYPES.PRIVATE,
+        title: "Work-ERP",
     },
     {
         path: "*",

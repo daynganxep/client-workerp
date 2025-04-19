@@ -21,9 +21,9 @@ Dự án tích hợp **Tailwind CSS** để thiết kế giao diện và **Ant D
 
 Bạn có thể sử dụng `@` làm alias cho các đường dẫn trong dự án. Ví dụ:
 
-- `@components` để trỏ đến thư mục chứa các component.
-- `@assets` để trỏ đến nơi lưu trữ tài nguyên như ảnh, video.
-- `@layouts` để lưu các layout sử dụng trong dự án.
+-   `@components` để trỏ đến thư mục chứa các component.
+-   `@assets` để trỏ đến nơi lưu trữ tài nguyên như ảnh, video.
+-   `@layouts` để lưu các layout sử dụng trong dự án.
 
 ## 5. ToolTip component
 
@@ -33,8 +33,8 @@ Dự án có component **ToolTip** nằm trong thư mục `@components/ToolTip`.
 
 Dự án có hai loại route:
 
-- **Public Route**: Không yêu cầu đăng nhập.
-- **Private Route**: Yêu cầu người dùng phải đăng nhập mới có thể truy cập.
+-   **Public Route**: Không yêu cầu đăng nhập.
+-   **Private Route**: Yêu cầu người dùng phải đăng nhập mới có thể truy cập.
 
 ## 7. Quản lý nội dung ảnh, video
 
@@ -46,8 +46,8 @@ Nếu bạn có bất kỳ component nào dùng chung nhiều lần trong dự �
 
 ## 9. Cấu hình API và hằng số
 
-- Các mã API code sẽ được lưu trong file `@configs/apiCode.config.js`.
-- Các hằng số sử dụng trong dự án sẽ được lưu trong file `@configs/const.config.js`.
+-   Các mã API code sẽ được lưu trong file `@configs/apiCode.config.js`.
+-   Các hằng số sử dụng trong dự án sẽ được lưu trong file `@configs/const.config.jsx.js`.
 
 ## 10. Layouts
 
@@ -59,20 +59,20 @@ Khi sử dụng các service của **Axios**, các lỗi và dữ liệu đều 
 
 ```js
 const handleSubmit = async (data) => {
-  const [result, error] = await AuthService.login(data);
-  if (error) {
-    setErrorMessage(getMessage(error.code));
-    toast.error(getMessage(error.code), {
-      autoClose: 3000,
+    const [result, error] = await AuthService.login(data);
+    if (error) {
+        setErrorMessage(getMessage(error.code));
+        toast.error(getMessage(error.code), {
+            autoClose: 3000,
+        });
+        return;
+    }
+    toast.success(getMessage(result.code), {
+        autoClose: 3000,
     });
-    return;
-  }
-  toast.success(getMessage(result.code), {
-    autoClose: 3000,
-  });
-  const tokens = result.data;
-  dispatch(setTokens(tokens));
-  navigate(redirect);
+    const tokens = result.data;
+    dispatch(setTokens(tokens));
+    navigate(redirect);
 };
 ```
 

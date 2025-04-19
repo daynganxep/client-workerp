@@ -4,7 +4,7 @@ import PrivateRoute from "./PrivateRoute";
 import AdminMainLayout from "@layouts/admin/MainLayout";
 import UserMainLayout from "@layouts/user/MainLayout";
 
-import { ROLES } from "@configs/const.config";
+import { ROLES } from "@configs/const.config.jsx";
 
 const ADMIN_ROUTE_TYPES = {
     PUBLIC: PublicRoute,

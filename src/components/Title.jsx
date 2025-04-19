@@ -1,6 +1,6 @@
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
-function Title({ children = "Chợ mới" }) {
+function Title({ children = "Work-ERP" }) {
   return (
     <Helmet>
       <meta charSet="utf-8" />

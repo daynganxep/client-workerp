@@ -1,29 +1,28 @@
 import Router from "@app/Router";
-import { ConfigProvider, App as AntApp } from "antd";
-import { ToastContainer } from "react-toastify";
+import { ThemeProvider } from "@mui/material/styles";
+import { Toaster } from "react-hot-toast";
+import { HelmetProvider } from "react-helmet-async";
 import useInitialApp from "@hooks/useInitialApp";
-import "react-toastify/dist/ReactToastify.css";
-import "./tailwind.css";
+import { lightTheme, darkTheme } from "./theme";
+import { useSelector } from "react-redux";
+import { useMemo } from "react";
+import CssBaseline from "@mui/material/CssBaseline";
 import "./global.css";
 
 function App() {
-    useInitialApp();
-    return (
-        <ConfigProvider
-            theme={{
-                token: {
-                    colorPrimary: "#f06595",
-                    colorSuccess: "#3b82f6",
-                    colorWarning: "#ffd43b",
-                    colorError: "#ff3300",
-                },
-            }}
-        >
-            <AntApp>
-                <Router></Router>
-                <ToastContainer />
-            </AntApp>
-        </ConfigProvider>
-    );
+  const { theme: mode } = useSelector((state) => state.setting);
+  const theme = useMemo(() => (mode === "light" ? lightTheme : darkTheme), [mode]);
+  useInitialApp();
+
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <HelmetProvider>
+        <Router />
+        <Toaster />
+      </HelmetProvider>
+    </ThemeProvider>
+  );
 }
+
 export default App;

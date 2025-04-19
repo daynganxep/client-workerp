@@ -5,9 +5,9 @@ import reduxStore from "@redux/store.redux";
 import App from "@app/App";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <Provider store={reduxStore}>
-      <App />
-    </Provider>
-  </StrictMode>
+    <StrictMode>
+        <Provider store={reduxStore}>
+            <App />
+        </Provider>
+    </StrictMode>
 );
