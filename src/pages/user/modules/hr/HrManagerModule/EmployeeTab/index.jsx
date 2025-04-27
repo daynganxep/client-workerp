@@ -23,6 +23,9 @@ import PositionService from "@services/hr-module-service/position.service";
 import useFormValidation from "@hooks/useForm";
 import { employeeSchema, inviteEmployeeSchema } from "@validations/hrSchema";
 import toast from "@hooks/toast";
+import Employee from "@components/Employee";
+import { formatDateForUI } from "@tools/date.tool";
+import DateField from "@components/DateField";
 
 function EmployeeTab() {
     const { id: companyId } = useSelector((state) => state.company);
@@ -91,10 +94,10 @@ function EmployeeTab() {
     const handleInvite = async () => {
         if (!validateInvite()) return;
         startInviteSubmitting();
-        const [, err] = await EmployeeService.inviteToCompany(inviteData);
+        const [res, err] = await EmployeeService.inviteToCompany(inviteData);
         finishInviteSubmitting();
         if (err) return toast.error(err.code);
-        toast.success("Invited employee successfully");
+        toast.success(res.code);
         setOpenInvite(false);
     };
 
@@ -107,13 +110,13 @@ function EmployeeTab() {
             departmentId: editData.department || null,
             positionId: editData.position || null,
         };
-        const [, err] = await EmployeeService.updateEmployee(
+        const [res, err] = await EmployeeService.updateEmployee(
             editingEmployee.id,
             requestData,
         );
         finishEditSubmitting();
         if (err) return toast.error(err.code);
-        toast.success("Updated employee successfully");
+        toast.success(res.code);
         setOpenEdit(false);
         fetchEmployees();
     };
@@ -121,12 +124,7 @@ function EmployeeTab() {
     const openEditDialog = (employee) => {
         setEditingEmployee(employee);
         handleEditChange("name", employee.name);
-        handleEditChange(
-            "dob",
-            employee.dob
-                ? new Date(employee.dob).toISOString().split("T")[0]
-                : "",
-        );
+        handleEditChange("dob", employee.dob);
         handleEditChange("department", employee.department?.id || null);
         handleEditChange("position", employee.position?.id || null);
         setOpenEdit(true);
@@ -157,25 +155,29 @@ function EmployeeTab() {
                         <TableCell>Ngày sinh</TableCell>
                         <TableCell>Phòng ban</TableCell>
                         <TableCell>Vị trí</TableCell>
+                        <TableCell>Email</TableCell>
+                        <TableCell>Số điện thoại</TableCell>
                         <TableCell>Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {employees.map((employee) => (
                         <TableRow key={employee.id}>
-                            <TableCell>{employee.name}</TableCell>
+                            <TableCell><Employee employeeId={employee.id} size={1.2} showName></Employee></TableCell>
                             <TableCell>
-                                {employee.dob
-                                    ? new Date(
-                                        employee.dob,
-                                    ).toLocaleDateString()
-                                    : "N/A"}
+                                {formatDateForUI(employee.dob)}
                             </TableCell>
                             <TableCell>
-                                {employee.department?.name || "N/A"}
+                                {employee?.department?.name || "N/A"}
                             </TableCell>
                             <TableCell>
-                                {employee.position?.name || "N/A"}
+                                {employee?.position?.name || "N/A"}
+                            </TableCell>
+                            <TableCell>
+                                {employee?.email || "N/A"}
+                            </TableCell>
+                            <TableCell>
+                                {employee?.phone || "N/A"}
                             </TableCell>
                             <TableCell>
                                 <Button
@@ -231,17 +233,15 @@ function EmployeeTab() {
                         helperText={editErrors.name}
                         sx={{ mt: 1 }}
                     />
-                    <TextField
+                    <DateField
                         fullWidth
                         label="Ngày sinh"
-                        type="date"
                         value={editData.dob}
                         onChange={(e) =>
                             handleEditChange("dob", e.target.value)
                         }
                         error={!!editErrors.dob}
                         helperText={editErrors.dob}
-                        InputLabelProps={{ shrink: true }}
                         sx={{ mt: 2 }}
                     />
                     <Select

@@ -16,8 +16,6 @@ import ForgotPassword from '@pages/user/auth/ForgotPassword';
 import Logout from '@pages/user/auth/Logout';
 import CompanyManagerModule from '@pages/user/modules/company/CompanyManagerModule';
 import CompanyUserModule from '@pages/user/modules/company/CompanyUserModule';
-import CompanyInfoTab from '@pages/user/modules/company/CompanyManagerModule/CompanyInfoTab';
-import CompanyModuleRolesTab from '@pages/user/modules/company/CompanyManagerModule/CompanyModuleRolesTab';
 import HrManagerModule from '@pages/user/modules/hr/HrManagerModule';
 import HrUserModule from '@pages/user/modules/hr/HrUserModule';
 import ProjectManagerModule from '@pages/user/modules/project/ProjectManagerModule';
@@ -27,7 +25,6 @@ import ProjectDetail from '@pages/user/modules/project/ProjectManagerModule/Proj
 import TaskDetail from '@pages/user/modules/project/ProjectManagerModule/TaskDetail';
 import UserProjectDashboard from '@pages/user/modules/project/ProjectUserModule/UserProjectDashboard';
 import UserProjectDetail from '@pages/user/modules/project/ProjectUserModule/UserProjectDetail';
-import UserTaskDetail from '@pages/user/modules/project/ProjectUserModule/UserTaskDetail';
 
 const router = createBrowserRouter([
     {
@@ -100,7 +97,7 @@ const router = createBrowserRouter([
                             },
                             {
                                 path: "task/:taskId",
-                                element: <TaskDetail />,
+                                element: <TaskDetail isManager={true} />,
                             }
                         ]
                     },
@@ -118,7 +115,7 @@ const router = createBrowserRouter([
                             },
                             {
                                 path: "task/:taskId",
-                                element: <UserTaskDetail />,
+                                element: <TaskDetail isManager={false} />,
                             }
                         ]
                     },

@@ -1,6 +1,5 @@
 import Router from "@app/Router";
 import { ThemeProvider } from "@mui/material/styles";
-import { Toaster } from "react-hot-toast";
 import { HelmetProvider } from "react-helmet-async";
 import useInitialApp from "@hooks/useInitialApp";
 import { lightTheme, darkTheme } from "./theme";
@@ -8,6 +7,7 @@ import { useSelector } from "react-redux";
 import { useMemo } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import "./global.css";
+import ReactHotToaster from "@components/ReactHotToaster";
 
 function App() {
   const { theme: mode } = useSelector((state) => state.setting);
@@ -19,7 +19,7 @@ function App() {
       <CssBaseline />
       <HelmetProvider>
         <Router />
-        <Toaster />
+        <ReactHotToaster />
       </HelmetProvider>
     </ThemeProvider>
   );

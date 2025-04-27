@@ -1,6 +1,6 @@
 import BrandName from "@components/BandName";
+import Logo from "@components/Logo"
 import { Link } from "react-router-dom";
-import logo from "@assets/images/logo.svg";
 
 import ".scss";
 
@@ -11,7 +11,7 @@ function LogoAndBrandName({ size = 1 }) {
       className="logo-and-brandname"
       style={{ transform: `scale(${size})` }}
     >
-      <img src={logo} alt="work-erp" />
+      <Logo></Logo>
       <BrandName></BrandName>
     </Link>
   );

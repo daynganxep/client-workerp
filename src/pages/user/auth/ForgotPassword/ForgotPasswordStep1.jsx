@@ -15,14 +15,10 @@ const ForgotPasswordStep1 = ({ onNext }) => {
         const [result, error] = await AuthService.forgotPassword(email);
         if (error) {
             setErrorMessage(getMessage(error.code));
-            toast.error(getMessage(error.code), {
-                autoClose: 3000,
-            });
+            toast.error(error.code);
             return;
         }
-        toast.error(getMessage(result.code), {
-            autoClose: 3000,
-        });
+        toast.error(result.code);
         onNext();
     };
 

@@ -3,8 +3,8 @@ import CompanyModuleRolesService from "@services/compay-module-service/company-m
 import { DataGrid } from "@mui/x-data-grid";
 import { Checkbox, Button, Select, MenuItem } from "@mui/material";
 import toast from "@hooks/toast";
-import "./.scss";
 import { useSelector } from "react-redux";
+import { MODULE_OPTIONS_MAP, MODULE_ROLES_MAP } from "@configs/const.config";
 
 function CompanyModuleRolesTab() {
     const [cmrs, setCmrs] = useState([]);
@@ -70,7 +70,7 @@ function CompanyModuleRolesTab() {
         }));
         const [res, err] = await CompanyModuleRolesService.modifyMany(requests);
         if (err) return toast.error(err.code);
-        toast.success("Roles updated successfully");
+        toast.success(res.code);
         fetchCmrs();
     };
 
@@ -88,7 +88,7 @@ function CompanyModuleRolesTab() {
         },
         ...modules.map((module) => ({
             field: module,
-            headerName: module,
+            headerName: MODULE_OPTIONS_MAP[module].label,
             width: 200,
             renderCell: (params) => {
                 const cmr = getCmr(params.row.userId, module);
@@ -117,8 +117,8 @@ function CompanyModuleRolesTab() {
                             disabled={!cmr.active}
                             sx={{ minWidth: 120 }}
                         >
-                            <MenuItem value="USER">USER</MenuItem>
-                            <MenuItem value="MANAGER">MANAGER</MenuItem>
+                            <MenuItem value="USER">{MODULE_ROLES_MAP["USER"].label}</MenuItem>
+                            <MenuItem value="MANAGER">{MODULE_ROLES_MAP["MANAGER"].label}</MenuItem>
                         </Select>
                     </div>
                 );

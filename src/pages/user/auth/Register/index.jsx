@@ -55,15 +55,14 @@ const Register = () => {
 
             if (error) {
                 setErrorMessage(getMessage(error.code));
-                toast.error(getMessage(error.code));
+                toast.error(error.code);
                 return;
             }
 
-            toast.success(getMessage(result.code));
+            toast.success(result.code);
             dispatch(setRedirect("/"));
             navigate("/");
         } catch (err) {
-            console.error("Register error:", err);
             toast.error("Đã xảy ra lỗi không mong muốn");
         } finally {
             finishSubmitting();

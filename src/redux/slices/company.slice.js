@@ -62,6 +62,7 @@ const companySlice = createSlice({
             state.name = payload.name;
             state.domain = payload.domain;
             state.avatar = payload.avatar;
+            state.coverImage = payload.coverImage;
             state.active = payload.active;
         },
         setEmployeeInfo: (state, { payload }) => {

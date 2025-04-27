@@ -28,6 +28,14 @@ export const updateCompanyInforSchema = Joi.object({
             "string.uri": "Avatar phải là một URL hợp lệ (http hoặc https)",
             "string.base": "Avatar phải là chuỗi ký tự",
         }),
+    coverImage: Joi.string()
+        .uri({ scheme: ["http", "https"] })
+        .allow("")
+        .optional()
+        .messages({
+            "string.uri": "Ảnh bìa phải là một URL hợp lệ (http hoặc https)",
+            "string.base": "Ảnh bìa phải là chuỗi ký tự",
+        }),
     active: Joi.boolean().required().messages({
         "boolean.base": "Trạng thái hoạt động phải là true hoặc false",
         "any.required": "Trạng thái hoạt động là trường bắt buộc",

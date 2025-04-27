@@ -3,27 +3,17 @@ import { toast } from "react-hot-toast";
 
 function getMessage(key) {
     if (!apiCode[key]) {
-        console.log(`toast getMessage :: key :: ${key} :: notfound`);
+        console.log(`toast :: ${key} :: not found`);
     }
     return apiCode[key] || key;
 }
 
 const success = (message) => {
-    toast.success(getMessage(message), {
-        style: {
-            background: "#333",
-            color: "#fff",
-        },
-    });
+    toast.success(getMessage(message));
 };
 
 const error = (message) => {
-    toast.error(getMessage(message), {
-        style: {
-            background: "#333",
-            color: "#fff",
-        },
-    });
+    toast.error(getMessage(message));
 };
 
 export default {

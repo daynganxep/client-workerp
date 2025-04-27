@@ -16,7 +16,6 @@ function Home() {
     const theme = useTheme();
     const sectionsRef = useRef([]);
     const { isLoging, user } = useSelector(state => state.auth);
-    console.log({ isLoging, user })
 
     // Animation khi scroll
     useEffect(() => {
@@ -202,7 +201,6 @@ function Home() {
                     </Button>
                 </Box>
             </Container>
-            {isLoging ? user?.id : ""}
         </Box>
     );
 }

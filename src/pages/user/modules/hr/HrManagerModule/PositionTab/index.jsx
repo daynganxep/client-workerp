@@ -71,7 +71,7 @@ function PositionTab() {
     const handleDelete = async (positionId) => {
         const [res, err] = await PositionService.deletePosition(positionId);
         if (err) return toast.error(err.code);
-        toast.success("Deleted position successfully");
+        toast.success(res.code);
         fetchPositions();
     };
 

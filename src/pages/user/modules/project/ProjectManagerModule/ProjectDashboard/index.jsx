@@ -4,9 +4,6 @@ import ProjectService from "@services/project-module-service/project.service";
 import {
     Typography,
     Button,
-    Card,
-    CardContent,
-    CardActions,
     Grid,
     Dialog,
     DialogTitle,
@@ -15,13 +12,13 @@ import {
     TextField,
     Box,
 } from "@mui/material";
-import { Folder, Add, AccessTime, CalendarToday } from "@mui/icons-material";
+import DateField from "@components/DateField";
+import { Add, } from "@mui/icons-material";
 import ProjectCard from "@components/ProjectCard";
 import useFormValidation from "@hooks/useForm";
 import { projectSchema } from "@validations/projectSchema";
 import toast from "@hooks/toast";
 import ".scss";
-import { Link } from "react-router-dom";
 
 function ProjectDashboard() {
     const [projects, setProjects] = useState([]);
@@ -58,7 +55,7 @@ function ProjectDashboard() {
         const [res, err] = await ProjectService.createProject(data);
         finishSubmitting();
         if (err) return toast.error(err.code);
-        toast.success("Created project successfully");
+        toast.success(res.code);
         setOpenCreate(false);
         fetchProjects();
     };
@@ -121,10 +118,9 @@ function ProjectDashboard() {
                         }
                         sx={{ mt: 2 }}
                     />
-                    <TextField
+                    <DateField
                         fullWidth
                         label="Ngày bắt đầu"
-                        type="date"
                         value={data.startDate}
                         onChange={(e) =>
                             handleChange("startDate", e.target.value)
@@ -132,7 +128,7 @@ function ProjectDashboard() {
                         InputLabelProps={{ shrink: true }}
                         sx={{ mt: 2 }}
                     />
-                    <TextField
+                    <DateField
                         fullWidth
                         label="Ngày kết thúc"
                         type="date"

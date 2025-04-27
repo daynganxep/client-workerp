@@ -17,12 +17,14 @@ import {
     Box,
     Chip,
 } from "@mui/material";
-import { Add, Delete, People, Edit } from "@mui/icons-material";
+import { Add, Delete, Edit } from "@mui/icons-material";
 import useFormValidation from "@hooks/useForm";
 import { projectMemberSchema } from "@validations/projectSchema";
 import toast from "@hooks/toast";
 import { useSelector } from "react-redux";
 import useEmployee from "@hooks/useEmployee";
+import { PROJECT_MEMBER_ROLE } from "@configs/const.config";
+import Employee from "@components/Employee";
 
 function ProjectMembers({ projectId }) {
     const employees = useSelector((state) => state.company.employees) || [];
@@ -60,22 +62,21 @@ function ProjectMembers({ projectId }) {
     const handleAddMember = async () => {
         if (!validate()) return;
         startSubmitting();
-        const [, err] = await ProjectService.addMember(projectId, data);
+        const [res, err] = await ProjectService.addMember(projectId, data);
         finishSubmitting();
-        console.log(err);
         if (err) return toast.error(err.code);
-        toast.success("Member added successfully");
+        toast.success(res.code);
         setOpenMember(false);
         fetchMembers();
     };
 
     const handleRemoveMember = async (employeeId) => {
-        const [, err] = await ProjectService.removeMember(
+        const [res, err] = await ProjectService.removeMember(
             projectId,
             employeeId,
         );
         if (err) return toast.error(err.code);
-        toast.success("Member removed successfully");
+        toast.success(res.code);
         fetchMembers();
     };
 
@@ -128,14 +129,11 @@ function ProjectMembers({ projectId }) {
                         >
                             <CardContent sx={{ flexGrow: 1 }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                    <People sx={{ color: 'primary.main', fontSize: 32, mr: 2 }} />
-                                    <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
-                                        {employeeInfo(member.employeeId).name}
-                                    </Typography>
+                                    <Employee employeeId={member.employeeId} showName={true}></Employee>
                                 </Box>
                                 <Chip
-                                    label={member.role}
-                                    color={member.role === 'LEADER' ? 'primary' : 'default'}
+                                    label={PROJECT_MEMBER_ROLE[member.role]?.label}
+                                    color={PROJECT_MEMBER_ROLE[member.role]?.color}
                                     size="small"
                                 />
                             </CardContent>
@@ -188,8 +186,11 @@ function ProjectMembers({ projectId }) {
                         onChange={(e) => handleChange("role", e.target.value)}
                         error={!!errors.role}
                     >
-                        <MenuItem value="LEADER">Leader</MenuItem>
-                        <MenuItem value="MEMBER">Member</MenuItem>
+                        {Object.entries(PROJECT_MEMBER_ROLE).map(([key, value]) => (
+                            <MenuItem key={key} value={key}>
+                                {value.label}
+                            </MenuItem>
+                        ))}
                     </Select>
                     {errors.role && (
                         <Typography color="error" variant="caption">
@@ -257,8 +258,11 @@ function ProjectMembers({ projectId }) {
                         sx={{ mt: 2 }}
                         error={!!errors.role}
                     >
-                        <MenuItem value="LEADER">Leader</MenuItem>
-                        <MenuItem value="MEMBER">Member</MenuItem>
+                        {Object.entries(PROJECT_MEMBER_ROLE).map(([key, value]) => (
+                            <MenuItem key={key} value={key}>
+                                {value.label}
+                            </MenuItem>
+                        ))}
                     </Select>
                     {errors.role && (
                         <Typography color="error" variant="caption">

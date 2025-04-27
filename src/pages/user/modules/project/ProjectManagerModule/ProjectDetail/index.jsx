@@ -11,17 +11,13 @@ function ProjectDetail() {
     const { projectId } = useParams();
 
     const tabs = [
+        { label: "Nhiệm vụ", value: "tasks", element: <ProjectTasks projectId={projectId} isManager /> },
+        { label: "Thành viên", value: "members", element: <ProjectMembers projectId={projectId} /> },
         {
             label: "Tổng quan",
             value: "overview",
             element: <ProjectOverview projectId={projectId} />,
         },
-        { label: "Tasks", value: "tasks", element: <ProjectTasks projectId={projectId} /> },
-        { label: "Thành viên", value: "members", element: <ProjectMembers projectId={projectId} /> },
-        // {
-        //     label: "Milestones", value: "milestones",
-        //     element: <ProjectMilestones projectId={projectId} />,
-        // },
     ];
 
     return (

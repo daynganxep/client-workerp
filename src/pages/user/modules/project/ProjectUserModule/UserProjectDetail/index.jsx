@@ -1,18 +1,16 @@
 import { useParams } from "react-router-dom";
-import ModuleTabLayout from "@layouts/user/ModuleTabLayout";
-import AllTasks from "./AllTasks";
-import MyTasks from "./MyTasks";
 import TabNavigation from "@layouts/user/WorkingLayout/TabNavigation";
+import ProjectTasks from "../../ProjectManagerModule/ProjectDetail/ProjectTasks";
 
 function UserProjectDetail() {
     const { projectId } = useParams();
 
     const tabs = [
-        { label: "Task của tôi", value: "my-tasks", element: <MyTasks projectId={projectId} /> },
+        { label: "Nhiệm vụ của tôi", value: "my-tasks", element: <ProjectTasks projectId={projectId} isMyTasks /> },
         {
-            label: "Tất cả Task",
+            label: "Tất cả nhiệm vụ",
             value: "all-task",
-            element: <AllTasks projectId={projectId} />,
+            element: <ProjectTasks projectId={projectId} />,
         },
     ];
 

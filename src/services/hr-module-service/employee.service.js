@@ -13,6 +13,8 @@ const EmployeeService = {
         service(axios.post(`/hr-app/employees/add-owner-to-company`, data)),
     updateEmployee: (employeeId, data) =>
         service(axios.put(`/hr-app/employees/${employeeId}`, data)),
+    updateMyEmployeeInfo: (employeeId, data) =>
+        service(axios.put(`/hr-app/employees/${employeeId}/me`, data)),
 };
 
 export default EmployeeService;

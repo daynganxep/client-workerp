@@ -41,12 +41,11 @@ const TaskService = {
         ),
     addComment: (taskId, data) =>
         service(axios.post(`/project-app/tasks/${taskId}/comments`, data)),
-    updateComment: (taskId, commentId, data) =>
+    updateComment: (taskId, commentId, { content }) =>
         service(
-            axios.put(
-                `/project-app/tasks/${taskId}/comments/${commentId}`,
-                data,
-            ),
+            axios.put(`/project-app/tasks/${taskId}/comments/${commentId}`, {
+                content,
+            }),
         ),
     deleteComment: (taskId, commentId) =>
         service(

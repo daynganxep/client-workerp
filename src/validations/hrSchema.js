@@ -1,3 +1,7 @@
+import {
+    CONTRACT_STATUSES_MAP,
+    CONTRACT_TYPES_MAP,
+} from "@configs/const.config";
 import Joi from "joi";
 
 export const inviteEmployeeSchema = Joi.object({
@@ -32,7 +36,7 @@ export const contractSchema = Joi.object({
     }),
     endDate: Joi.date().optional(),
     type: Joi.string()
-        .valid("FULL_TIME", "PART_TIME", "FREELANCE")
+        .valid(...Object.keys(CONTRACT_TYPES_MAP))
         .required()
         .messages({
             "any.required": "Loại hợp đồng là bắt buộc",
@@ -43,7 +47,7 @@ export const contractSchema = Joi.object({
         "number.min": "Lương phải lớn hơn hoặc bằng 0",
     }),
     status: Joi.string()
-        .valid("ACTIVE", "INACTIVE", "PENDING")
+        .valid(...Object.keys(CONTRACT_STATUSES_MAP))
         .required()
         .messages({
             "any.required": "Trạng thái là bắt buộc",
@@ -64,4 +68,38 @@ export const employeeSchema = Joi.object({
     }),
     department: Joi.string().allow(null, "").optional(),
     position: Joi.string().allow(null, "").optional(),
+});
+
+export const employeeUpdateMyInfoSchema = Joi.object({
+    name: Joi.string().required().messages({
+        "string.empty": "Tên không được để trống",
+        "any.required": "Tên là bắt buộc",
+    }),
+    avatar: Joi.string()
+        .uri({ scheme: ["http", "https"] })
+        .allow(null, "")
+        .optional()
+        .messages({
+            "string.uri": "Avatar phải là một URL hợp lệ (http hoặc https)",
+            "string.base": "Avatar phải là chuỗi ký tự",
+        }),
+    dob: Joi.date().optional().messages({
+        "date.base": "Ngày sinh không hợp lệ",
+    }),
+    email: Joi.string()
+        .email({ tlds: { allow: false } })
+        .allow(null, "")
+        .optional()
+        .messages({
+            "string.email": "Email không hợp lệ",
+            "string.base": "Email phải là chuỗi ký tự",
+        }),
+    phone: Joi.string()
+        .pattern(/^[0-9]+$/)
+        .allow(null, "")
+        .optional()
+        .messages({
+            "string.pattern.base": "Số điện thoại không hợp lệ",
+            "string.base": "Số điện thoại phải là chuỗi ký tự",
+        }),
 });

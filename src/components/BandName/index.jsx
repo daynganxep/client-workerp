@@ -1,7 +1,9 @@
+import useIsDark from "@hooks/useIsDark";
 import { Box, Typography, useTheme } from "@mui/material";
 
 function BrandName() {
   const theme = useTheme();
+  const isDark = useIsDark();
 
   return (
     <Box
@@ -17,9 +19,9 @@ function BrandName() {
         sx={{
           fontWeight: 700,
           fontSize: { xs: '24px', sm: '32px', md: '40px' },
-          background: theme.palette.mode === 'dark'
+          background: isDark
             ? 'linear-gradient(to right, #64B5F6, #81C784)'
-            : 'linear-gradient(to right, #1976D2, #388E3C)',
+            : 'linear-gradient(to right,rgb(0, 0, 0),rgb(0, 18, 76))',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           letterSpacing: '-1px'

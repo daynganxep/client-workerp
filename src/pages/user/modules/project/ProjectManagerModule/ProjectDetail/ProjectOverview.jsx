@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import ProjectService from "@services/project-module-service/project.service";
-import { Box, Card, CardContent, Grid, Chip, IconButton, Divider, DialogActions, TextField, MenuItem, Select, DialogContent, DialogTitle, Dialog, Typography, CircularProgress } from '@mui/material';
+import { Box, Card, CardContent, Grid, Chip, IconButton, Divider, DialogActions, TextField, MenuItem, Select, DialogContent, DialogTitle, Dialog, Typography, CircularProgress, Button } from '@mui/material';
 import { Folder, Edit, CalendarToday, Description } from '@mui/icons-material';
 import useFormValidation from "@hooks/useForm";
 import { projectSchema } from "@validations/projectSchema";
 import toast from "@hooks/toast";
-import { Button } from "react-scroll";
+import { PROJECT_STATUSES_MAP } from "@configs/const.config";
+import { formatDateForUI } from "@tools/date.tool";
+import DateField from "@components/DateField";
 
 function ProjectOverview({ projectId }) {
     const [project, setProject] = useState(null);
@@ -37,7 +39,6 @@ function ProjectOverview({ projectId }) {
         const [res, err] = await ProjectService.getProjectById(projectId);
         if (err) return toast.error(err.code);
         setProject(res.data);
-        // Đồng bộ dữ liệu ban đầu vào form
         setValues({
             name: res.data.name,
             description: res.data.description || "",
@@ -51,45 +52,21 @@ function ProjectOverview({ projectId }) {
     const formatDateForInput = (dateString) => {
         if (!dateString) return "";
         const date = new Date(dateString);
-        return isNaN(date) ? "" : date.toISOString().split("T")[0]; // Trả về YYYY-MM-DD
-    };
-
-    const formatDateForBackend = (dateString) => {
-        if (!dateString) return null;
-        const date = new Date(dateString);
-        return isNaN(date) ? null : date.toISOString(); // Trả về ISO 8601 đầy đủ
+        return isNaN(date) ? "" : date.toISOString().split("T")[0];
     };
 
     const handleEditProject = async () => {
         if (!validate()) return;
         startSubmitting();
-        const updatedData = {
-            ...data,
-            startDate: formatDateForBackend(data.startDate),
-            endDate: formatDateForBackend(data.endDate),
-        };
-        const [, err] = await ProjectService.updateProject(
+        const [res, err] = await ProjectService.updateProject(
             projectId,
-            updatedData,
+            data,
         );
         finishSubmitting();
         if (err) return toast.error(err.code);
-        toast.success("Project updated successfully");
+        toast.success(res.code);
         setOpenEdit(false);
-        fetchProject(); // Làm mới dữ liệu sau khi cập nhật
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'OPEN':
-                return 'info';
-            case 'IN_PROGRESS':
-                return 'warning';
-            case 'COMPLETED':
-                return 'success';
-            default:
-                return 'default';
-        }
+        fetchProject();
     };
 
     if (!project) return <div>Loading...</div>;
@@ -106,8 +83,8 @@ function ProjectOverview({ projectId }) {
                                     {project.name}
                                 </Typography>
                                 <Chip
-                                    label={project.status}
-                                    color={getStatusColor(project.status)}
+                                    label={PROJECT_STATUSES_MAP[project.status]?.label}
+                                    color={PROJECT_STATUSES_MAP[project.status]?.color}
                                     size="small"
                                     sx={{ mt: 1 }}
                                 />
@@ -148,7 +125,7 @@ function ProjectOverview({ projectId }) {
                                         Thời gian
                                     </Typography>
                                     <Typography sx={{ mt: 1 }}>
-                                        {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
+                                        {formatDateForUI(project.startDate)} - {formatDateForUI(project.endDate)}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -199,13 +176,15 @@ function ProjectOverview({ projectId }) {
                                 onChange={(e) => handleChange("status", e.target.value)}
                                 label="Trạng thái"
                             >
-                                <MenuItem value="OPEN">Open</MenuItem>
-                                <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
-                                <MenuItem value="COMPLETED">Completed</MenuItem>
+                                {Object.entries(PROJECT_STATUSES_MAP).map(([key, { code, label }]) => (
+                                    <MenuItem key={key} value={code}>
+                                        {label}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <TextField
+                            <DateField
                                 fullWidth
                                 label="Ngày bắt đầu"
                                 type="date"
@@ -217,7 +196,7 @@ function ProjectOverview({ projectId }) {
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <TextField
+                            <DateField
                                 fullWidth
                                 label="Ngày kết thúc"
                                 type="date"

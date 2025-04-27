@@ -24,15 +24,11 @@ const ForgotPasswordStep2 = () => {
     });
     if (error) {
       setErrorMessage(getMessage(error.code));
-      toast.error(getMessage(error.code), {
-        autoClose: 3000,
-      });
+      toast.error(error.code);
       return;
     }
     dispatch(setTokens(result.data));
-    toast.success(getMessage(result.code), {
-      autoClose: 3000,
-    });
+    toast.success(result.code);
     navigate("/");
   };
 

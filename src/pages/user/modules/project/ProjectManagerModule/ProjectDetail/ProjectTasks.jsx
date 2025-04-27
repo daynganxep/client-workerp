@@ -23,6 +23,9 @@ import {
     ToggleButtonGroup,
     Divider,
     Chip,
+    useTheme,
+    InputLabel,
+    FormControl,
 } from "@mui/material";
 import {
     Assignment,
@@ -37,11 +40,18 @@ import useFormValidation from "@hooks/useForm";
 import { taskSchema } from "@validations/projectSchema";
 import toast from "@hooks/toast";
 import useEmployee from "@hooks/useEmployee";
+import { formatDateForInput, formatDateForUI } from "@tools/date.tool";
+import { TASK_PRIORITY_MAP, TASK_STATUSES_MAP } from "@configs/const.config";
+import Employee from "@components/Employee";
+import useIsDark from "@hooks/useIsDark";
+import DateField from "@components/DateField";
 import { Link } from "react-router-dom";
-import { formatDateForBackend, formatDateForInput } from "@tools/date.tool";
+import ReactQuill from "react-quill";
 import "./project-tasks.scss";
 
-function ProjectTasks({ projectId }) {
+function ProjectTasks({ projectId, isManager = false, isMyTasks = false }) {
+    const theme = useTheme();
+    const isDarkMode = useIsDark();
     const employeeInfo = useEmployee();
     const [tasks, setTasks] = useState([]);
     const [sortBy, setSortBy] = useState("dueDate");
@@ -51,6 +61,15 @@ function ProjectTasks({ projectId }) {
     const [viewMode, setViewMode] = useState("kanban");
     const [members, setMembers] = useState([]);
     const [deleteConfirm, setDeleteConfirm] = useState({ open: false, taskId: null });
+    const initialTask = {
+        title: "",
+        description: "",
+        projectId,
+        assignees: [],
+        priority: TASK_PRIORITY_MAP.LOW.code,
+        status: TASK_STATUSES_MAP.TO_DO.code,
+        dueDate: "",
+    }
 
     const {
         data,
@@ -61,23 +80,16 @@ function ProjectTasks({ projectId }) {
         finishSubmitting,
         isSubmitting,
         setValues,
-    } = useFormValidation(taskSchema, {
-        title: "",
-        description: "",
-        projectId,
-        assignees: [],
-        priority: "LOW",
-        status: "TO_DO",
-        dueDate: "",
-    });
+    } = useFormValidation(taskSchema, initialTask);
 
     useEffect(() => {
         fetchTasks();
         fetchMembers();
-    }, [projectId, sortBy, order]);
+    }, [projectId, isManager, isMyTasks, sortBy, order]);
 
     const fetchTasks = async () => {
-        const [res, err] = await TaskService.getTasksByProjectId(projectId, {
+        TaskService.getMyTasks()
+        const [res, err] = await TaskService[isMyTasks ? "getMyTasks" : "getTasksByProjectId"](projectId, {
             sortBy,
             order,
         });
@@ -94,47 +106,31 @@ function ProjectTasks({ projectId }) {
     const handleCreateTask = async () => {
         if (!validate()) return;
         startSubmitting();
-        const taskData = {
-            ...data,
-            dueDate: formatDateForBackend(data.dueDate), // Xử lý an toàn trước khi gửi BE
-        };
-        const [, err] = await TaskService.createTask(projectId, taskData);
+        const [res, err] = await TaskService.createTask(projectId, data);
         finishSubmitting();
         if (err) return toast.error(err.code);
-        toast.success("Task created successfully");
+        toast.success(res.code);
         setOpenTask(false);
-        setValues({
-            title: "",
-            description: "",
-            projectId,
-            assignees: [],
-            priority: "MEDIUM",
-            status: "TO_DO",
-            dueDate: "",
-        });
+        setValues(initialTask);
         fetchTasks();
     };
 
     const handleEditTask = async () => {
         if (!validate()) return;
         startSubmitting();
-        const taskData = {
-            ...data,
-            dueDate: formatDateForBackend(data.dueDate),
-        };
-        const [, err] = await TaskService.updateTask(editTask.id, taskData);
+        const [res, err] = await TaskService.updateTask(editTask.id, data);
         finishSubmitting();
         if (err) return toast.error(err.code);
-        toast.success("Task updated successfully");
+        toast.success(res.code);
         setEditTask(null);
         fetchTasks();
     };
 
     const handleDeleteTask = async (taskId) => {
         setDeleteConfirm({ open: false, taskId: null });
-        const [, err] = await TaskService.deleteTask(taskId);
+        const [res, err] = await TaskService.deleteTask(taskId);
         if (err) return toast.error(err.code);
-        toast.success("Xóa task thành công");
+        toast.success(res.code);
         fetchTasks();
     };
 
@@ -143,28 +139,21 @@ function ProjectTasks({ projectId }) {
     };
 
     const renderKanbanView = () => {
-        const statusColumns = {
-            TO_DO: { title: 'To Do', color: 'info.light' },
-            IN_PROGRESS: { title: 'In Progress', color: 'warning.light' },
-            DONE: { title: 'Done', color: 'success.light' }
-        };
 
-        const getPriorityColor = (priority) => {
-            switch (priority) {
-                case 'HIGH': return 'error.main';
-                case 'MEDIUM': return 'warning.main';
-                case 'LOW': return 'success.main';
-                default: return 'text.secondary';
-            }
+        const getStatusColor = (status) => {
+            const baseColor = TASK_STATUSES_MAP[status]?.color || 'default';
+            return isDarkMode
+                ? theme.palette[baseColor].dark
+                : theme.palette[baseColor].light;
         };
 
         return (
             <Grid container spacing={3}>
-                {Object.entries(statusColumns).map(([status, { title, color }]) => (
+                {Object.entries(TASK_STATUSES_MAP).map(([status, { label }]) => (
                     <Grid item xs={12} md={4} key={status}>
                         <Box
                             sx={{
-                                bgcolor: color,
+                                bgcolor: getStatusColor(status),
                                 borderRadius: 2,
                                 p: 2,
                                 minHeight: 'calc(100vh - 250px)',
@@ -180,7 +169,7 @@ function ProjectTasks({ projectId }) {
                                     gap: 1
                                 }}
                             >
-                                {title}
+                                {label}
                                 <Chip
                                     label={tasks.filter(t => t.status === status).length}
                                     size="small"
@@ -206,43 +195,38 @@ function ProjectTasks({ projectId }) {
                                                 <Assignment sx={{ fontSize: 20, mr: 1, verticalAlign: 'text-bottom' }} />
                                                 {task.title}
                                             </Typography>
-
-                                            <Box sx={{ mb: 2, color: 'text.secondary', fontSize: '0.875rem' }}>
-                                                {task.description}
-                                            </Box>
-
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
+                                                {task.dueDate && (
+                                                    <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
+                                                        <CalendarToday sx={{ fontSize: 16, mr: 0.5 }} />
+                                                        {formatDateForUI(task.dueDate)}
+                                                    </Typography>
+                                                )}
                                                 <Chip
-                                                    label={task.priority}
+                                                    label={TASK_PRIORITY_MAP[task.priority]?.label}
                                                     size="small"
+                                                    color={TASK_PRIORITY_MAP[task.priority]?.color}
                                                     sx={{
-                                                        bgcolor: getPriorityColor(task.priority),
                                                         color: 'white',
                                                         fontWeight: 'medium'
                                                     }}
                                                 />
-                                                {task.dueDate && (
-                                                    <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
-                                                        <CalendarToday sx={{ fontSize: 16, mr: 0.5 }} />
-                                                        {formatDateForInput(task.dueDate)}
-                                                    </Typography>
-                                                )}
                                             </Box>
 
                                             {task.assignees?.length > 0 && (
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                    {task.assignees.map((assignee) => (
-                                                        <Chip
+                                                <Box sx={{ display: 'flex', alignItems: 'start', flexDirection: 'column', gap: 1 }}>
+                                                    {task?.assignees?.map((assignee) => (
+                                                        <Employee
                                                             key={assignee}
-                                                            label={employeeInfo(assignee)?.name}
-                                                            size="small"
-                                                            variant="outlined"
-                                                            sx={{ maxWidth: 120 }}
+                                                            employeeId={assignee}
+                                                            size={1}
+                                                            tooltipSize={10}
+                                                            showName={true}
                                                         />
                                                     )).slice(0, 2)}
                                                     {task.assignees.length > 2 && (
                                                         <Chip
-                                                            label={`+${task.assignees.length - 2}`}
+                                                            label={`+${task?.assignees?.length - 2}`}
                                                             size="small"
                                                             variant="outlined"
                                                         />
@@ -251,36 +235,45 @@ function ProjectTasks({ projectId }) {
                                             )}
                                         </CardContent>
 
-                                        <CardActions sx={{ px: 2, py: 1, borderTop: 1, borderColor: 'divider' }}>
-                                            {/* <Button
-                                                size="small"
-                                                component={Link}
-                                                to={`/working/project/manager/task/${task.id}`}
-                                                sx={{ mr: 'auto' }}
-                                            >
-                                                Chi tiết
-                                            </Button> */}
-                                            <IconButton size="small" onClick={() => {
-                                                setValues({
-                                                    title: task.title,
-                                                    description: task.description || "",
-                                                    projectId,
-                                                    assignees: task.assignees || [],
-                                                    priority: task.priority,
-                                                    status: task.status,
-                                                    dueDate: formatDateForInput(task.dueDate),
-                                                });
-                                                setEditTask(task);
-                                            }}>
-                                                <Edit fontSize="small" />
-                                            </IconButton>
-                                            <IconButton
-                                                size="small"
-                                                onClick={() => setDeleteConfirm({ open: true, taskId: task.id })}
-                                            >
-                                                <Delete fontSize="small" />
-                                            </IconButton>
-                                        </CardActions>
+                                        {(isManager || isMyTasks) &&
+                                            <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 2, py: 1, borderTop: 1, borderColor: 'divider' }}>
+
+                                                {(isManager || isMyTasks) &&
+                                                    <Button
+                                                        size="small"
+                                                        component={Link}
+                                                        to={`/working/project/${isManager ? "manager" : "user"}/task/${task.id}`}
+                                                        sx={{ mr: 'auto' }}
+                                                    >
+                                                        Chi tiết
+                                                    </Button>
+                                                }
+                                                {isManager &&
+                                                    <Box>
+                                                        <IconButton size="small" onClick={() => {
+                                                            setValues({
+                                                                title: task.title,
+                                                                description: task.description || "",
+                                                                projectId,
+                                                                assignees: task.assignees || [],
+                                                                priority: task.priority,
+                                                                status: task.status,
+                                                                dueDate: formatDateForInput(task.dueDate),
+                                                            });
+                                                            setEditTask(task);
+                                                        }}>
+                                                            <Edit fontSize="small" />
+                                                        </IconButton>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => setDeleteConfirm({ open: true, taskId: task.id })}
+                                                        >
+                                                            <Delete fontSize="small" />
+                                                        </IconButton>
+                                                    </Box>
+                                                }
+                                            </CardActions>
+                                        }
                                     </Card>
                                 ))}
                             </Box>
@@ -327,84 +320,73 @@ function ProjectTasks({ projectId }) {
                                 <Grid item xs={12} sm={6}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <Chip
-                                            label={task.status}
+                                            label={TASK_STATUSES_MAP[task.status]?.label}
                                             size="small"
-                                            color={
-                                                task.status === 'DONE' ? 'success' :
-                                                    task.status === 'IN_PROGRESS' ? 'warning' : 'info'
-                                            }
+                                            color={TASK_STATUSES_MAP[task.status]?.color}
                                         />
                                         <Chip
-                                            label={task.priority}
+                                            label={TASK_PRIORITY_MAP[task.priority]?.label}
                                             size="small"
-                                            color={
-                                                task.priority === 'HIGH' ? 'error' :
-                                                    task.priority === 'MEDIUM' ? 'warning' : 'success'
-                                            }
+                                            color={TASK_PRIORITY_MAP[task.priority]?.color}
                                         />
                                     </Box>
                                 </Grid>
                                 <Grid item xs={12} sm={6}>
                                     <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
                                         <CalendarToday sx={{ fontSize: 16, mr: 1 }} />
-                                        {formatDateForInput(task.dueDate) || "Chưa có hạn"}
+                                        {formatDateForUI(task.dueDate) || "Chưa có hạn"}
                                     </Typography>
                                 </Grid>
                             </Grid>
 
                             {task.assignees?.length > 0 && (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                                     {task.assignees.map(assignee => (
-                                        <Chip
-                                            key={assignee}
-                                            label={employeeInfo(assignee)?.name}
-                                            size="small"
-                                            variant="outlined"
-                                        />
+                                        <Employee key={assignee} employeeId={assignee} showName></Employee>
                                     ))}
                                 </Box>
                             )}
                         </Box>
 
-                        <Box sx={{
-                            display: 'flex',
-                            gap: 1,
-                            alignItems: 'center',
-                            alignSelf: { xs: 'stretch', sm: 'center' }
-                        }}>
-                            {/* <Button
-                                component={Link}
-                                to={`/working/project/manager/task/${task.id}`}
-                                variant="outlined"
-                                size="small"
-                                sx={{ minWidth: 100 }}
-                            >
-                                Chi tiết
-                            </Button> */}
-                            <IconButton
-                                size="small"
-                                onClick={() => {
-                                    setValues({
-                                        title: task.title,
-                                        description: task.description || "",
-                                        projectId,
-                                        assignees: task.assignees || [],
-                                        priority: task.priority,
-                                        status: task.status,
-                                        dueDate: formatDateForInput(task.dueDate),
-                                    });
-                                    setEditTask(task);
-                                }}
-                            >
-                                <Edit />
-                            </IconButton>
-                            <IconButton
-                                size="small"
-                                onClick={() => setDeleteConfirm({ open: true, taskId: task.id })}
-                            >
-                                <Delete />
-                            </IconButton>
-                        </Box>
+                        {(isManager || isMyTasks) &&
+                            <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 2, py: 1, gap: 6 }}>
+
+                                {(isManager || isMyTasks) &&
+                                    <Button
+                                        size="small"
+                                        component={Link}
+                                        to={`/working/project/${isManager ? "manager" : "user"}/task/${task.id}`}
+                                        sx={{ mr: 'auto' }}
+                                    >
+                                        Chi tiết
+                                    </Button>
+                                }
+                                {isManager &&
+                                    <Box>
+                                        <IconButton size="small" onClick={() => {
+                                            setValues({
+                                                title: task.title,
+                                                description: task.description || "",
+                                                projectId,
+                                                assignees: task.assignees || [],
+                                                priority: task.priority,
+                                                status: task.status,
+                                                dueDate: formatDateForInput(task.dueDate),
+                                            });
+                                            setEditTask(task);
+                                        }}>
+                                            <Edit fontSize="small" />
+                                        </IconButton>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => setDeleteConfirm({ open: true, taskId: task.id })}
+                                        >
+                                            <Delete fontSize="small" />
+                                        </IconButton>
+                                    </Box>
+                                }
+                            </CardActions>
+                        }
                     </ListItem>
                     {index < tasks.length - 1 && <Divider />}
                 </>
@@ -420,9 +402,9 @@ function ProjectTasks({ projectId }) {
                     onChange={(e) => setSortBy(e.target.value)}
                     sx={{ mr: 2 }}
                 >
-                    <MenuItem value="dueDate">Due Date</MenuItem>
-                    <MenuItem value="priority">Priority</MenuItem>
-                    <MenuItem value="status">Status</MenuItem>
+                    <MenuItem value="dueDate">Hạn chót</MenuItem>
+                    <MenuItem value="priority">Độ ưu tiên</MenuItem>
+                    <MenuItem value="status">Trạng thái</MenuItem>
                 </Select>
                 <Button
                     onClick={() => setOrder(order === "asc" ? "desc" : "asc")}
@@ -442,14 +424,19 @@ function ProjectTasks({ projectId }) {
                         <ViewList />
                     </ToggleButton>
                 </ToggleButtonGroup>
-                <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={() => setOpenTask(true)}
-                    sx={{ ml: 2 }}
-                >
-                    Task mới
-                </Button>
+                {isManager &&
+                    <Button
+                        variant="contained"
+                        startIcon={<Add />}
+                        onClick={() => {
+                            setValues(initialTask);
+                            setOpenTask(true)
+                        }}
+                        sx={{ ml: 2 }}
+                    >
+                        NHIỆM VỤ MỚI
+                    </Button>
+                }
             </div>
 
             {viewMode === "kanban" ? renderKanbanView() : renderListView()}
@@ -473,64 +460,76 @@ function ProjectTasks({ projectId }) {
                         onChange={(e) => handleChange("title", e.target.value)}
                         error={!!errors.title}
                         helperText={errors.title}
-                        sx={{ mt: 1 }}
+                        sx={{ mt: 1, mb: 2 }}
                     />
-                    <TextField
-                        fullWidth
-                        label="Mô tả"
+                    <ReactQuill
+                        palaceholder="Mô tả công việc..."
                         value={data.description}
-                        onChange={(e) =>
-                            handleChange("description", e.target.value)
-                        }
-                        sx={{ mt: 2 }}
+                        onChange={(value) => handleChange("description", value)}
+                        theme="snow"
+                        modules={{
+                            toolbar: [
+                                [{ header: [1, 2, false] }],
+                                ['bold', 'italic', 'underline'],
+                                ['link'],
+                                [{ list: 'ordered' }, { list: 'bullet' }],
+                            ],
+                        }}
+                        style={{ backgroundColor: 'transparent' }}
                     />
-                    <Select
-                        fullWidth
-                        multiple
-                        value={data.assignees}
-                        onChange={(e) =>
-                            handleChange("assignees", e.target.value)
-                        }
-                        renderValue={(selected) =>
-                            selected
-                                .map((id) => employeeInfo(id)?.name || id)
-                                .join(", ")
-                        }
+                    <FormControl fullWidth
+                        sx={{ mt: 2 }}
+                        error={!!errors.assignees}
+                        helperText={errors.assignees}
+                    >
+                        <InputLabel id="demo-simple-select-label">Người thực hiện</InputLabel>
+                        <Select
+                            fullWidth
+                            multiple
+                            value={data.assignees}
+                            onChange={(e) =>
+                                handleChange("assignees", e.target.value)
+                            }
+                            renderValue={(selected) =>
+                                selected
+                                    .map((id) => employeeInfo(id)?.name || id)
+                                    .join(", ")
+                            }
+                            label="Người thực hiện"
+                        >
+                            {members.map((member) => (
+                                <MenuItem
+                                    key={member.employeeId}
+                                    value={member.employeeId}
+                                >
+                                    {employeeInfo(member.employeeId)?.name ||
+                                        member.employeeId}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <FormControl fullWidth
                         sx={{ mt: 2 }}
                     >
-                        {members.map((member) => (
-                            <MenuItem
-                                key={member.employeeId}
-                                value={member.employeeId}
-                            >
-                                {employeeInfo(member.employeeId)?.name ||
-                                    member.employeeId}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <Select
-                        fullWidth
-                        value={data.priority}
-                        onChange={(e) =>
-                            handleChange("priority", e.target.value)
-                        }
-                        sx={{ mt: 2 }}
-                    >
-                        <MenuItem value="LOW">Low</MenuItem>
-                        <MenuItem value="MEDIUM">Medium</MenuItem>
-                        <MenuItem value="HIGH">High</MenuItem>
-                    </Select>
-                    {/* <Select
-                        fullWidth
-                        value={data.status}
-                        onChange={(e) => handleChange("status", e.target.value)}
-                        sx={{ mt: 2 }}
-                    >
-                        <MenuItem value="TO_DO">To Do</MenuItem>
-                        <MenuItem value="IN_PROGRESS">In Progress</MenuItem>
-                        <MenuItem value="DONE">Done</MenuItem>
-                    </Select> */}
-                    <TextField
+                        <InputLabel id="demo-simple-select-label">Độ ưu tiên</InputLabel>
+                        <Select
+                            fullWidth
+                            value={data.priority}
+                            onChange={(e) =>
+                                handleChange("priority", e.target.value)
+                            }
+                            label="Độ ưu tiên"
+                        >
+
+                            {Object.entries(TASK_PRIORITY_MAP).map(([key, { label }]) => (
+                                <MenuItem key={key} value={key}>
+                                    {label}
+                                </MenuItem>
+                            ))}
+
+                        </Select>
+                    </FormControl>
+                    <DateField
                         fullWidth
                         label="Hạn"
                         type="date"
@@ -538,7 +537,6 @@ function ProjectTasks({ projectId }) {
                         onChange={(e) =>
                             handleChange("dueDate", e.target.value)
                         }
-                        InputLabelProps={{ shrink: true }}
                         sx={{ mt: 2 }}
                     />
                 </DialogContent>

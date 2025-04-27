@@ -1,24 +1,50 @@
-import { CardContent } from "@mui/material";
-import BrandName from "@components/BandName";
-import { Link, Outlet } from "react-router-dom";
-import bg from "@assets/images/nnnoise.svg";
-import logo from "@assets/images/logo.svg";
-import ".scss";
+import { Box, Card, CardContent, Container, alpha } from "@mui/material";
+import { Link } from "react-router-dom";
+import LogoAndBrandName from "@components/LogoAndBrandName";
+import { Outlet } from "react-router-dom";
 
 function AuthLayout() {
   return (
-    <div className="auth-layout">
-      <img src={bg} alt="Background" className="auth-layout__background" />
-      <div className="auth-layout__container">
-        <div className="auth-layout__card">
-          <Link to="/" className="auth-layout__header">
-            <img src={logo} alt="work-erp" />
-            <BrandName></BrandName>
-          </Link>
-          <CardContent><Outlet></Outlet></CardContent>
-        </div>
-      </div>
-    </div>
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+      }}
+    >
+      <Container maxWidth="sm" sx={{ px: 2 }}>
+        <Card
+          elevation={3}
+          sx={(theme) => ({
+            p: 3,
+            backdropFilter: 'blur(8px)',
+            background: alpha(theme.palette.background.paper, 0.8),
+            borderRadius: 2,
+            border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+          })}
+        >
+          <Box
+            component={Link}
+            to="/"
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              mb: 3,
+              textDecoration: 'none'
+            }}
+          >
+            <LogoAndBrandName />
+          </Box>
+
+          <CardContent sx={{ p: 0 }}>
+            <Outlet />
+          </CardContent>
+        </Card>
+      </Container>
+    </Box>
   );
 }
 

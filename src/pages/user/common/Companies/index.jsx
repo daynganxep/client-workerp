@@ -32,6 +32,8 @@ function Companies() {
     const navigate = useNavigate();
     const theme = useTheme();
 
+    console.log(companies)
+
     // Fetch danh sách công ty
     async function fetchCompanies() {
         setLoading(true);
@@ -56,6 +58,7 @@ function Companies() {
     // Xử lý vào công ty
     const handleComeInCompany = async (company) => {
         dispatch(companyActions.setCompanyCore(company));
+        dispatch(companyActions.setCompanyInfo(company));
         const companyId = company.id;
 
         const [[res1, err1], [res2, err2]] = await Promise.all([
@@ -66,7 +69,7 @@ function Companies() {
         if (!err1 && !err2) {
             dispatch(companyActions.setEmployees(res1.data));
             dispatch(companyActions.setCompanyModuleRoles(res2.data));
-            navigate('/working/project');
+            navigate('/working/hr/user');
         }
     };
 
@@ -155,41 +158,90 @@ function Companies() {
                                         height: '100%',
                                         display: 'flex',
                                         flexDirection: 'column',
+                                        overflow: 'hidden',
                                         '&:hover': {
                                             boxShadow: theme.shadows[4],
-                                            transform: 'scale(1.02)',
+                                            transform: 'translateY(-4px)',
                                         },
                                     }}
-                                    className="company-card"
                                 >
-                                    <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
+                                    {/* Cover Image */}
+                                    <Box
+                                        sx={{
+                                            position: 'relative',
+                                            paddingTop: '40%',
+                                            backgroundColor: theme.palette.mode === 'dark'
+                                                ? 'grey.800'
+                                                : 'grey.100',
+                                            backgroundImage: company.coverImage
+                                                ? `url(${company.coverImage})`
+                                                : 'none',
+                                            backgroundSize: 'cover',
+                                            backgroundPosition: 'center',
+                                        }}
+                                    >
+                                        {/* Avatar overlapping the cover */}
                                         <Avatar
-                                            src={company.logo}
-                                            {...(company.logo ? { sx: { width: 64, height: 64 } } : stringAvatar(company.name))}
-                                            sx={{ mx: 'auto', mb: 2 }}
+                                            src={company.avatar}
+                                            {...(!company.avatar && stringAvatar(company.name))}
+                                            sx={{
+                                                position: 'absolute',
+                                                left: '50%',
+                                                bottom: 0,
+                                                transform: 'translate(-50%, 50%)',
+                                                width: 80,
+                                                height: 80,
+                                                border: `4px solid ${theme.palette.background.paper}`,
+                                                boxShadow: theme.shadows[2],
+                                            }}
                                         />
+                                    </Box>
+
+                                    <CardContent sx={{
+                                        flexGrow: 1,
+                                        textAlign: 'center',
+                                        mt: 5 // Space for avatar overflow
+                                    }}>
                                         <Typography
                                             variant="h6"
-                                            sx={{ color: theme.palette.text.primary, mb: 1 }}
+                                            sx={{
+                                                color: theme.palette.text.primary,
+                                                mb: 1,
+                                                fontWeight: 600
+                                            }}
                                         >
                                             {company.name}
                                         </Typography>
                                         <Typography
                                             variant="body2"
-                                            sx={{ color: theme.palette.text.secondary }}
+                                            sx={{
+                                                color: theme.palette.text.secondary,
+                                                mb: 1
+                                            }}
                                         >
-                                            Domain: {company.domain || 'Chưa cài đặt'}
+                                            {company.domain || 'Chưa cài đặt domain'}
                                         </Typography>
                                         <Typography
                                             variant="body2"
-                                            sx={{ color: theme.palette.text.secondary }}
+                                            sx={{
+                                                color: company.active
+                                                    ? theme.palette.success.main
+                                                    : theme.palette.error.main,
+                                                fontWeight: 500
+                                            }}
                                         >
-                                            Trạng thái: {company.active ? 'Đang hoạt động' : 'Không hoạt động'}
+                                            {company.active ? 'Đang hoạt động' : 'Không hoạt động'}
                                         </Typography>
                                     </CardContent>
-                                    <CardActions sx={{ justifyContent: 'center', pb: 2 }}>
+
+                                    <CardActions sx={{
+                                        justifyContent: 'center',
+                                        pb: 2,
+                                        px: 2
+                                    }}>
                                         <Button
-                                            variant="outlined"
+                                            fullWidth
+                                            variant="contained"
                                             color="primary"
                                             onClick={() => handleComeInCompany(company)}
                                             sx={{

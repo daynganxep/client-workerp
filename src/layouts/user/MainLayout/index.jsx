@@ -6,11 +6,10 @@ import {
     Container,
     Box,
     Button,
-    Avatar,
-    Typography,
 } from '@mui/material';
 import LogoAndBrandName from '@components/LogoAndBrandName';
 import ThemeToggleButton from '@components/ThemeToggleButton';
+import UserMenu from './UserMenu';
 import '.scss';
 
 function MainLayout() {
@@ -39,14 +38,7 @@ function MainLayout() {
                                 >
                                     Công ty
                                 </Button>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Avatar
-                                        src={user?.avatar}
-                                        srcSet={user?.avatar}
-                                        sx={{ width: 32, height: 32 }}
-                                    />
-                                    <Typography variant="body1">{user?.fullName || 'User'}</Typography>
-                                </Box>
+                                <UserMenu user={user} />
                                 <Button
                                     variant="outlined"
                                     color="inherit"

@@ -57,7 +57,7 @@ function ProjectMilestones({ projectId }) {
         );
         finishSubmitting();
         if (err) return toast.error(err.code);
-        toast.success("Milestone created successfully");
+        toast.success(res.code);
         setOpenMilestone(false);
         fetchMilestones();
     };
@@ -71,7 +71,7 @@ function ProjectMilestones({ projectId }) {
         );
         finishSubmitting();
         if (err) return toast.error(err.code);
-        toast.success("Milestone updated successfully");
+        toast.success(res.code);
         setEditMilestone(null);
         fetchMilestones();
     };
@@ -79,7 +79,7 @@ function ProjectMilestones({ projectId }) {
     const handleDeleteMilestone = async (milestoneId) => {
         const [res, err] = await MilestoneService.deleteMilestone(milestoneId);
         if (err) return toast.error(err.code);
-        toast.success("Milestone deleted successfully");
+        toast.success(res.code);
         fetchMilestones();
     };
 
@@ -188,8 +188,8 @@ function ProjectMilestones({ projectId }) {
                         {isSubmitting
                             ? "Đang xử lý..."
                             : editMilestone
-                            ? "Cập nhật"
-                            : "Tạo"}
+                                ? "Cập nhật"
+                                : "Tạo"}
                     </Button>
                 </DialogActions>
             </Dialog>

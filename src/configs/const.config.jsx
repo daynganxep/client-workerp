@@ -22,28 +22,19 @@ export const ROLES = {
     ADMIN: "ADMIN",
 };
 
-export const PRODUCT_STATUSES = {
-    PENDING: {
-        title: "Đang chờ duyệt",
-        actions: { ACTIVE: "Duyệt", REJECTED: "Từ chối" },
-    },
-    ACTIVE: {
-        title: "Đang bán",
-        actions: { BLOCKED: "Khóa" },
-    },
-    BLOCKED: {
-        title: "Đang bị khóa",
-        actions: { DRAFT: "Mở khóa (Nháp)" },
-    },
-    DRAFT: {
-        title: "",
-        actions: {},
-    },
-};
-
 export const MODULE_ROLES = {
     MANAGER: "MANAGER",
     USER: "USER",
+};
+
+export const MODULE_ROLES_MAP = {
+    MANAGER: {
+        code: "MANAGER",
+        label: "Quản lý"
+    }, USER: {
+        code: "USER",
+        label: "Người dùng"
+    },
 };
 
 export const MODULE_OPTIONS_MAP = {
@@ -83,3 +74,114 @@ export const TASK_STATUSES = {
     IN_PROGRESS: "IN_PROGRESS",
     DONE: "DONE",
 };
+
+export const CONTRACT_TYPES_MAP = {
+    FULL_TIME: {
+        code: "FULL_TIME",
+        label: "Toàn thời gian",
+        color: 'success',
+    },
+    PART_TIME: {
+        code: "PART_TIME",
+        label: "Bán thời gian",
+        color: 'info',
+    }, INTERN: {
+        code: "INTERN",
+        label: "Thực tập",
+        color: 'warning',
+    },
+};
+
+export const CONTRACT_STATUSES_MAP = {
+    ACTIVE: {
+        code: "ACTIVE",
+        label: "Đang hoạt động",
+        color: 'success',
+    },
+    EXPIRED: {
+        code: "EXPIRED",
+        label: "Hết hạn",
+        color: 'info',
+    }, TERMINATED: {
+        code: "TERMINATED",
+        label: "Đã chấm dứt",
+        color: 'warning',
+    },
+};
+
+export const PROJECT_STATUSES_MAP = {
+    OPEN: {
+        code: "OPEN",
+        label: "Mới",
+        color: 'info',
+    },
+    IN_PROGRESS: {
+        code: "IN_PROGRESS",
+        label: "Đang thực hiện",
+        color: 'warning',
+    },
+    COMPLETED: {
+        code: "COMPLETED",
+        label: "Hoàn thành",
+        color: 'success',
+    },
+    ON_HOLD: {
+        code: "ON_HOLD",
+        label: "Tạm dừng",
+        color: 'secondary',
+    },
+    CANCELLED: {
+        code: "CANCELLED",
+        label: "Đã hủy",
+        color: 'error',
+    },
+};
+
+export const PROJECT_MEMBER_ROLE = {
+    LEADER: {
+        code: "LEADER",
+        label: "Trưởng nhóm",
+        color: 'success',
+    }, MEMBER: {
+        code: "MEMBER",
+        label: "Thành viên",
+        color: 'secondary',
+    }
+}
+
+export const TASK_PRIORITY_MAP = {
+    LOW: {
+        code: "LOW",
+        label: "Thấp",
+        color: 'success',
+    },
+    MEDIUM: {
+        code: "MEDIUM",
+        label: "Trung bình",
+        color: 'warning',
+    },
+    HIGH: {
+        code: "HIGH",
+        label: "Cao",
+        color: 'error',
+    },
+};
+
+export const TASK_STATUSES_MAP = {
+    TO_DO: {
+        code: "TO_DO",
+        label: "Chưa thực hiện",
+        color: 'info',
+    },
+    IN_PROGRESS: {
+        code: "IN_PROGRESS",
+        label: "Đang thực hiện",
+        color: 'warning',
+    },
+    DONE: {
+        code: "DONE",
+        label: "Hoàn thành",
+        color: 'success',
+    },
+}
+

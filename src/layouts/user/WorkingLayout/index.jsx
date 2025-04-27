@@ -22,10 +22,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { MODULE_OPTIONS_MAP } from '@configs/const.config';
+import { MODULE_OPTIONS_MAP, MODULE_ROLES_MAP } from '@configs/const.config';
 import CompanyModuleRolesService from '@services/compay-module-service/company-module-roles.service';
 import EmployeeService from '@services/hr-module-service/employee.service';
 import ThemeToggleButton from '@components/ThemeToggleButton';
+import LogoAndBrandName from '@components/LogoAndBrandName';
 import { companyActions } from '@redux/slices/company.slice';
 import '.scss';
 
@@ -46,7 +47,7 @@ function WorkingLayout() {
     const currentModule = modules.find(
         (m) => m.moduleCode.toLowerCase() === moduleCode?.toLowerCase()
     );
-    const moduleRoles = currentModule?.moduleRoles || ['USER'];
+    const moduleRoles = currentModule?.moduleRoles || [MODULE_ROLES_MAP.USER.code];
     const hasMultipleRoles = moduleRoles.length > 1;
 
     // Toggle sidebar
@@ -59,7 +60,7 @@ function WorkingLayout() {
             CompanyModuleRolesService.getByEmployee(companyId),
             EmployeeService.getMyEmployeeInfo(),
         ]);
-        console.log({ err1, err2, err3 })
+        console.log({ res2 });
         if (!err1 && !err2 && !err3) {
             dispatch(companyActions.setEmployees(res1.data));
             dispatch(companyActions.setCompanyModuleRoles(res2.data));
@@ -85,7 +86,7 @@ function WorkingLayout() {
             key="module"
             sx={{ color: theme.palette.text.primary }}
         >
-            {moduleCode?.charAt(0).toUpperCase() + moduleCode?.slice(1).replace('-', ' ') || 'Working'}
+            {MODULE_OPTIONS_MAP[moduleCode?.toUpperCase()]?.label}
         </Typography>,
         tab && (
             <Typography
@@ -207,6 +208,19 @@ function WorkingLayout() {
                 })}
             </List>
 
+
+            <Box
+                sx={{
+                    borderTop: `1px solid ${theme.palette.divider}`,
+                    display: isSidebarOpen ? 'flex' : 'none',
+                    alignItems: 'start',
+                    gap: 1,
+
+                }}
+            >
+                <LogoAndBrandName size={0.7}></LogoAndBrandName>
+            </Box>
+
             {/* Sidebar footer */}
             <Box
                 sx={{
@@ -215,6 +229,7 @@ function WorkingLayout() {
                     borderTop: `1px solid ${theme.palette.divider}`,
                     display: 'flex',
                     alignItems: 'center',
+                    justifyContent: 'space-between',
                     gap: 1,
                 }}
             >
@@ -226,7 +241,7 @@ function WorkingLayout() {
                     <Avatar alt="Employee Name" src="/path/to/avatar.jpg" />
                 )}
             </Box>
-        </Box>
+        </Box >
     );
 
     return (
@@ -333,7 +348,7 @@ function WorkingLayout() {
                                             }),
                                         }}
                                     >
-                                        {r == "MANAGER" ? "QUẢN LÝ" : "NGƯỜI DÙNG"}
+                                        {MODULE_ROLES_MAP[r]?.label || r}
                                     </Button>
                                 );
                             })}

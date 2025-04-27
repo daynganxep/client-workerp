@@ -1,425 +1,462 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import TaskService from "@services/project-module-service/task.service";
 import {
     Typography,
     Button,
+    TextField,
+    Select,
+    MenuItem,
+    Box,
     Card,
     CardContent,
     Grid,
-    TextField,
+    Chip,
+    Stack,
+    Divider,
+    CircularProgress,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
-    IconButton,
-    CardActions,
-    Box,
-    Stack,
-    Chip,
-    Avatar,
+    FormControl,
+    InputLabel,
+    useTheme,
 } from "@mui/material";
 import {
-    Assignment,
-    Add,
     Edit,
-    Delete,
     CalendarToday,
-    People,
-    Send,
     AccessTime,
-    Update,
 } from "@mui/icons-material";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import DOMPurify from "dompurify";
+import TaskService from "@services/project-module-service/task.service";
 import useFormValidation from "@hooks/useForm";
+import { taskSchema, taskUpdateSchema } from "@validations/projectSchema";
+import { TASK_PRIORITY_MAP, TASK_STATUSES_MAP } from "@configs/const.config";
 import toast from "@hooks/toast";
-import ".scss";
+import { formatDateForUI } from "@tools/date.tool";
+import DateField from "@components/DateField";
+import Comments from "./Comments";
+import useEmployee from "@hooks/useEmployee";
+import ProjectService from "@services/project-module-service/project.service";
 
-function TaskDetail() {
+
+function TaskDetail({ isManager = false }) {
+    const theme = useTheme();
     const { taskId } = useParams();
+    const [projectId, setProjectId] = useState(null);
     const [task, setTask] = useState(null);
-    const [openSubtask, setOpenSubtask] = useState(false);
-    const [openEditComment, setOpenEditComment] = useState(null);
-    const [openDelete, setOpenDelete] = useState(false);
-    const [openEdit, setOpenEdit] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [comments, setComments] = useState([]);
+    const [members, setMembers] = useState([]);
+    const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const employeeInfo = useEmployee()
+
+    const initialManager = {
+        title: "",
+        description: "",
+        assignees: [],
+        priority: "",
+        status: "",
+        dueDate: "",
+        projectId,
+    }
+
+    const initialUser = {
+        status: "",
+        dueDate: "",
+        estimatedTime: "",
+    }
 
     const {
-        data: commentData,
-        handleChange: handleCommentChange,
-        resetForm: resetCommentForm,
-    } = useFormValidation(null, { content: "" });
-    const {
-        data: subtaskData,
-        handleChange: handleSubtaskChange,
-        resetForm: resetSubtaskForm,
-    } = useFormValidation(null, { title: "", dueDate: "" });
+        data,
+        errors,
+        handleChange,
+        validate,
+        resetForm,
+        isSubmitting,
+        startSubmitting,
+        finishSubmitting,
+    } = useFormValidation(isManager ? taskSchema : taskUpdateSchema, isManager ? initialManager : initialUser);
 
-
-    useEffect(() => {
-        const fetchTask = async () => {
-            const [res, err] = await TaskService.getTaskById(taskId);
-            if (err) return toast.error(err.code);
-            setTask(res.data);
-        };
-        fetchTask();
-    }, [taskId]);
-
-    const handleAddComment = async () => {
-        const [res, err] = await TaskService.addComment(taskId, commentData);
+    const fetchMembers = async () => {
+        const [res, err] = await ProjectService.getProjectById(projectId);
         if (err) return toast.error(err.code);
-        toast.success("Comment added successfully");
-        resetCommentForm();
-        fetchTask();
-    };
-
-    const handleAddSubtask = async () => {
-        const [res, err] = await TaskService.createSubtask(taskId, subtaskData);
-        if (err) return toast.error(err.code);
-        toast.success("Subtask added successfully");
-        setOpenSubtask(false);
-        resetSubtaskForm();
-        fetchTask();
-    };
-
-    const handleEditComment = async () => {
-        const [res, err] = await TaskService.updateComment(
-            taskId,
-            openEditComment.id,
-            commentData,
-        );
-        if (err) return toast.error(err.code);
-        toast.success("Comment updated successfully");
-        setOpenEditComment(null);
-        resetCommentForm();
-        fetchTask();
-    };
-
-    const handleDeleteComment = async (commentId) => {
-        const [res, err] = await TaskService.deleteComment(taskId, commentId);
-        if (err) return toast.error(err.code);
-        toast.success("Comment deleted successfully");
-        fetchTask();
-    };
-
-    const handleAddDependency = async (dependencyId) => {
-        const [res, err] = await TaskService.addDependency(
-            taskId,
-            dependencyId,
-        );
-        if (err) return toast.error(err.code);
-        toast.success("Dependency added successfully");
-        fetchTask();
-    };
-
-    const handleRemoveDependency = async (dependencyId) => {
-        const [res, err] = await TaskService.removeDependency(
-            taskId,
-            dependencyId,
-        );
-        if (err) return toast.error(err.code);
-        toast.success("Dependency removed successfully");
-        fetchTask();
+        setMembers(res.data.members || []);
     };
 
     const fetchTask = async () => {
+        setIsLoading(true);
         const [res, err] = await TaskService.getTaskById(taskId);
+        setIsLoading(false);
         if (err) return toast.error(err.code);
         setTask(res.data);
+        setProjectId(res.data.projectId);
+        const _comments = (res.data.comments || []);
+        _comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setComments(_comments);
     };
 
-    if (!task) return <div>Loading...</div>;
+    const handleTaskUpdate = async () => {
+        if (!validate()) return;
+
+        startSubmitting();
+        const [res, err] = await TaskService[isManager ? "updateTask" : "assignUpdateTask"](taskId, data);
+        finishSubmitting();
+
+        if (err) return toast.error(err.code);
+        toast.success(res.code);
+        setOpenUpdateDialog(false);
+        resetForm();
+        fetchTask();
+    };
+
+    useEffect(() => {
+        fetchTask();
+    }, [taskId]);
+
+    useEffect(() => {
+        isManager && task != null && fetchMembers();
+    }, [task]);
+
+    useEffect(() => {
+        if (task && openUpdateDialog) {
+            resetForm();
+            if (isManager) {
+                handleChange("title", task.title || "");
+                handleChange("description", task.description || "");
+                handleChange("assignees", task.assignees || []);
+                handleChange("priority", task.priority || "");
+                handleChange(
+                    "dueDate",
+                    task.dueDate
+                        ? new Date(task.dueDate).toISOString().split("T")[0]
+                        : ""
+                );
+                handleChange("status", task.status || "");
+                handleChange("projectId", projectId);
+            } else {
+                handleChange("status", task.status || "");
+                handleChange(
+                    "dueDate",
+                    task.dueDate
+                        ? new Date(task.dueDate).toISOString().split("T")[0]
+                        : ""
+                );
+                handleChange("estimatedTime", task.estimatedTime || "");
+            }
+        }
+    }, [task, openUpdateDialog]);
+
+    if (isLoading || !task) {
+        return (
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "200px",
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    const quillStyles = {
+        '& .ql-container': {
+            border: 'none',
+            fontFamily: theme.typography.fontFamily,
+        },
+        '& .ql-editor': {
+            padding: 0,
+            color: theme.palette.text.primary,
+            fontFamily: 'inherit',
+            '& h1, & h2': {
+                color: theme.palette.text.primary,
+                fontFamily: 'inherit',
+            },
+            '& p, & li': {
+                color: theme.palette.text.primary,
+                fontSize: theme.typography.body1.fontSize,
+            },
+            '& a': {
+                color: theme.palette.primary.main,
+            },
+        },
+        '& .ql-editor.ql-blank::before': {
+            color: theme.palette.text.secondary,
+            fontStyle: 'normal',
+        },
+    };
 
     return (
         <div className="task-detail">
-            {/* Header with Actions */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                <Button
-                    startIcon={<Edit />}
-                    variant="contained"
-                    color="primary"
-                    sx={{ mr: 1 }}
-                    onClick={() => setOpenEdit(true)}
+            {/* Main Task Information */}
+            <CardContent sx={{ p: 0, mb: 3 }}>
+                <Box
+                    sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    }}
                 >
-                    Chỉnh sửa
-                </Button>
-                <Button
-                    startIcon={<Delete />}
-                    variant="outlined"
-                    color="error"
-                    onClick={() => setOpenDelete(true)}
-                >
-                    Xóa
-                </Button>
-            </Box>
-
-            {/* Main Task Card */}
-            <Card elevation={2} sx={{ mb: 4 }}>
-                <CardContent>
-                    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 3 }}>
-                        <Box>
-                            <Typography variant="h5" sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                                <Assignment sx={{ mr: 1, color: 'primary.main' }} />
-                                {task.title}
-                            </Typography>
-                            <Typography color="text.secondary" sx={{ mb: 2 }}>
-                                {task.description || "Chưa có mô tả"}
-                            </Typography>
-                        </Box>
-                        <Stack direction="row" spacing={1}>
-                            <Chip
-                                label={task.status}
-                                color={
-                                    task.status === 'DONE' ? 'success' :
-                                        task.status === 'IN_PROGRESS' ? 'warning' : 'info'
-                                }
-                            />
-                            <Chip
-                                label={task.priority}
-                                color={
-                                    task.priority === 'HIGH' ? 'error' :
-                                        task.priority === 'MEDIUM' ? 'warning' : 'success'
-                                }
-                            />
-                        </Stack>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography
+                            variant="h5"
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                            }}
+                        >
+                            {task.title}
+                        </Typography>
                     </Box>
 
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
-                            <Stack spacing={2}>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <CalendarToday sx={{ mr: 1, color: 'text.secondary' }} />
-                                    <Typography>
-                                        Hạn: {new Date(task.dueDate).toLocaleDateString()}
-                                    </Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <People sx={{ mr: 1, color: 'text.secondary' }} />
-                                    <Typography>Người thực hiện:</Typography>
-                                </Box>
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, pl: 4 }}>
-                                    {task.assignees?.map(assignee => (
-                                        <Chip
-                                            key={assignee}
-                                            label={assignee}
-                                            size="small"
-                                            variant="outlined"
-                                        />
-                                    ))}
-                                </Box>
-                            </Stack>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <Stack spacing={2}>
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <AccessTime sx={{ mr: 1, color: 'text.secondary' }} />
-                                    <Typography>
-                                        Tạo lúc: {new Date(task.createdAt).toLocaleString()}
-                                    </Typography>
-                                </Box>
-                                {task.updatedAt && (
-                                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <Update sx={{ mr: 1, color: 'text.secondary' }} />
-                                        <Typography>
-                                            Cập nhật: {new Date(task.updatedAt).toLocaleString()}
-                                        </Typography>
-                                    </Box>
-                                )}
-                            </Stack>
-                        </Grid>
-                    </Grid>
-                </CardContent>
-            </Card>
-
-            {/* Subtasks Section */}
-            <Box sx={{ mb: 4 }}>
-                <Box sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    mb: 2,
-                    bgcolor: 'background.paper',
-                    p: 2,
-                    borderRadius: 1
-                }}>
-                    <Typography variant="h6">
-                        Công việc con ({task?.subTasks?.length || 0})
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        startIcon={<Add />}
-                        onClick={() => setOpenSubtask(true)}
-                    >
-                        Thêm công việc con
-                    </Button>
+                    <Stack direction="row" spacing={1}>
+                        <Chip
+                            label={TASK_STATUSES_MAP[task.status]?.label}
+                            color={TASK_STATUSES_MAP[task.status]?.color}
+                        />
+                        <Chip
+                            label={TASK_PRIORITY_MAP[task.priority]?.label}
+                            color={TASK_PRIORITY_MAP[task.priority]?.color}
+                        />
+                    </Stack>
                 </Box>
 
-                <Grid container spacing={2}>
-                    {task?.subTasks?.map((subTask) => (
-                        <Grid item xs={12} sm={6} md={4} key={subTask.id}>
-                            <Card
-                                sx={{
-                                    height: '100%',
-                                    transition: 'all 0.2s',
-                                    '&:hover': {
-                                        transform: 'translateY(-4px)',
-                                        boxShadow: 3
-                                    }
-                                }}
+                <Divider sx={{ my: 3 }} />
+
+                {task.description ? (
+                    <Box sx={quillStyles}>
+                        <ReactQuill
+                            value={DOMPurify.sanitize(task.description)}
+                            readOnly={true}
+                            theme="bubble"
+                            modules={{ toolbar: false }}
+                        />
+                    </Box>
+                ) : (
+                    <Typography color="text.secondary">
+                        Chưa có mô tả
+                    </Typography>
+                )}
+
+                <Divider sx={{ my: 3 }} />
+
+                <Box spacing={2} sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Box
+                        sx={{ display: "flex", alignItems: "center" }}
+                    >
+                        <CalendarToday
+                            sx={{ mr: 1, color: "text.secondary" }}
+                        />
+                        <Typography>
+                            Hạn:{" "}
+                            {formatDateForUI(task.dueDate) ||
+                                "Chưa có"}
+                        </Typography>
+                    </Box>
+                    <Box
+                        sx={{ display: "flex", alignItems: "center" }}
+                    >
+                        <AccessTime
+                            sx={{ mr: 1, color: "text.secondary" }}
+                        />
+                        <Typography>
+                            Thời gian ước tính:{" "}
+                            {task.estimatedTime || "Chưa có"} giờ
+                        </Typography>
+                    </Box>
+                    <Button
+                        variant="contained"
+                        startIcon={<Edit />}
+                        onClick={() => setOpenUpdateDialog(true)}
+                    >
+                        Cập nhật công việc
+                    </Button>
+                </Box>
+            </CardContent>
+
+            <Comments
+                taskId={taskId}
+                comments={comments}
+                startSubmitting={startSubmitting}
+                finishSubmitting={finishSubmitting}
+                fetchTask={fetchTask}
+                isSubmitting={isSubmitting}
+            />
+
+            {/* Update Task Dialog */}
+            <Dialog
+                open={openUpdateDialog}
+                onClose={() => setOpenUpdateDialog(false)}
+                maxWidth="md"
+                fullWidth
+            >
+                <DialogTitle>Cập nhật công việc</DialogTitle>
+
+                {isManager ?
+                    (<DialogContent>
+                        <TextField
+                            fullWidth
+                            label="Tiêu đề"
+                            value={data.title}
+                            onChange={(e) => handleChange("title", e.target.value)}
+                            error={!!errors.title}
+                            helperText={errors.title}
+                            sx={{ mt: 1, mb: 2 }}
+                        />
+                        <ReactQuill
+                            palaceholder="Mô tả công việc..."
+                            value={data.description}
+                            onChange={(value) => handleChange("description", value.trim())}
+                            theme="snow"
+                            modules={{
+                                toolbar: [
+                                    [{ header: [1, 2, false] }],
+                                    ['bold', 'italic', 'underline'],
+                                    ['link'],
+                                    [{ list: 'ordered' }, { list: 'bullet' }],
+                                ],
+                            }}
+                            style={{ backgroundColor: 'transparent' }}
+                        />
+                        <FormControl fullWidth
+                            sx={{ mt: 2 }}
+                            error={!!errors.assignees}
+                            helperText={errors.assignees}
+                        >
+                            <InputLabel id="demo-simple-select-label">Người thực hiện</InputLabel>
+                            <Select
+                                fullWidth
+                                multiple
+                                value={data.assignees}
+                                onChange={(e) =>
+                                    handleChange("assignees", e.target.value)
+                                }
+                                renderValue={(selected) =>
+                                    selected
+                                        .map((id) => employeeInfo(id)?.name || id)
+                                        .join(", ")
+                                }
+                                label="Người thực hiện"
                             >
-                                <CardContent>
-                                    <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 'medium' }}>
-                                        {subTask.title}
-                                    </Typography>
-                                    <Stack spacing={1}>
-                                        <Chip
-                                            label={subTask.status}
-                                            size="small"
-                                            color={subTask.status === 'DONE' ? 'success' : 'default'}
-                                        />
-                                        <Typography variant="body2" color="text.secondary">
-                                            Hạn: {new Date(subTask.dueDate).toLocaleDateString()}
-                                        </Typography>
-                                    </Stack>
-                                </CardContent>
-                                <CardActions sx={{ justifyContent: 'flex-end' }}>
-                                    <IconButton size="small" onClick={() => handleEditSubtask(subTask)}>
-                                        <Edit fontSize="small" />
-                                    </IconButton>
-                                    <IconButton size="small" onClick={() => handleDeleteSubtask(subTask.id)}>
-                                        <Delete fontSize="small" />
-                                    </IconButton>
-                                </CardActions>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
+                                {members.map((member) => (
+                                    <MenuItem
+                                        key={member.employeeId}
+                                        value={member.employeeId}
+                                    >
+                                        {employeeInfo(member.employeeId)?.name ||
+                                            member.employeeId}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth
+                            sx={{ mt: 2 }}
+                        >
+                            <InputLabel id="demo-simple-select-label">Độ ưu tiên</InputLabel>
+                            <Select
+                                fullWidth
+                                value={data.priority}
+                                onChange={(e) =>
+                                    handleChange("priority", e.target.value)
+                                }
+                                label="Độ ưu tiên"
+                            >
 
-            {/* Comments Section */}
-            <Box sx={{ mb: 4 }}>
-                <Typography variant="h6" sx={{ mb: 2, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
-                    Bình luận
-                </Typography>
+                                {Object.entries(TASK_PRIORITY_MAP).map(([key, { label }]) => (
+                                    <MenuItem key={key} value={key}>
+                                        {label}
+                                    </MenuItem>
+                                ))}
 
-                {/* Add Comment */}
-                <Card sx={{ mb: 2, p: 2 }}>
-                    <TextField
-                        value={commentData.content}
-                        onChange={(e) => handleCommentChange("content", e.target.value)}
-                        placeholder="Thêm bình luận..."
-                        multiline
-                        rows={2}
-                        fullWidth
+                            </Select>
+                        </FormControl>
+                        <DateField
+                            fullWidth
+                            label="Hạn"
+                            type="date"
+                            value={data.dueDate}
+                            onChange={(e) =>
+                                handleChange("dueDate", e.target.value)
+                            }
+                            sx={{ mt: 2 }}
+                            error={!!errors.dueDate}
+                            helperText={errors.dueDate}
+                        />
+                    </DialogContent>) : (<DialogContent
+                        sx={{ display: "flex", gap: 4, flexDirection: "column" }}
+                    >
+                        <FormControl fullWidth
+                            sx={{ mt: 2 }}
+                        >
+                            <InputLabel id="demo-simple-select-label">Trạng thái</InputLabel>
+                            <Select
+                                fullWidth
+                                size="small"
+                                value={data.status}
+                                onChange={(e) =>
+                                    handleChange("status", e.target.value)
+                                }
+                                error={!!errors.status}
+                                label="Trạng thái"
+                            >
+                                {Object.entries(TASK_STATUSES_MAP).map(
+                                    ([key, { label }]) => (
+                                        <MenuItem key={key} value={key}>
+                                            {label}
+                                        </MenuItem>
+                                    )
+                                )}
+                            </Select>
+                        </FormControl>
+                        <DateField
+                            fullWidth
+                            size="small"
+                            type="date"
+                            value={data.dueDate}
+                            onChange={(e) =>
+                                handleChange(
+                                    "dueDate",
+                                    e.target.value
+                                )
+                            }
+                            label="Hạn nhiệm vụ"
+                            error={!!errors.dueDate}
+                            helperText={errors.dueDate}
+                        />
+                        <TextField
+                            fullWidth
+                            size="small"
+                            type="number"
+                            value={data.estimatedTime}
+                            onChange={(e) =>
+                                handleChange(
+                                    "estimatedTime",
+                                    e.target.value
+                                )
+                            }
+                            label="Thời gian ước tính (giờ)"
+                            error={!!errors.estimatedTime}
+                            helperText={errors.estimatedTime}
+                        />
+                    </DialogContent>)
+                }
+                <DialogActions sx={{ p: 2, gap: 1 }}>
+                    <Button
                         variant="outlined"
-                        sx={{ mb: 1 }}
-                    />
-                    <Button
-                        onClick={handleAddComment}
-                        variant="contained"
-                        startIcon={<Send />}
-                        disabled={!commentData.content.trim()}
+                        onClick={() => setOpenUpdateDialog(false)}
                     >
-                        Gửi
-                    </Button>
-                </Card>
-
-                {/* Comments List */}
-                <Stack spacing={2}>
-                    {task?.comments?.map((cmt) => (
-                        <Card key={cmt.id} sx={{ bgcolor: 'background.paper' }}>
-                            <CardContent>
-                                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                    <Avatar sx={{ width: 32, height: 32, mr: 1 }}>
-                                        {cmt.createdBy[0]}
-                                    </Avatar>
-                                    <Box>
-                                        <Typography variant="subtitle2">
-                                            {cmt.createdBy}
-                                        </Typography>
-                                        <Typography variant="caption" color="text.secondary">
-                                            {new Date(cmt.createdAt).toLocaleString()}
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                                <Typography sx={{ ml: 5 }}>
-                                    {cmt.content}
-                                </Typography>
-                            </CardContent>
-                            <CardActions sx={{ justifyContent: 'flex-end', p: 1 }}>
-                                <IconButton
-                                    size="small"
-                                    onClick={() => {
-                                        handleCommentChange("content", cmt.content);
-                                        setOpenEditComment(cmt);
-                                    }}
-                                >
-                                    <Edit fontSize="small" />
-                                </IconButton>
-                                <IconButton
-                                    size="small"
-                                    onClick={() => handleDeleteComment(cmt.id)}
-                                >
-                                    <Delete fontSize="small" />
-                                </IconButton>
-                            </CardActions>
-                        </Card>
-                    ))}
-                </Stack>
-            </Box>
-
-            {/* Dialogs */}
-            <Dialog open={openSubtask} onClose={() => setOpenSubtask(false)}>
-                <DialogTitle>Thêm công việc con</DialogTitle>
-                <DialogContent dividers>
-                    <TextField
-                        fullWidth
-                        label="Tiêu đề"
-                        value={subtaskData.title}
-                        onChange={(e) => handleSubtaskChange("title", e.target.value)}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Hạn"
-                        type="date"
-                        value={subtaskData.dueDate}
-                        onChange={(e) => handleSubtaskChange("dueDate", e.target.value)}
-                        InputLabelProps={{ shrink: true }}
-                        sx={{ mt: 2 }}
-                    />
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button variant="outlined" onClick={() => setOpenSubtask(false)}>
                         Hủy
                     </Button>
                     <Button
                         variant="contained"
-                        onClick={handleAddSubtask}
-                        disabled={!subtaskData.title || !subtaskData.dueDate}
-                    >
-                        Thêm
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={!!openEditComment} onClose={() => setOpenEditComment(null)}>
-                <DialogTitle>Chỉnh sửa bình luận</DialogTitle>
-                <DialogContent dividers>
-                    <TextField
-                        fullWidth
-                        multiline
-                        rows={3}
-                        value={commentData.content}
-                        onChange={(e) => handleCommentChange("content", e.target.value)}
-                    />
-                </DialogContent>
-                <DialogActions sx={{ p: 2 }}>
-                    <Button variant="outlined" onClick={() => setOpenEditComment(null)}>
-                        Hủy
-                    </Button>
-                    <Button
-                        variant="contained"
-                        onClick={handleEditComment}
-                        disabled={!commentData.content.trim()}
+                        onClick={handleTaskUpdate}
+                        disabled={isSubmitting}
                     >
                         Cập nhật
                     </Button>

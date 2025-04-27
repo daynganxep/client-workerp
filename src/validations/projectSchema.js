@@ -1,3 +1,4 @@
+import { PROJECT_STATUSES_MAP } from "@configs/const.config";
 import Joi from "joi";
 
 export const projectSchema = Joi.object({
@@ -20,7 +21,7 @@ export const projectSchema = Joi.object({
         "any.required": "Ngày kết thúc là bắt buộc",
     }),
     status: Joi.string()
-        .valid("OPEN", "IN_PROGRESS", "COMPLETED")
+        .valid(...Object.keys(PROJECT_STATUSES_MAP))
         .default("OPEN")
         .messages({
             "any.only": "Trạng thái phải là OPEN, IN_PROGRESS hoặc COMPLETED",
@@ -54,9 +55,14 @@ export const taskSchema = Joi.object({
     estimatedTime: Joi.number().min(0).optional().messages({
         "number.min": "Thời gian ước tính phải lớn hơn hoặc bằng 0",
     }),
-    dueDate: Joi.date().optional().messages({
-        "date.base": "Ngày hết hạn không hợp lệ",
-    }),
+    dueDate: Joi.alternatives()
+        .try(
+            Joi.date().messages({
+                "date.base": "Hạn không hợp lệ",
+            }),
+            Joi.string().allow("").optional(),
+        )
+        .optional(),
     tags: Joi.array().items(Joi.string()).optional(),
 });
 

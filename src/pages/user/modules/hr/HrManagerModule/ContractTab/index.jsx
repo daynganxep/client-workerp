@@ -22,15 +22,22 @@ import EmployeeService from "@services/hr-module-service/employee.service";
 import useFormValidation from "@hooks/useForm";
 import { contractSchema } from "@validations/hrSchema";
 import toast from "@hooks/toast";
+import { CONTRACT_STATUSES_MAP, CONTRACT_TYPES_MAP } from "@configs/const.config";
+import DateField from "@components/DateField";
 import "./.scss";
+import { formatDateForUI } from "@tools/date.tool";
+import { currencyFormat } from "@tools/string.tool";
+import Employee from "@components/Employee";
 
 function ContractTab() {
     const { id: companyId } = useSelector((state) => state.company);
+    const employeesMap = useSelector((state) => state.company.employeesMap);
     const [contracts, setContracts] = useState([]);
     const [employees, setEmployees] = useState([]);
     const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
     const [openCreate, setOpenCreate] = useState(false);
     const [editingId, setEditingId] = useState(null);
+
 
     const {
         data,
@@ -44,9 +51,9 @@ function ContractTab() {
         employeeId: "",
         startDate: "",
         endDate: "",
-        type: "FULL_TIME",
+        type: CONTRACT_TYPES_MAP.FULL_TIME.code,
         salary: 0,
-        status: "ACTIVE",
+        status: CONTRACT_STATUSES_MAP.ACTIVE.code,
         companyId,
     });
 
@@ -82,13 +89,8 @@ function ContractTab() {
             ? await ContractService.updateContract(editingId, data)
             : await ContractService.createContract(data);
         finishSubmitting();
-        if (err)
-            return toast.error(
-                `Failed to ${editingId ? "update" : "create"} contract`,
-            );
-        toast.success(
-            `${editingId ? "Updated" : "Created"} contract successfully`,
-        );
+        if (err) return toast.error(err.code);
+        toast.success(res.code);
         setOpenCreate(false);
         setEditingId(null);
         fetchContracts(data.employeeId);
@@ -97,7 +99,7 @@ function ContractTab() {
     const handleDelete = async (contractId) => {
         const [res, err] = await ContractService.deleteContract(contractId);
         if (err) return toast.error(err.code);
-        toast.success("Deleted contract successfully");
+        toast.success(res.code);
         fetchContracts(selectedEmployeeId);
     };
 
@@ -150,25 +152,17 @@ function ContractTab() {
                     {contracts.map((contract) => (
                         <TableRow key={contract.id}>
                             <TableCell>
-                                {employees.find(
-                                    (e) => e.id === contract.employeeId,
-                                )?.name || "N/A"}
+                                <Employee employeeId={contract.employeeId} showName></Employee>
                             </TableCell>
                             <TableCell>
-                                {new Date(
-                                    contract.startDate,
-                                ).toLocaleDateString()}
+                                {formatDateForUI(contract.startDate)}
                             </TableCell>
                             <TableCell>
-                                {contract.endDate
-                                    ? new Date(
-                                        contract.endDate,
-                                    ).toLocaleDateString()
-                                    : "N/A"}
+                                {formatDateForUI(contract.endDate)}
                             </TableCell>
-                            <TableCell>{contract.type}</TableCell>
-                            <TableCell>{contract.salary}</TableCell>
-                            <TableCell>{contract.status}</TableCell>
+                            <TableCell>{CONTRACT_TYPES_MAP[contract.type]?.label}</TableCell>
+                            <TableCell>{currencyFormat(contract.salary)}</TableCell>
+                            <TableCell>{CONTRACT_STATUSES_MAP[contract.status]?.label}</TableCell>
                             <TableCell>
                                 <Button
                                     onClick={() => {
@@ -220,7 +214,7 @@ function ContractTab() {
                             </MenuItem>
                         ))}
                     </Select>
-                    <TextField
+                    <DateField
                         fullWidth
                         label="Ngày bắt đầu"
                         type="date"
@@ -233,7 +227,7 @@ function ContractTab() {
                         InputLabelProps={{ shrink: true }}
                         sx={{ mt: 2 }}
                     />
-                    <TextField
+                    <DateField
                         fullWidth
                         label="Ngày kết thúc"
                         type="date"
@@ -253,9 +247,14 @@ function ContractTab() {
                         error={!!errors.type}
                         sx={{ mt: 2 }}
                     >
-                        <MenuItem value="FULL_TIME">Full Time</MenuItem>
-                        <MenuItem value="PART_TIME">Part Time</MenuItem>
-                        <MenuItem value="FREELANCE">Freelance</MenuItem>
+                        {Object.keys(CONTRACT_TYPES_MAP).map((type) => {
+                            const { code, label } = CONTRACT_TYPES_MAP[type];
+                            return (
+                                <MenuItem key={code} value={code}>
+                                    {label}
+                                </MenuItem>
+                            )
+                        })}
                     </Select>
                     <TextField
                         fullWidth
@@ -274,9 +273,14 @@ function ContractTab() {
                         error={!!errors.status}
                         sx={{ mt: 2 }}
                     >
-                        <MenuItem value="ACTIVE">Active</MenuItem>
-                        <MenuItem value="INACTIVE">Inactive</MenuItem>
-                        <MenuItem value="PENDING">Pending</MenuItem>
+                        {Object.keys(CONTRACT_STATUSES_MAP).map((status) => {
+                            const { code, label } = CONTRACT_STATUSES_MAP[status];
+                            return (
+                                <MenuItem key={code} value={code}>
+                                    {label}
+                                </MenuItem>
+                            )
+                        })}
                     </Select>
                 </DialogContent>
                 <DialogActions>

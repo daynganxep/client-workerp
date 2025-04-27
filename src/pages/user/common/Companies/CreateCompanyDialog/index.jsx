@@ -53,10 +53,10 @@ function CreateCompanyDialog({ open, onClose, onSuccess }) {
         try {
             const [result, error] = await CompanyService.createCompany(data);
             if (error) {
-                toast.error(getMessage(error.code));
+                toast.error(error.code);
                 return;
             }
-            toast.success(getMessage(result.code));
+            toast.success(result.code);
             onSuccess();
             onClose();
         } finally {

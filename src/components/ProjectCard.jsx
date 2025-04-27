@@ -1,6 +1,8 @@
 import { Card, CardContent, CardActions, Typography, Button, Box } from '@mui/material';
 import { Folder, CalendarToday, AccessTime } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import { formatDateForUI } from '@tools/date.tool';
+import { PROJECT_STATUSES_MAP } from '@configs/const.config';
 
 function ProjectCard({ project, linkPath }) {
     return (
@@ -47,7 +49,7 @@ function ProjectCard({ project, linkPath }) {
                             }}
                         />
                         <Typography variant="body2" color="text.secondary">
-                            {new Date(project.startDate).toLocaleDateString()} - {new Date(project.endDate).toLocaleDateString()}
+                            {formatDateForUI(project.startDate)} - {formatDateForUI(project.endDate)}
                         </Typography>
                     </Box>
 
@@ -62,7 +64,7 @@ function ProjectCard({ project, linkPath }) {
                         <Typography
                             variant="body2"
                             sx={{
-                                color: 'primary.main',
+                                color: "primary.main",
                                 fontWeight: 'medium',
                                 px: 1,
                                 py: 0.5,
@@ -70,7 +72,7 @@ function ProjectCard({ project, linkPath }) {
                                 borderRadius: 1
                             }}
                         >
-                            {project.status}
+                            {PROJECT_STATUSES_MAP[project.status]?.label}
                         </Typography>
                     </Box>
                 </Box>
