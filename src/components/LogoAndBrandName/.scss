@@ -1,0 +1,12 @@
+.logo-and-brandname {
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+  justify-content: center;
+  gap: 12px;
+  text-decoration: none;
+
+  img {
+    height: 60px;
+  }
+}

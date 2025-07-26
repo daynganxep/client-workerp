@@ -1,0 +1,24 @@
+.xxx-brand {
+    display: flex;
+    gap: 8px;
+    text-decoration: none;
+
+    .work {
+        font-family: "Plaster", system-ui;
+        font-weight: 400;
+        font-style: normal;
+        text-decoration: none;
+    }
+
+    .erp {
+        font-family: "Plaster", system-ui;
+        font-weight: 400;
+        font-style: normal;
+        border-radius: 20px;
+        padding: 0 16px;
+    }
+
+    span {
+        text-decoration: none !important;
+    }
+}
