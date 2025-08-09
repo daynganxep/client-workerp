@@ -14,7 +14,7 @@ yarn-error.log*
 pnpm-debug.log*
 *.log
 
-# môi trường
+# Environment
 .env
 .env.*.local
 .env.local

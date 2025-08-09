@@ -1,10 +1,8 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
-import Title from '@components/Title';
-import PublicRoute from '@app/Router/routeTypes/PublicRoute';
-import PrivateRoute from '@app/Router/routeTypes/PrivateRoute';
+import { createBrowserRouter } from 'react-router-dom';
+import { ADMIN_ROUTE_TYPES, USER_ROUTE_TYPES } from '@app/Router/routeTypes/routeTypes';
 import AdminMainLayout from '@layouts/admin/MainLayout';
 import UserMainLayout from '@layouts/user/MainLayout';
-import AuthLayout from '@layouts/user/AuthLayout';
+import UserAuthLayout from '@layouts/user/AuthLayout';
 import WorkingLayout from '@layouts/user/WorkingLayout';
 import NotFound from '@pages/user/common/NotFound';
 import Home from '@pages/user/common/Home';
@@ -25,50 +23,52 @@ import ProjectDetail from '@pages/user/modules/project/ProjectManagerModule/Proj
 import TaskDetail from '@pages/user/modules/project/ProjectManagerModule/TaskDetail';
 import UserProjectDashboard from '@pages/user/modules/project/ProjectUserModule/UserProjectDashboard';
 import UserProjectDetail from '@pages/user/modules/project/ProjectUserModule/UserProjectDetail';
+import WrapPage from '@components/WrapPage';
 
 const router = createBrowserRouter([
     {
-        element: <PublicRoute />,
-        children: [
-            {
-                element: <UserMainLayout />,
-                children: [
-                    { path: '/', element: <><Title>Trang chủ</Title><Home /></> },
-                    { path: '/home', element: <><Title>Trang chủ</Title><Home /></> },
-                    { path: '/404', element: <><Title>Không tìm thấy trang</Title><NotFound /></> },
-                    { path: '*', element: <><Title>Không tìm thấy trang</Title><NotFound /></> },
-                ],
-            },
-            {
-                element: <AuthLayout />,
-                children: [
-                    { path: '/auth/login', element: <><Title>Đăng nhập</Title><Login /></> },
-                    { path: '/auth/register', element: <><Title>Đăng ký</Title><Register /></> },
-                    { path: '/auth/forgot-password', element: <><Title>Lấy lại mật khẩu</Title><ForgotPassword /></> },
-                    { path: '/auth/logout', element: <><Title>Đăng xuất</Title><Logout /></> },
-                    { path: '/auth/receive-refresh-token', element: <><Title>Nhận tokens</Title><ReceiveTokens /></> },
-                ],
-            },
-        ],
-    },
-    {
-        element: <PrivateRoute AccessDeniedLayout={AdminMainLayout} />,
+        element: <ADMIN_ROUTE_TYPES.PRIVATE />,
         children: [
             {
                 element: <AdminMainLayout />,
                 children: [
-                    { path: '/admin', element: <><Title>Admin Dashboard</Title><Home /></> },
+                    { path: '/admin', element: <WrapPage title="Admin Dashboard" Component={Home} /> },
                 ],
             },
         ],
     },
     {
-        element: <PrivateRoute AccessDeniedLayout={UserMainLayout} />,
+        element: <USER_ROUTE_TYPES.PUBLIC />,
         children: [
             {
                 element: <UserMainLayout />,
                 children: [
-                    { path: '/companies', element: <><Title>Danh sách công ty</Title><Companies /></> },
+                    { path: '/', element: <WrapPage title="Trang chủ" Component={Home} /> },
+                    { path: '/home', element: <WrapPage title="Trang chủ" Component={Home} /> },
+                    { path: '/404', element: <WrapPage title="Không tìm thấy trang" Component={NotFound} /> },
+                    { path: '*', element: <WrapPage title="Không tìm thấy trang" Component={NotFound} /> },
+                ],
+            },
+            {
+                element: <UserAuthLayout />,
+                path: '/auth',
+                children: [
+                    { path: 'login', element: <WrapPage title="Đăng nhập" Component={Login} /> },
+                    { path: 'register', element: <WrapPage title="Đăng ký" Component={Register} /> },
+                    { path: 'forgot-password', element: <WrapPage title="Lấy lại mật khẩu" Component={ForgotPassword} /> },
+                    { path: 'logout', element: <WrapPage title="Đăng xuất" Component={Logout} /> },
+                    { path: 'receive-refresh-token', element: <WrapPage title="Nhận tokens" Component={ReceiveTokens} /> },
+                ],
+            },
+        ],
+    },
+    {
+        element: <USER_ROUTE_TYPES.PRIVATE />,
+        children: [
+            {
+                element: <UserMainLayout />,
+                children: [
+                    { path: '/companies', element: <WrapPage title="Danh sách công ty" Component={Companies} /> },
                 ],
             },
             {
@@ -77,55 +77,55 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: 'company/manager/:tab?',
-                        element: <CompanyManagerModule />,
+                        element: <WrapPage title="Quản lý công ty" Component={CompanyManagerModule} />,
                     },
                     {
                         path: 'company/user/:tab?',
-                        element: <CompanyUserModule />,
+                        element: <WrapPage title="Công ty của tôi" Component={CompanyUserModule} />,
                     },
                     {
                         path: 'project/manager/*',
-                        element: <ProjectManagerModule />,
+                        element: <WrapPage title="Quản lý dự án" Component={ProjectManagerModule} />,
                         children: [
                             {
                                 index: true,
-                                element: <ProjectDashboard />,
+                                element: <WrapPage title="Dashboard dự án" Component={ProjectDashboard} />,
                             },
                             {
                                 path: ":projectId/:tab?",
-                                element: <ProjectDetail />,
+                                element: <WrapPage title="Chi tiết dự án" Component={ProjectDetail} />,
                             },
                             {
                                 path: "task/:taskId",
-                                element: <TaskDetail isManager={true} />,
+                                element: <WrapPage title="Chi tiết công việc" element={<TaskDetail isManager={true} />} />,
                             }
                         ]
                     },
                     {
                         path: 'project/user/*',
-                        element: <ProjectUserModule />,
+                        element: <WrapPage title="Dự án của tôi" Component={ProjectUserModule} />,
                         children: [
                             {
                                 index: true,
-                                element: <UserProjectDashboard />,
+                                element: <WrapPage title="Dashboard dự án" Component={UserProjectDashboard} />,
                             },
                             {
                                 path: ":projectId/:tab?",
-                                element: <UserProjectDetail />,
+                                element: <WrapPage title="Chi tiết dự án" Component={UserProjectDetail} />,
                             },
                             {
                                 path: "task/:taskId",
-                                element: <TaskDetail isManager={false} />,
+                                element: <WrapPage title="Chi tiết công việc" element={<TaskDetail isManager={false} />} />,
                             }
                         ]
                     },
                     {
                         path: 'hr/manager/:tab?',
-                        element: <HrManagerModule />,
+                        element: <WrapPage title="Quản lý nhân sự" Component={HrManagerModule} />,
                     },
                     {
                         path: 'hr/user/:tab?',
-                        element: <HrUserModule />,
+                        element: <WrapPage title="Nhân sự của tôi" Component={HrUserModule} />,
                     },
                 ],
             }

@@ -1,15 +1,15 @@
 import PublicRoute from "./PublicRoute";
 import PrivateRoute from "./PrivateRoute";
 
-import AdminMainLayout from "@layouts/admin/MainLayout";
-import UserMainLayout from "@layouts/user/MainLayout";
+// import AdminMainLayout from "@layouts/admin/MainLayout";
+// import UserMainLayout from "@layouts/user/MainLayout";
 
-import { ROLES } from "@configs/const.config.jsx";
+// import { ROLES } from "@configs/const.config.jsx";
 
 const ADMIN_ROUTE_TYPES = {
     PUBLIC: PublicRoute,
     PRIVATE: ({ children }) => (
-        <PrivateRoute AccessDeniedLayout={AdminMainLayout} role={ROLES.ADMIN}>
+        <PrivateRoute /*AccessDeniedLayout={AdminMainLayout} role={ROLES.ADMIN}*/ >
             {children}
         </PrivateRoute>
     ),
@@ -18,7 +18,7 @@ const ADMIN_ROUTE_TYPES = {
 const USER_ROUTE_TYPES = {
     PUBLIC: PublicRoute,
     PRIVATE: ({ children }) => (
-        <PrivateRoute AccessDeniedLayout={UserMainLayout} role={ROLES.USER}>
+        <PrivateRoute /* AccessDeniedLayout={UserMainLayout} role={ROLES.USER} */>
             {children}
         </PrivateRoute>
     ),
