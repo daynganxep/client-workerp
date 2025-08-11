@@ -12,7 +12,7 @@ import {
     useTheme,
 } from '@mui/material';
 import useFormValidation from '@hooks/useForm';
-import useMessageByApiCode from '@hooks/useMessageByApiCode';
+import useMessageByApiCode from '@hooks/use-message-by-api-code';
 import toast from '@hooks/toast';
 import CompanyService from '@services/compay-module-service/company.service';
 import { createCompanySchema } from '@validations/companySchema';

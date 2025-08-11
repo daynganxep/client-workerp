@@ -18,7 +18,7 @@ import CompanyService from "@services/compay-module-service/company.service";
 import { updateCompanyInforSchema } from "@validations/companySchema";
 import { companyActions } from "@redux/slices/company.slice";
 import { Edit, PhotoCamera } from "@mui/icons-material";
-import useMessageByApiCode from "@hooks/useMessageByApiCode";
+import useMessageByApiCode from "@hooks/use-message-by-api-code";
 import useFormValidation from "@hooks/useForm";
 import UploadsService from "@services/util-service/uploads.service";
 

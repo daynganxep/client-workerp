@@ -16,7 +16,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import AuthService from "@services/auth-service/auth.service";
-import useMessageByApiCode from "@hooks/useMessageByApiCode";
+import useMessageByApiCode from "@hooks/use-message-by-api-code";
 import useFormValidation from "@hooks/useForm";
 import { forgotPasswordStep1Schema, forgotPasswordStep2Schema } from "@validations/authSchema";
 import { setTokens } from "@redux/slices/auth.slice";

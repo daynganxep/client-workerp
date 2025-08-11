@@ -1,10 +1,10 @@
 import Router from "@app/Router";
 import { ThemeProvider } from "@mui/material/styles";
 import { HelmetProvider } from "react-helmet-async";
-import useInitialApp from "@hooks/useInitialApp";
 import { lightTheme, darkTheme } from "./theme";
 import { useSelector } from "react-redux";
 import { useMemo } from "react";
+import useInitialApp from "@hooks/useInitialApp";
 import CssBaseline from "@mui/material/CssBaseline";
 import ReactHotToaster from "@components/ReactHotToaster";
 import { THEMES } from "@configs/const.config";

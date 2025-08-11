@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Form, Field, SubmitButton, ErrorMessage } from "@components/Form";
 import AuthService from "@services/auth-service/auth.service";
-import useMessageByApiCode from "@hooks/useMessageByApiCode";
+import useMessageByApiCode from "@hooks/use-message-by-api-code";
 import { forgotPasswordStep1Schema } from "@validations/authSchema";
 import toast from "@hooks/toast";
 import { Link } from "react-router-dom";

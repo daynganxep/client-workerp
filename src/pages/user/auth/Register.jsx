@@ -10,25 +10,22 @@ import {
     IconButton,
     InputAdornment,
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { GitHub, Visibility, VisibilityOff } from "@mui/icons-material";
 import { FcGoogle } from "react-icons/fc";
-import { GitHub } from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import toast from "@hooks/toast";
 import AuthService from "@services/auth-service/auth.service";
-import useMessageByApiCode from "@hooks/useMessageByApiCode";
+import useMessageByApiCode from "@hooks/use-message-by-api-code";
 import useFormValidation from "@hooks/useForm";
-import { loginSchema } from "@validations/authSchema";
-import { setTokens } from "@redux/slices/auth.slice";
+import { registerSchema } from "@validations/authSchema";
+import { setRedirect } from "@redux/slices/auth.slice";
 import { SERVER_URL } from "@configs/const.config.jsx";
-import ".scss";
 
-const LogIn = () => {
+const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const getMessage = useMessageByApiCode();
     const dispatch = useDispatch();
-    const redirect = useSelector((state) => state.auth.redirect);
     const navigate = useNavigate();
 
     const {
@@ -39,7 +36,7 @@ const LogIn = () => {
         validate,
         startSubmitting,
         finishSubmitting,
-    } = useFormValidation(loginSchema, {
+    } = useFormValidation(registerSchema, {
         email: "",
         password: "",
     });
@@ -53,7 +50,7 @@ const LogIn = () => {
         if (!validate()) return;
         startSubmitting();
         try {
-            const [result, error] = await AuthService.login(data);
+            const [result, error] = await AuthService.register(data);
 
             if (error) {
                 setErrorMessage(getMessage(error.code));
@@ -62,8 +59,8 @@ const LogIn = () => {
             }
 
             toast.success(result.code);
-            dispatch(setTokens(result.data));
-            navigate(redirect);
+            dispatch(setRedirect("/"));
+            navigate("/");
         } catch (err) {
             toast.error("Đã xảy ra lỗi không mong muốn");
         } finally {
@@ -99,7 +96,7 @@ const LogIn = () => {
                         }
                         error={!!errors.password}
                         helperText={errors.password}
-                        autoComplete="current-password"
+                        autoComplete="new-password"
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
@@ -118,20 +115,6 @@ const LogIn = () => {
                         }}
                     />
 
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="space-between"
-                    >
-                        <Link
-                            component={RouterLink}
-                            to="/auth/forgot-password"
-                            variant="body2"
-                        >
-                            Quên mật khẩu?
-                        </Link>
-                    </Stack>
-
                     <Button
                         fullWidth
                         size="large"
@@ -139,7 +122,7 @@ const LogIn = () => {
                         variant="contained"
                         disabled={isSubmitting}
                     >
-                        {isSubmitting ? "Đang xử lý..." : "Đăng nhập"}
+                        {isSubmitting ? "Đang xử lý..." : "Đăng ký"}
                     </Button>
                 </Stack>
             </form>
@@ -150,13 +133,13 @@ const LogIn = () => {
                 alignItems="center"
                 justifyContent="center"
             >
-                <Typography variant="body2">Chưa có tài khoản?</Typography>
+                <Typography variant="body2">Đã có tài khoản?</Typography>
                 <Link
                     component={RouterLink}
-                    to="/auth/register"
+                    to="/auth/login"
                     variant="subtitle2"
                 >
-                    Đăng ký
+                    Đăng nhập
                 </Link>
             </Stack>
 
@@ -168,7 +151,7 @@ const LogIn = () => {
                 href={SERVER_URL.OAUTH2_GOOGLE}
                 startIcon={<FcGoogle />}
             >
-                Đăng nhập với Google
+                Đăng ký với Google
             </Button>
             <Button
                 fullWidth
@@ -184,4 +167,4 @@ const LogIn = () => {
     );
 };
 
-export default LogIn;
+export default Register;

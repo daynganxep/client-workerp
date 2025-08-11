@@ -1,7 +1,6 @@
 import BrandName from "@components/BandName";
 import Logo from "@components/Logo"
 import { Link } from "react-router-dom";
-
 import ".scss";
 
 function LogoAndBrandName({ size = 1 }) {
