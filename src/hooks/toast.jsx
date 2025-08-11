@@ -1,4 +1,4 @@
-import apiCode from "@configs/apiCode.config";
+import apiCode from "@configs/api-code.config";
 import { toast } from "react-hot-toast";
 
 function getMessage(key) {

@@ -1,0 +1,77 @@
+import { useState } from "react";
+import { Form, Field, SubmitButton, ErrorMessage } from "@components/Form";
+import AuthService from "@services/auth-service/auth.service";
+import useMessageByApiCode from "@hooks/use-message-by-api-code";
+import { forgotPasswordStep1Schema } from "@validations/auth-schema";
+import toast from "@hooks/toast";
+import { Link } from "react-router-dom";
+import HeaderForm from "../components/header-form";
+
+const ForgotPasswordStep1 = ({ onNext }) => {
+    const [errorMessage, setErrorMessage] = useState("");
+    const getMessage = useMessageByApiCode();
+
+    const handleSubmit = async ({ email }) => {
+        const [result, error] = await AuthService.forgotPassword(email);
+        if (error) {
+            setErrorMessage(getMessage(error.code));
+            toast.error(error.code);
+            return;
+        }
+        toast.error(result.code);
+        onNext();
+    };
+
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-md">
+                <HeaderForm>Quên mật khẩu</HeaderForm>
+                <Form
+                    onSubmit={handleSubmit}
+                    schema={forgotPasswordStep1Schema}
+                >
+                    <Field
+                        name="email"
+                        label="Email"
+                        type="email"
+                        placeholder="Nhập email"
+                    />
+                    <ErrorMessage message={errorMessage}></ErrorMessage>
+                    <SubmitButton loadingText="Đang xử lý yêu cầu...">
+                        Xác nhận
+                    </SubmitButton>
+                </Form>
+                <div className="mt-4 text-center">
+                    <p className="text-sm text-gray-600">
+                        Bạn đã có tài khoản?{" "}
+                        <Link
+                            to="/register"
+                            className="text-indigo-500 hover:underline"
+                        >
+                            Đăng nhập ngay
+                        </Link>
+                    </p>
+                    <p className="text-sm text-gray-600">
+                        Bạn chưa có tài khoản?{" "}
+                        <Link
+                            to="/register"
+                            className="text-indigo-500 hover:underline"
+                        >
+                            Đăng ký ngay
+                        </Link>
+                    </p>
+                    <p className="mt-4 text-sm text-gray-600">
+                        <Link
+                            to="/home"
+                            className="text-indigo-500 hover:underline"
+                        >
+                            Về trang chủ
+                        </Link>
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ForgotPasswordStep1;

@@ -1,4 +1,4 @@
-import apiCode from "@configs/apiCode.config";
+import apiCode from "@configs/api-code.config";
 
 export default function useMessageByApiCode() {
     return function (key) {

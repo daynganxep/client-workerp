@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import App from "@app/App";
+import App from "@app/app";
 import reduxStore from "@redux/store.redux";
 
 const queryClient = new QueryClient();

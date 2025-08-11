@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getLS } from "@tools/localStorage.tool";
+import { getLS } from "@tools/local-storage.tool";
 
 const authSlice = createSlice({
     name: "auth",
