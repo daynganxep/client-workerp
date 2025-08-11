@@ -13,6 +13,7 @@ export default defineConfig({
             "@hooks": "/src/hooks",
             "@images": "/src/assets/images",
             "@layouts": "/src/layouts",
+            "@locales": "/src/locales",
             "@pages": "/src/pages",
             "@redux": "/src/redux",
             "@routes": "/src/routes",
@@ -20,6 +21,7 @@ export default defineConfig({
             "@tools": "/src/tools",
             "@db": "/src/db",
             "@validations": "/src/validations",
+
         },
     },
     server: {

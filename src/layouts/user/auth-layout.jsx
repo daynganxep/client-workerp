@@ -15,13 +15,11 @@ function AuthLayout() {
     >
       <Container maxWidth="sm" sx={{ px: 2 }}>
         <Card
-          elevation={3}
           sx={{
             p: 3,
           }}
         >
           <LogoAndBrandName />
-
           <CardContent sx={{ mt: 3 }}>
             <Outlet />
           </CardContent>

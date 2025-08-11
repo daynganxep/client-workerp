@@ -27,6 +27,9 @@
             "@layouts/*": [
                 "layouts/*"
             ],
+            "@locales/*": [
+                "locales/*"
+            ],
             "@pages/*": [
                 "pages/*"
             ],

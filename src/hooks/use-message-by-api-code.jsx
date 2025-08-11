@@ -1,10 +1,10 @@
-import apiCode from "@configs/api-code.config";
+import { useTranslation } from "react-i18next";
 
 export default function useMessageByApiCode() {
+    const { t } = useTranslation();
+
     return function (key) {
-        if (!apiCode[key]) {
-            console.log(`useMessageByApiCode :: key :: ${key} :: notfound`);
-        }
-        return apiCode[key] || key;
+        const apiCodeKey = `api-code.${key}`;
+        return t(apiCodeKey) || apiCodeKey;
     };
 }

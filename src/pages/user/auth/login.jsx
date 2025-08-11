@@ -16,10 +16,12 @@ import ErrorMessage from "@components/form/error-message";
 import { loginSchema } from "@validations/auth-schema";
 import { joiResolver } from "@hookform/resolvers/joi";
 import { SERVER_URL } from "@configs/const.config.jsx";
-import { AUTH_LOGIN_DEFAULT_VALUES } from "@configs/form-default-values";
+import { AUTH_LOGIN_DEFAULT_VALUES } from "@configs/form-default-values.config";
+import { useTranslation } from "react-i18next";
 
 
 function LogIn() {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
@@ -53,7 +55,7 @@ function LogIn() {
                 <Stack spacing={3} mt={3}>
                     <TextField
                         fullWidth
-                        label="Email"
+                        label={t("auth.login.email")}
                         autoComplete="email"
                         error={!!errors.email}
                         helperText={errors.email?.message}
@@ -64,7 +66,7 @@ function LogIn() {
 
                     <TextField
                         fullWidth
-                        label="Mật khẩu"
+                        label={t("auth.login.password")}
                         autoComplete="current-password"
                         type={showPassword ? "text" : "password"}
                         error={!!errors.password}
@@ -94,7 +96,7 @@ function LogIn() {
                         loading={mutation.isPending}
                         endIcon={<LoginIcon />}
                     >
-                        Đăng nhập
+                        {t("auth.login.login-button")}
                     </Button>
                 </Stack>
             </form >
@@ -107,13 +109,13 @@ function LogIn() {
                     component={RouterLink}
                     to="/auth/forgot-password"
                 >
-                    Quên mật khẩu?
+                    {t("auth.login.forgot-password")}
                 </Link>
                 <Link
                     component={RouterLink}
                     to="/auth/register"
                 >
-                    Đăng ký tài khoản
+                    {t("auth.login.sign-up-prompt")}
                 </Link>
             </Stack>
 
@@ -129,7 +131,7 @@ function LogIn() {
                     href={SERVER_URL.OAUTH2_GOOGLE}
                     startIcon={<Google />}
                 >
-                    Đăng nhập với Google
+                    {t("auth.login.google-login")}
                 </Button>
 
                 <Button
@@ -140,7 +142,7 @@ function LogIn() {
                     href={SERVER_URL.OAUTH2_GITHUB}
                     startIcon={<GitHub />}
                 >
-                    Đăng nhập với Github
+                    {t("auth.login.github-login")}
                 </Button>
             </Stack>
         </Stack >

@@ -1,19 +1,17 @@
-import apiCode from "@configs/api-code.config";
 import { toast } from "react-hot-toast";
+import i18n from "i18next";
 
 function getMessage(key) {
-    if (!apiCode[key]) {
-        console.log(`toast :: ${key} :: not found`);
-    }
-    return apiCode[key] || key;
+    const translated = i18n.t(key);
+    return translated;
 }
 
-const success = (message) => {
-    toast.success(getMessage(message));
+const success = (messageKey) => {
+    toast.success(getMessage(messageKey));
 };
 
-const error = (message) => {
-    toast.error(getMessage(message));
+const error = (messageKey) => {
+    toast.error(getMessage(messageKey));
 };
 
 export default {
