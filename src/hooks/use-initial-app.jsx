@@ -1,56 +1,61 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AuthService from "@services/auth-service/auth.service";
-import {
-  setAccessToken,
-  setTokens,
-  setUser,
-  setIsLogin,
-} from "@redux/slices/auth.slice";
+import { authActions } from "@redux/slices/auth.slice";
 import env from "@configs/env.config";
 
 const useInitialApp = () => {
   const dispatch = useDispatch();
-  const isLoging = useSelector((state) => state.auth.isLoging);
-  const refreshTokenString = useSelector(
-    (state) => state.auth.tokens.refreshToken
-  );
+  const { refreshToken, accessToken } = useSelector((state) => state.auth.tokens);
 
-  const refreshToken = async () => {
+
+  const handleRefreshToken = useCallback(async () => {
     const [result, error] = await AuthService.refreshToken();
     if (error) {
-      dispatch(setIsLogin(false));
-      dispatch(setTokens({ accessToken: "", refreshToken: "" }));
-      dispatch(setUser(null));
-      return;
+      dispatch(authActions.setStates({ field: "tokens", reset: true }));
+      dispatch(authActions.setStates({ field: "isLoging", value: false }));
+      return false;
     }
     const { accessToken } = result.data;
-    dispatch(setAccessToken(accessToken));
-    dispatch(setIsLogin(true));
-  };
+    dispatch(authActions.setStates({ field: "tokens.accessToken", value: accessToken }));
+    dispatch(authActions.setStates({ field: "isLoging", value: true }));
+    return true;
+  }, [dispatch]);
 
-  const fetchUser = async () => {
-    const [getUserInfoResult, getUserInfoError] =
-      await AuthService.getUserInfo();
-    if (getUserInfoError) {
-      dispatch(setUser(null));
+  const fetchUser = useCallback(async () => {
+    const [res, err] = await AuthService.getUserInfo();
+    if (err) {
+      dispatch(authActions.setStates({ field: "user", reset: true }));
       return;
     }
-    dispatch(setUser(getUserInfoResult.data));
-  };
-
-  const fetchData = async () => {
-    await refreshToken();
-    if (!isLoging) return;
-    await Promise.all([fetchUser()]);
-  };
+    dispatch(authActions.setStates({ field: "user", value: res.data }));
+  }, [dispatch]);
 
   useEffect(() => {
-    fetchData();
-    if (!isLoging) return;
-    const intervalId = setInterval(refreshToken, env.interval_refresh_token);
-    return () => clearInterval(intervalId);
-  }, [dispatch, isLoging, refreshTokenString, fetchData]);
+    let intervalId;
+
+    const init = async () => {
+      if (!refreshToken) {
+        dispatch(authActions.setStates({ field: "isLoging", value: false }));
+        return;
+      }
+
+      await handleRefreshToken();
+      intervalId = setInterval(handleRefreshToken, env.interval_refresh_token);
+    };
+
+    init();
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [refreshToken, handleRefreshToken, fetchUser, dispatch]);
+
+  useEffect(() => {
+    if (accessToken) {
+      fetchUser();
+    }
+  }, [accessToken, fetchUser]);
 };
 
 export default useInitialApp;

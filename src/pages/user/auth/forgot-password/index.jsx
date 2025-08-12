@@ -19,7 +19,7 @@ import AuthService from "@services/auth-service/auth.service";
 import useMessageByApiCode from "@hooks/use-message-by-api-code";
 import useFormValidation from "@hooks/use-form";
 import { forgotPasswordStep1Schema, forgotPasswordStep2Schema } from "@validations/auth-schema";
-import { setTokens } from "@redux/slices/auth.slice";
+import { authActions } from "@redux/slices/auth.slice";
 import toast from "@hooks/toast";
 
 const steps = ['Xác nhận email', 'Đặt lại mật khẩu'];
@@ -91,7 +91,7 @@ const ForgotPassword = () => {
         return;
       }
 
-      dispatch(setTokens(result.data));
+      dispatch(authActions.setStates({ field: "tokens", value: result.data }));
       toast.success(result.code);
       navigate("/");
     } catch (err) {

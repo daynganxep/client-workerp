@@ -1,17 +1,16 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setTokens, setUser } from "@redux/slices/auth.slice";
+import { authActions } from "@redux/slices/auth.slice";
 
 const LogOut = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(setTokens({ accessToken: "", refreshToken: "" }));
-    dispatch(setUser(null));
+    dispatch(authActions.setStates({ field: "tokens", reset: true }));
     navigate("/");
-  }, [location, navigate]);
+  }, [navigate, dispatch]);
 
   return null;
 };

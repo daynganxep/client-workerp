@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useHref, useNavigate } from "react-router-dom";
-import { setRedirect } from "@redux/slices/auth.slice";
+import { authActions } from "@redux/slices/auth.slice";
 import { useDispatch } from "react-redux";
 
 const AccessDeniedPage = () => {
@@ -8,20 +8,25 @@ const AccessDeniedPage = () => {
   const navigate = useNavigate();
   const href = useHref();
   const dispatch = useDispatch();
+
+  function handleRedirect() {
+    dispatch(authActions.setStates({ field: "redirect", value: href }));
+    navigate("/auth/login");
+  }
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          dispatch(setRedirect(href));
-          navigate("/login"); // Điều hướng đến trang đăng nhập sau 5 giây
+          handleRedirect();
           return 0;
         }
         return prev - 1;
       });
-    }, 1000); // Cập nhật mỗi giây
+    }, 1000);
 
-    return () => clearInterval(timer); // Dọn dẹp khi component unmount
+    return () => clearInterval(timer);
   }, [navigate]);
 
   return (
@@ -34,10 +39,7 @@ const AccessDeniedPage = () => {
       </p>
       <div className="flex space-x-4">
         <button
-          onClick={() => {
-            dispatch(setRedirect(href));
-            navigate("/login");
-          }}
+          onClick={handleRedirect}
           className="px-4 py-2 text-white bg-blue-500 rounded"
         >
           Đăng Nhập
@@ -49,7 +51,7 @@ const AccessDeniedPage = () => {
           Về Trang Chính
         </button>
       </div>
-    </div>
+    </div >
   );
 };
 

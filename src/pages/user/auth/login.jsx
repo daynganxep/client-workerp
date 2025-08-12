@@ -18,12 +18,15 @@ import { joiResolver } from "@hookform/resolvers/joi";
 import { SERVER_URL } from "@configs/const.config.jsx";
 import { AUTH_LOGIN_DEFAULT_VALUES } from "@configs/form-default-values.config";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
+import { authActions } from "@redux/slices/auth.slice"
 
 
 function LogIn() {
     const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const {
         register,
@@ -41,8 +44,8 @@ function LogIn() {
             return result;
         },
         onSuccess: (result) => {
-            console.log("Login successful:", result);
-            navigate("/home");
+            dispatch(authActions.setStates({ field: "tokens", value: result.data }));
+            navigate("/");
         },
     });
 
@@ -149,4 +152,4 @@ function LogIn() {
     );
 }
 
-export default LogIn
+export default LogIn;

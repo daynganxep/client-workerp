@@ -6,7 +6,7 @@ import { forgotPasswordStep2Schema } from "@validations/auth-schema";
 import toast from "@hooks/toast";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { setTokens } from "@redux/slices/auth.slice";
+import { authActions } from "@redux/slices/auth.slice";
 import { Link } from "react-router-dom";
 import HeaderForm from "../components/header-form";
 
@@ -27,7 +27,7 @@ const ForgotPasswordStep2 = () => {
       toast.error(error.code);
       return;
     }
-    dispatch(setTokens(result.data));
+    dispatch(authActions.setStates({ field: "tokens", value: result.data }));
     toast.success(result.code);
     navigate("/");
   };

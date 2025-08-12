@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { setLS } from "@tools/local-storage.tool";
 
-import authReducer from "./slices/auth.slice";
+import { authReducer } from "./slices/auth.slice";
 import { settingReducer } from "./slices/setting.slice";
 import { companyReducer } from "./slices/company.slice";
 

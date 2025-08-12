@@ -1,117 +1,89 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
     TextField,
     Button,
-    Typography,
     Link,
     Stack,
-    Alert,
     IconButton,
     InputAdornment,
 } from "@mui/material";
-import { GitHub, Visibility, VisibilityOff } from "@mui/icons-material";
-import { FcGoogle } from "react-icons/fc";
-import { useDispatch } from "react-redux";
-import toast from "@hooks/toast";
+import { Visibility, VisibilityOff, GitHub, Google, Login as RegisterIcon } from "@mui/icons-material";
 import AuthService from "@services/auth-service/auth.service";
-import useMessageByApiCode from "@hooks/use-message-by-api-code";
-import useFormValidation from "@hooks/use-form";
-import { registerSchema } from "@validations/auth-schema";
-import { setRedirect } from "@redux/slices/auth.slice";
+import ErrorMessage from "@components/form/error-message";
+import { loginSchema } from "@validations/auth-schema";
+import { joiResolver } from "@hookform/resolvers/joi";
 import { SERVER_URL } from "@configs/const.config.jsx";
+import { AUTH_REGISTER_DEFAULT_VALUES } from "@configs/form-default-values.config";
+import { useTranslation } from "react-i18next";
+import toast from "@hooks/toast"
 
-const Register = () => {
+
+function Register() {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
-    const getMessage = useMessageByApiCode();
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const {
-        data,
-        errors,
-        isSubmitting,
-        handleChange,
-        validate,
-        startSubmitting,
-        finishSubmitting,
-    } = useFormValidation(registerSchema, {
-        email: "",
-        password: "",
+        register,
+        handleSubmit,
+        formState: { errors, isValid },
+    } = useForm({
+        resolver: joiResolver(loginSchema),
+        defaultValues: AUTH_REGISTER_DEFAULT_VALUES,
     });
 
-    const togglePasswordVisibility = () => {
-        setShowPassword(!showPassword);
-    };
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (!validate()) return;
-        startSubmitting();
-        try {
+    const mutation = useMutation({
+        mutationFn: async (data) => {
             const [result, error] = await AuthService.register(data);
-
-            if (error) {
-                setErrorMessage(getMessage(error.code));
-                toast.error(error.code);
-                return;
-            }
-
-            toast.success(result.code);
-            dispatch(setRedirect("/"));
+            if (error) throw new Error(error.code);
+            return result;
+        },
+        onSuccess: (result) => {
+            toast.success(t(`api-code.${result.code}`));
             navigate("/");
-        } catch (err) {
-            toast.error("Đã xảy ra lỗi không mong muốn");
-        } finally {
-            finishSubmitting();
-        }
-    };
+        },
+    });
+
 
     return (
-        <Stack spacing={3}>
-            {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+        <Stack spacing={5}>
+            <form onSubmit={handleSubmit(mutation.mutate)}>
+                <ErrorMessage mutation={mutation} />
 
-            <form onSubmit={handleSubmit}>
-                <Stack spacing={3}>
+                <Stack spacing={3} mt={3}>
                     <TextField
                         fullWidth
-                        label="Email"
-                        name="email"
-                        value={data.email}
-                        onChange={(e) => handleChange("email", e.target.value)}
-                        error={!!errors.email}
-                        helperText={errors.email}
+                        label={t("auth.register.email")}
                         autoComplete="email"
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                        required
+                        variant="outlined"
+                        {...register("email")}
                     />
 
                     <TextField
                         fullWidth
-                        label="Mật khẩu"
-                        name="password"
+                        label={t("auth.register.password")}
+                        autoComplete="current-password"
                         type={showPassword ? "text" : "password"}
-                        value={data.password}
-                        onChange={(e) =>
-                            handleChange("password", e.target.value)
-                        }
                         error={!!errors.password}
-                        helperText={errors.password}
-                        autoComplete="new-password"
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={togglePasswordVisibility}
-                                        edge="end"
-                                    >
-                                        {showPassword ? (
-                                            <VisibilityOff />
-                                        ) : (
-                                            <Visibility />
-                                        )}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
+                        helperText={errors.password?.message}
+                        required
+                        {...register("password")}
+                        slotProps={{
+                            input: {
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton onClick={() => setShowPassword((prev) => !prev)}>
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                )
+                            }
                         }}
                     />
 
@@ -119,52 +91,57 @@ const Register = () => {
                         fullWidth
                         size="large"
                         type="submit"
+                        color="primary"
                         variant="contained"
-                        disabled={isSubmitting}
+                        disabled={!isValid}
+                        loading={mutation.isPending}
+                        endIcon={<RegisterIcon />}
                     >
-                        {isSubmitting ? "Đang xử lý..." : "Đăng ký"}
+                        {t("auth.register.register-button")}
                     </Button>
                 </Stack>
-            </form>
+            </form >
 
             <Stack
                 direction="row"
-                spacing={2}
-                alignItems="center"
-                justifyContent="center"
+                justifyContent="end"
             >
-                <Typography variant="body2">Đã có tài khoản?</Typography>
                 <Link
                     component={RouterLink}
                     to="/auth/login"
-                    variant="subtitle2"
                 >
-                    Đăng nhập
+                    {t("auth.register.login-prompt")}
                 </Link>
             </Stack>
 
-            <Button
-                fullWidth
-                size="large"
-                color="inherit"
-                variant="outlined"
-                href={SERVER_URL.OAUTH2_GOOGLE}
-                startIcon={<FcGoogle />}
+            <Stack
+                spacing={3}
+                direction="column"
             >
-                Đăng ký với Google
-            </Button>
-            <Button
-                fullWidth
-                size="large"
-                color="inherit"
-                variant="outlined"
-                href={SERVER_URL.OAUTH2_GITHUB}
-                startIcon={<GitHub />}
-            >
-                Đăng nhập với Github
-            </Button>
-        </Stack>
+                <Button
+                    fullWidth
+                    size="large"
+                    color="inherit"
+                    variant="outlined"
+                    href={SERVER_URL.OAUTH2_GOOGLE}
+                    startIcon={<Google />}
+                >
+                    {t("auth.register.google-login")}
+                </Button>
+
+                <Button
+                    fullWidth
+                    size="large"
+                    color="inherit"
+                    variant="outlined"
+                    href={SERVER_URL.OAUTH2_GITHUB}
+                    startIcon={<GitHub />}
+                >
+                    {t("auth.register.github-login")}
+                </Button>
+            </Stack>
+        </Stack >
     );
-};
+}
 
 export default Register;

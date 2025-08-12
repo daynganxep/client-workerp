@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setRefreshTokens } from "@redux/slices/auth.slice";
+import { authActions } from "@redux/slices/auth.slice";
 
 const ReceiveTokens = () => {
     const location = useLocation();
@@ -13,10 +13,9 @@ const ReceiveTokens = () => {
         const queryParams = new URLSearchParams(location.search);
         const refreshToken = queryParams.get("refreshToken");
         if (refreshToken) {
-            dispatch(setRefreshTokens(refreshToken));
+            dispatch(authActions.setStates({ field: "tokens.refreshToken", value: refreshToken }));
             navigate(redirect);
         } else {
-            console.error("Missing query parameters!");
             navigate("/login");
         }
     }, [location, navigate, dispatch, redirect]);

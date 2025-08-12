@@ -21,6 +21,14 @@
             "sign-up-prompt": "Bạn chưa có tài khoản? Đăng ký",
             "google-login": "Đăng nhập với Google",
             "github-login": "Đăng nhập với Github"
+        },
+        "register": {
+            "email": "Email",
+            "password": "Mật khẩu",
+            "register-button": "Đăng ký",
+            "login-prompt": "Bạn đã có tài khoản? Đăng nhập",
+            "google-login": "Đăng ký với Google",
+            "github-login": "Đăng ký với Github"
         }
     },
     "api-code": {

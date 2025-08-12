@@ -39,11 +39,6 @@ const AuthService = {
             }),
         );
     },
-    upgradeToShop({ shopName }) {
-        return service(
-            axios.post(getAuthUrl("/upgrade-to-shop"), { name: shopName }),
-        );
-    },
     newTokens() {
         return service(axios.get(getAuthUrl("/new-tokens")));
     },
