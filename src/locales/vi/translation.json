@@ -18,7 +18,7 @@
             "password": "Mật khẩu",
             "login-button": "Đăng nhập",
             "forgot-password": "Quên mật khẩu?",
-            "sign-up-prompt": "Bạn chưa có tài khoản? Đăng ký",
+            "sign-up-prompt": "Bạn chưa có tài khoản?",
             "google-login": "Đăng nhập với Google",
             "github-login": "Đăng nhập với Github"
         },
@@ -26,9 +26,19 @@
             "email": "Email",
             "password": "Mật khẩu",
             "register-button": "Đăng ký",
-            "login-prompt": "Bạn đã có tài khoản? Đăng nhập",
+            "login-prompt": "Bạn đã có tài khoản?",
             "google-login": "Đăng ký với Google",
             "github-login": "Đăng ký với Github"
+        },
+        "forgot-password": {
+            "step1": "Xác nhận email",
+            "step2": "Đặt lại mật khẩu",
+            "email": "Email",
+            "step1-button": "Gửi yêu cầu",
+            "code": "Mã xác nhận",
+            "password": "Mật khẩu mới",
+            "confirm-password": "Xác nhận mật khẩu mới",
+            "step2-button": "Đặt lại mật khẩu"
         }
     },
     "api-code": {
@@ -37,12 +47,13 @@
         "auth-s-01": "Yêu cầu đăng ký thành công, hãy kiểm tra email của bạn",
         "auth-f-01-01": "Email đã tồn tại",
         "auth-f-02-01": "Mã không hợp lệ",
-        "auth-s-03": "Đăng ký thành công, Chào mừng bạn quay lại với WORK-ERP",
+        "auth-s-03": "Đăng nhập thành công, Chào mừng bạn quay lại với WORK-ERP",
         "auth-f-03": "Hết phiên đăng nhập",
         "auth-s-04": "Đã làm mưới access token",
         "auth-s-05": "Đăng xuất thành công",
         "auth-s-06": "Đổi mật khẩu thành công",
-        "auth-s-08": "Yêu cầu lấy lại mật khẩu thành công",
+        "auth-s-08": "Yêu cầu lấy lại mật khẩu thành công, hãy kiểm tra email của bạn",
+        "auth-f-08-01": "Email chưa đăng ký",
         "auth-s-09": "Lấy lại mật khẩu thành công",
         "auth-f-09-01": "Mã xác thực không hợp lệ",
         "auth-s-10": "Lấy thông tin của bạn thành công",

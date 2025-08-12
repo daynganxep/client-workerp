@@ -9,6 +9,7 @@ import {
     Stack,
     IconButton,
     InputAdornment,
+    Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff, GitHub, Google, Login as LoginIcon } from "@mui/icons-material";
 import AuthService from "@services/auth-service/auth.service";
@@ -20,6 +21,7 @@ import { AUTH_LOGIN_DEFAULT_VALUES } from "@configs/form-default-values.config";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { authActions } from "@redux/slices/auth.slice"
+import toast from "@hooks/toast";
 
 
 function LogIn() {
@@ -45,6 +47,7 @@ function LogIn() {
         },
         onSuccess: (result) => {
             dispatch(authActions.setStates({ field: "tokens", value: result.data }));
+            toast.success(result.code);
             navigate("/");
         },
     });
@@ -114,12 +117,17 @@ function LogIn() {
                 >
                     {t("auth.login.forgot-password")}
                 </Link>
-                <Link
-                    component={RouterLink}
-                    to="/auth/register"
-                >
-                    {t("auth.login.sign-up-prompt")}
-                </Link>
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography>
+                        {t("auth.login.sign-up-prompt")}
+                    </Typography>
+                    <Link
+                        component={RouterLink}
+                        to="/auth/register"
+                    >
+                        {t("auth.register.register-button")}
+                    </Link>
+                </Stack>
             </Stack>
 
             <Stack

@@ -9,6 +9,7 @@ import {
     Stack,
     IconButton,
     InputAdornment,
+    Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff, GitHub, Google, Login as RegisterIcon } from "@mui/icons-material";
 import AuthService from "@services/auth-service/auth.service";
@@ -42,7 +43,7 @@ function Register() {
             return result;
         },
         onSuccess: (result) => {
-            toast.success(t(`api-code.${result.code}`));
+            toast.success(result.code);
             navigate("/");
         },
     });
@@ -106,12 +107,17 @@ function Register() {
                 direction="row"
                 justifyContent="end"
             >
-                <Link
-                    component={RouterLink}
-                    to="/auth/login"
-                >
-                    {t("auth.register.login-prompt")}
-                </Link>
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography>
+                        {t("auth.register.login-prompt")}
+                    </Typography>
+                    <Link
+                        component={RouterLink}
+                        to="/auth/login"
+                    >
+                        {t("auth.login.login-button")}
+                    </Link>
+                </Stack>
             </Stack>
 
             <Stack

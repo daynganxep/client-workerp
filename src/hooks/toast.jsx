@@ -2,7 +2,7 @@ import { toast } from "react-hot-toast";
 import i18n from "i18next";
 
 function getMessage(key) {
-    const translated = i18n.t(key);
+    const translated = i18n.t(`api-code.${key}`);
     return translated;
 }
 
