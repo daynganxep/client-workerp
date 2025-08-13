@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { Link, Outlet } from 'react-router-dom';
 import {
     AppBar,
@@ -10,15 +11,15 @@ import {
 import LogoAndBrandName from '@components/ui/logo-and-brand-name';
 import ThemeToggleButton from '@components/ui/theme-toggle-button';
 import UserMenu from './user-menu';
-import '.scss';
 
 function MainLayout() {
+    const { t } = useTranslation();
     const { isLoging, user } = useSelector((state) => state.auth);
 
     return (
-        <Box className="main-layout">
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', p: 1 }}>
             {/* Header */}
-            <AppBar position="static" className="main-layout__header" elevation={0}>
+            <AppBar position="static" elevation={0} sx={{ borderRadius: 10 }}>
                 <Toolbar>
                     {/* Logo */}
                     <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
@@ -36,18 +37,9 @@ function MainLayout() {
                                     to="/companies"
                                     sx={{ borderRadius: '8px' }}
                                 >
-                                    Công ty
+                                    {t("layout.main.company-button")}
                                 </Button>
                                 <UserMenu user={user} />
-                                <Button
-                                    variant="outlined"
-                                    color="inherit"
-                                    component={Link}
-                                    to="/auth/logout"
-                                    sx={{ borderRadius: '8px' }}
-                                >
-                                    Đăng xuất
-                                </Button>
                             </>
                         ) : (
                             <>
@@ -58,16 +50,16 @@ function MainLayout() {
                                     to="/auth/login"
                                     sx={{ borderRadius: '8px' }}
                                 >
-                                    Đăng nhập
+                                    {t("layout.main.login-button")}
                                 </Button>
                                 <Button
-                                    variant="contained"
-                                    color="primary"
+                                    variant="outlined"
+                                    color="inherit"
                                     component={Link}
                                     to="/auth/register"
                                     sx={{ borderRadius: '8px' }}
                                 >
-                                    Đăng ký
+                                    {t("layout.main.register-button")}
                                 </Button>
                             </>
                         )}
@@ -78,7 +70,7 @@ function MainLayout() {
 
             {/* Main content */}
             <Box className="main-layout__content">
-                <Container maxWidth="xl" className="main-layout__container">
+                <Container maxWidth="xl">
                     <Outlet />
                 </Container>
             </Box>

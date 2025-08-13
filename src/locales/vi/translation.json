@@ -180,5 +180,14 @@
         "project_app-task-f-13-02": "Không tìm thấy bình luận",
         "project_app-task-f-13-03": "Bạn chỉ được xóa bình luận của mình",
         "project_app-task-f-14-01": "Không tìm thấy nhiệm vụ"
+    },
+    "layout": {
+        "main": {
+            "login-button": "Đăng nhập",
+            "register-button": "Đăng ký",
+            "company-button": "Công ty",
+            "logout-button": "Đăng xuất",
+            "copy-id": "Đã sao chép ID"
+        }
     }
 }
