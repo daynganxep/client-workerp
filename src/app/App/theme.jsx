@@ -40,6 +40,30 @@ export const lightTheme = createTheme({
   shape: {
     borderRadius: 3,
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+      },
+    },
+    MuiStack: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+      },
+    },
+    MuiContainer: {
+      styleOverrides: {
+        root: {
+          padding: 0,
+          borderRadius: 20,
+        },
+      },
+    },
+  },
 });
 
 export const darkTheme = createTheme({
@@ -74,5 +98,15 @@ export const darkTheme = createTheme({
   },
   shape: {
     borderRadius: 3,
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+      },
+    },
+
   },
 });

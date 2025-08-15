@@ -17,7 +17,6 @@ function Home() {
     const sectionsRef = useRef([]);
     const { isLoging, user } = useSelector(state => state.auth);
 
-    // Animation khi scroll
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
@@ -49,7 +48,6 @@ function Home() {
             }}
         >
             <Container maxWidth="lg">
-                {/* Hero Section */}
                 <Box
                     ref={(el) => (sectionsRef.current[0] = el)}
                     sx={{
@@ -94,7 +92,6 @@ function Home() {
                     </Button>
                 </Box>
 
-                {/* Features Section */}
                 <Box ref={(el) => (sectionsRef.current[1] = el)} sx={{ mb: 8 }}>
                     <Typography
                         variant="h4"

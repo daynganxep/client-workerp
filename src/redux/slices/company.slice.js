@@ -1,22 +1,26 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getLS } from "@tools/local-storage.tool";
+import { setStates } from "@tools/store.tool";
+
+const initialState = getLS("company", {
+    id: "",
+    owner: "",
+    name: "",
+    domain: "",
+    active: true,
+    employee: {},
+    modules: [],
+    companyModuleRoles: [],
+    companyModuleRolesMap: {},
+    employees: [],
+    employeesMap: {},
+})
 
 const companySlice = createSlice({
     name: "company",
-    initialState: getLS("company", {
-        id: "",
-        owner: "",
-        name: "",
-        domain: "",
-        active: true,
-        employee: {},
-        modules: [],
-        companyModuleRoles: [],
-        companyModuleRolesMap: {},
-        employees: [],
-        employeesMap: {},
-    }),
+    initialState,
     reducers: {
+        setStates: setStates(initialState),
         setCompanyCore: (state, { payload }) => {
             state.id = payload.id;
             state.owner = payload.owner;

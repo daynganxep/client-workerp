@@ -10,7 +10,12 @@
         "delete": "Xóa",
         "search": "Tìm kiếm",
         "no-data": "Không có dữ liệu",
-        "common-error": "Đã xảy ra lỗi"
+        "common-error": "Đã xảy ra lỗi",
+        "company": {
+            "list-company": "Công ty của tôi",
+            "create-company": "Tạo công ty mới",
+            "go-to-dashboard": "Vào trang làm việc"
+        }
     },
     "auth": {
         "login": {

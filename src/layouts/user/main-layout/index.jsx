@@ -17,7 +17,7 @@ function MainLayout() {
     const { isLoging, user } = useSelector((state) => state.auth);
 
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', p: 1 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', p: 1, gap: 2 }}>
             {/* Header */}
             <AppBar position="static" elevation={0} sx={{ borderRadius: 10 }}>
                 <Toolbar>
@@ -69,11 +69,9 @@ function MainLayout() {
             </AppBar>
 
             {/* Main content */}
-            <Box className="main-layout__content">
-                <Container maxWidth="xl">
-                    <Outlet />
-                </Container>
-            </Box>
+            <Container maxWidth="xl">
+                <Outlet />
+            </Container>
         </Box>
     );
 }

@@ -1,3 +1,4 @@
+import useFormValidation from '@hooks/use-form';
 import {
     Dialog,
     Box,
@@ -11,16 +12,13 @@ import {
     Alert,
     useTheme,
 } from '@mui/material';
-import useFormValidation from '@hooks/use-form';
-import useMessageByApiCode from '@hooks/use-message-by-api-code';
-import toast from '@hooks/toast';
 import CompanyService from '@services/compay-module-service/company.service';
+import toast from '@hooks/toast';
 import { createCompanySchema } from '@validations/company-schema';
 import { MODULE_OPTIONS } from '@configs/const.config';
 
 function CreateCompanyDialog({ open, onClose, onSuccess }) {
     const theme = useTheme();
-    const getMessage = useMessageByApiCode();
     const {
         data,
         errors,
@@ -35,7 +33,6 @@ function CreateCompanyDialog({ open, onClose, onSuccess }) {
         moduleCodes: [MODULE_OPTIONS[0].code, MODULE_OPTIONS[1].code],
     });
 
-    // Xử lý chọn module
     const handleModuleChange = (moduleCode) => {
         const currentModules = data.moduleCodes || [];
         const newModules = currentModules.includes(moduleCode)
@@ -44,7 +41,6 @@ function CreateCompanyDialog({ open, onClose, onSuccess }) {
         handleChange('moduleCodes', newModules);
     };
 
-    // Submit form
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validate()) return;

@@ -140,7 +140,6 @@ const ForgotPassword = () => {
             <TextField
               fullWidth
               label={t("auth.forgot-password.password")}
-              autoComplete="current-password"
               type={showPassword ? "text" : "password"}
               error={!!errorsStep2.password}
               helperText={errorsStep2.password?.message}
