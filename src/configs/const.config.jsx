@@ -53,15 +53,15 @@ export const MODULE_OPTIONS_MAP = {
         label: "Nhân sự",
         icon: <GroupsIcon />
     },
-    CHAT: {
-        code: "CHAT",
-        label: "Thảo luận",
-        icon: <ForumIcon />
-    },
     PROJECT: {
         code: "PROJECT",
         label: "Dự án",
         icon: <AccountTreeIcon />
+    },
+    CHAT: {
+        code: "CHAT",
+        label: "Thảo luận",
+        icon: <ForumIcon />
     },
     TIMEKEEPING: {
         code: "TIMEKEEPING",

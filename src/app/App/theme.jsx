@@ -7,6 +7,48 @@ const primaryMain = "#1976d2";
 // Generate secondary from primary tone
 const secondaryMain = lighten(primaryMain, 0.5);
 
+const components = {
+  MuiButton: {
+    styleOverrides: {
+      root: {
+        borderRadius: 8,
+      },
+    },
+  },
+  MuiTextField: {
+    styleOverrides: {
+      root: {
+        borderRadius: 8,
+      },
+    },
+  },
+  MuiInputBase: {
+    styleOverrides: {
+      root: {
+        borderRadius: 8,
+      },
+      input: {
+        borderRadius: 8,
+      },
+    },
+  },
+  MuiStack: {
+    styleOverrides: {
+      root: {
+        borderRadius: 8,
+      },
+    },
+  },
+  MuiContainer: {
+    styleOverrides: {
+      root: {
+        padding: 0,
+        borderRadius: 20,
+      },
+    },
+  },
+}
+
 export const lightTheme = createTheme({
   palette: {
     mode: "light",
@@ -40,30 +82,7 @@ export const lightTheme = createTheme({
   shape: {
     borderRadius: 3,
   },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiStack: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiContainer: {
-      styleOverrides: {
-        root: {
-          padding: 0,
-          borderRadius: 20,
-        },
-      },
-    },
-  },
+  components
 });
 
 export const darkTheme = createTheme({
@@ -99,14 +118,5 @@ export const darkTheme = createTheme({
   shape: {
     borderRadius: 3,
   },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
-    },
-
-  },
+  components
 });

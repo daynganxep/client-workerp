@@ -1,23 +1,18 @@
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
     Box,
     Typography,
-    Button,
     Grid2,
     Stack,
     useTheme,
 } from '@mui/material';
-import { Add } from '@mui/icons-material';
 import CompanyService from '@services/compay-module-service/company.service';
-import CreateCompanyDialog from './create-company-dialog';
+import CreateCompany from './create-company';
 import CompanyCard from './company-card';
 
 function Companies() {
     const { t } = useTranslation();
-    const [openDialog, setOpenDialog] = useState(false);
-
     const theme = useTheme();
 
     const { data: companies = [] } = useQuery({
@@ -28,10 +23,6 @@ function Companies() {
             return res.data;
         },
     });
-
-    const handleOpenDialog = () => {
-        setOpenDialog(true);
-    };
 
     return (
         <Stack sx={{ gap: 2 }}>
@@ -50,14 +41,7 @@ function Companies() {
                 >
                     {t("common.company.list-company")}
                 </Typography>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={handleOpenDialog}
-                    startIcon={<Add />}
-                >
-                    {t("common.company.create-company")}
-                </Button>
+                <CreateCompany />
             </Box>
 
             <Grid2 container spacing={3}>
@@ -67,11 +51,6 @@ function Companies() {
                     </Grid2>
                 ))}
             </Grid2>
-
-            <CreateCompanyDialog
-                open={openDialog}
-                onClose={() => setOpenDialog(false)}
-            />
         </Stack >
     );
 }

@@ -4,6 +4,7 @@
         "error": "Lỗi",
         "success": "Thành công",
         "cancel": "Hủy",
+        "ok": "OK",
         "confirm": "Xác nhận",
         "save": "Lưu",
         "edit": "Chỉnh sửa",
@@ -14,7 +15,12 @@
         "company": {
             "list-company": "Công ty của tôi",
             "create-company": "Tạo công ty mới",
-            "go-to-dashboard": "Vào trang làm việc"
+            "go-to-dashboard": "Vào trang làm việc",
+            "create": "Tạo",
+            "company-name": "Tên công ty",
+            "domain": "Tên miền",
+            "modules": "Các modules",
+            "no-domain": "Không có tên miền"
         }
     },
     "auth": {

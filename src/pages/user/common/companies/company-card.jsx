@@ -115,18 +115,7 @@ function CompanyCard({ company }) {
                     mb: 1
                 }}
             >
-                {company.domain || 'Chưa cài đặt domain'}
-            </Typography>
-            <Typography
-                variant="body2"
-                sx={{
-                    color: company.active
-                        ? theme.palette.success.main
-                        : theme.palette.error.main,
-                    fontWeight: 500
-                }}
-            >
-                {company.active ? 'Đang hoạt động' : 'Không hoạt động'}
+                {company.domain || t('common.company.no-domain')}
             </Typography>
         </CardContent>
 
