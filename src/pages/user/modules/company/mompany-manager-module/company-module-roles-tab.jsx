@@ -1,86 +1,84 @@
-import { useState, useEffect } from "react";
-import CompanyModuleRolesService from "@services/compay-module-service/company-module-roles.service";
-import { DataGrid } from "@mui/x-data-grid";
-import { Checkbox, Button, Select, MenuItem } from "@mui/material";
-import toast from "@hooks/toast";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { DataGrid } from "@mui/x-data-grid";
+import { Checkbox, Button, Select, MenuItem, Stack } from "@mui/material";
+import CompanyModuleRolesService from "@services/compay-module-service/company-module-roles.service";
 import { MODULE_OPTIONS_MAP, MODULE_ROLES_MAP } from "@configs/const.config";
+import toast from "@hooks/toast";
+import { Cancel, Save } from "@mui/icons-material";
 
 function CompanyModuleRolesTab() {
-    const [cmrs, setCmrs] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [modules, setModules] = useState([]);
+    const { t } = useTranslation();
     const employeesMap = useSelector((state) => state.company.employeesMap);
+    const [cmrs, setCmrs] = useState([]);
+    const users = [...new Set(cmrs.map((item) => item.userId))];
+    const modules = [...new Set(cmrs.map((item) => item.moduleCode))];
 
-    // Lấy dữ liệu từ API
-    async function fetchCmrs() {
-        const [res, err] = await CompanyModuleRolesService.getAllByManager();
-        if (err) return toast.error(err.code);
-        const data = res.data;
+    const { refetch, isLoading } = useQuery({
+        queryKey: ["company-module-roles"],
+        queryFn: async () => {
+            const [res, err] = await CompanyModuleRolesService.getAllByManager();
+            if (err) throw new Error(err.code);
+            setCmrs(res.data);
+            return res.data;
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        },
+    });
 
-        // Nhóm dữ liệu theo userId và moduleCode
-        const uniqueUsers = [...new Set(data.map((item) => item.userId))];
-        const uniqueModules = [...new Set(data.map((item) => item.moduleCode))];
-        setUsers(uniqueUsers);
-        setModules(uniqueModules);
-        setCmrs(data);
-    }
+    const { mutate, isPending: isSaving } = useMutation({
+        mutationFn: async (requests) => {
+            const [res, err] = await CompanyModuleRolesService.modifyMany(requests);
+            if (err) throw new Error(err.code);
+            return res;
+        },
+        onSuccess: (res) => {
+            toast.success(res.code);
+            refetch();
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        },
+    });
 
-    useEffect(() => {
-        fetchCmrs();
-    }, []);
-
-    // Tìm CMR theo userId và moduleCode
     const getCmr = (userId, moduleCode) => {
         return (
-            cmrs.find(
-                (cmr) => cmr.userId === userId && cmr.moduleCode === moduleCode,
-            ) || { active: false, moduleRoles: [] }
+            cmrs.find((cmr) => cmr.userId === userId && cmr.moduleCode === moduleCode) || {
+                active: false,
+                moduleRoles: [],
+            }
         );
     };
 
-    // Xử lý thay đổi active
     const handleActiveChange = (userId, moduleCode, checked) => {
         setCmrs((prev) =>
             prev.map((cmr) =>
-                cmr.userId === userId && cmr.moduleCode === moduleCode
-                    ? { ...cmr, active: checked }
-                    : cmr,
-            ),
+                cmr.userId === userId && cmr.moduleCode === moduleCode ? { ...cmr, active: checked } : cmr
+            )
         );
     };
 
-    // Xử lý thay đổi moduleRoles
     const handleRolesChange = (userId, moduleCode, roles) => {
         setCmrs((prev) =>
             prev.map((cmr) =>
                 cmr.userId === userId && cmr.moduleCode === moduleCode
                     ? { ...cmr, moduleRoles: roles }
-                    : cmr,
-            ),
+                    : cmr
+            )
         );
     };
 
-    // Lưu thay đổi
-    const handleSave = async () => {
-        const requests = cmrs.map((cmr) => ({
-            id: cmr.id,
-            active: cmr.active,
-            moduleRoles: cmr.moduleRoles,
-        }));
-        const [res, err] = await CompanyModuleRolesService.modifyMany(requests);
-        if (err) return toast.error(err.code);
-        toast.success(res.code);
-        fetchCmrs();
-    };
+    const handleSave = () => { mutate(cmrs) };
 
-    // Định nghĩa cột cho DataGrid
     const columns = [
-        { field: "id", headerName: "Mã nhân viên", width: 200 },
+        { field: "id", headerName: t("working.company.user-id"), width: 120 },
         {
             field: "userId",
-            headerName: "Nhân viên",
-            width: 250,
+            headerName: t("working.company.employee"),
+            width: 200,
             renderCell: (params) => {
                 const employee = employeesMap[params.value];
                 return employee ? `${employee.name}` : params.value;
@@ -89,31 +87,19 @@ function CompanyModuleRolesTab() {
         ...modules.map((module) => ({
             field: module,
             headerName: MODULE_OPTIONS_MAP[module].label,
-            width: 200,
+            width: 260,
             renderCell: (params) => {
                 const cmr = getCmr(params.row.userId, module);
                 return (
-                    <div className="cell-content">
+                    <div>
                         <Checkbox
                             checked={cmr.active}
-                            onChange={(e) =>
-                                handleActiveChange(
-                                    params.row.userId,
-                                    module,
-                                    e.target.checked,
-                                )
-                            }
+                            onChange={(e) => handleActiveChange(params.row.userId, module, e.target.checked)}
                         />
                         <Select
                             multiple
                             value={cmr.moduleRoles}
-                            onChange={(e) =>
-                                handleRolesChange(
-                                    params.row.userId,
-                                    module,
-                                    e.target.value,
-                                )
-                            }
+                            onChange={(e) => handleRolesChange(params.row.userId, module, e.target.value)}
                             disabled={!cmr.active}
                             sx={{ minWidth: 120 }}
                         >
@@ -126,32 +112,43 @@ function CompanyModuleRolesTab() {
         })),
     ];
 
-    // Định nghĩa hàng cho DataGrid
     const rows = users.map((userId) => ({
-        id: userId, // DataGrid yêu cầu id duy nhất
+        id: userId,
         userId,
     }));
 
     return (
-        <div className="company-roles-tab">
-            <div style={{ height: 400, width: "100%" }}>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    pageSize={5}
-                    rowsPerPageOptions={[5, 10, 20]}
-                    disableSelectionOnClick
-                />
-            </div>
-            <Button
-                onClick={handleSave}
-                variant="contained"
-                color="primary"
-                sx={{ mt: 2 }}
-            >
-                Lưu thay đổi
-            </Button>
-        </div>
+        <Stack spacing={2}>
+            <DataGrid
+                rows={rows}
+                columns={columns}
+                pageSize={5}
+                disableSelectionOnClick
+                sx={{ maxHeight: 600, minHeight: 300 }}
+                rowCount={10}
+                loading={isLoading}
+            />
+            <Stack direction="row" justifyContent="flex-end" gap={2}>
+                <Button
+                    onClick={refetch}
+                    variant="outlined"
+                    color="info"
+                    startIcon={<Cancel />}
+                >
+                    {t("common.cancel")}
+                </Button>
+                <Button
+                    onClick={handleSave}
+                    variant="contained"
+                    color="primary"
+                    disabled={isSaving}
+                    loading={isSaving}
+                    startIcon={<Save />}
+                >
+                    {t("working.company.save-changes")}
+                </Button>
+            </Stack>
+        </Stack>
     );
 }
 

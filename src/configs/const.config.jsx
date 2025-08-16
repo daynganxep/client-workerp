@@ -70,9 +70,12 @@ export const MODULE_OPTIONS_MAP = {
     },
 };
 
+
 export const MODULE_OPTIONS = Object.keys(MODULE_OPTIONS_MAP).map(
     (module_key) => MODULE_OPTIONS_MAP[module_key],
 );
+
+export const REQUIRED_MODULES = [MODULE_OPTIONS_MAP.COMPANY.code, MODULE_OPTIONS_MAP.HR.code, MODULE_OPTIONS_MAP.PROJECT.code];
 
 export const TASK_STATUSES = {
     TO_DO: "TO_DO",

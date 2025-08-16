@@ -15,7 +15,7 @@ function Companies() {
     const { t } = useTranslation();
     const theme = useTheme();
 
-    const { data: companies = [] } = useQuery({
+    const { data: companies = [], refetch } = useQuery({
         queryKey: ["my-companies"],
         queryFn: async () => {
             const [res, error] = await CompanyService.getAllMyCompanies();
@@ -41,7 +41,7 @@ function Companies() {
                 >
                     {t("common.company.list-company")}
                 </Typography>
-                <CreateCompany />
+                <CreateCompany refetchCompanies={refetch} />
             </Box>
 
             <Grid2 container spacing={3}>

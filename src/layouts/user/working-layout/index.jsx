@@ -22,12 +22,12 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { MODULE_OPTIONS_MAP, MODULE_ROLES_MAP } from '@configs/const.config';
 import CompanyModuleRolesService from '@services/compay-module-service/company-module-roles.service';
 import EmployeeService from '@services/hr-module-service/employee.service';
 import ThemeToggleButton from '@components/ui/theme-toggle-button';
 import LogoAndBrandName from '@components/ui/logo-and-brand-name';
 import { companyActions } from '@redux/slices/company.slice';
+import { MODULE_OPTIONS_MAP, MODULE_ROLES_MAP } from '@configs/const.config';
 import '.scss';
 
 function WorkingLayout() {
@@ -45,7 +45,7 @@ function WorkingLayout() {
 
     // Module và role hiện tại
     const currentModule = modules.find(
-        (m) => m.moduleCode.toLowerCase() === moduleCode?.toLowerCase()
+        (m) => m?.moduleCode?.toLowerCase() === moduleCode?.toLowerCase()
     );
     const moduleRoles = currentModule?.moduleRoles || [MODULE_ROLES_MAP.USER.code];
     const hasMultipleRoles = moduleRoles.length > 1;
@@ -93,7 +93,7 @@ function WorkingLayout() {
                 key="tab"
                 sx={{ color: theme.palette.text.primary }}
             >
-                {tab.charAt(0).toUpperCase() + tab.slice(1).replace('-', ' ')}
+                {tab?.charAt(0)?.toUpperCase() + tab?.slice(1)?.replace('-', ' ')}
             </Typography>
         ),
     ];
@@ -157,14 +157,14 @@ function WorkingLayout() {
                 }}
             >
                 {modules.map((module) => {
-                    const moduleConfig = MODULE_OPTIONS_MAP[module.moduleCode.toUpperCase()];
-                    const isActive = module.moduleCode.toLowerCase() === moduleCode?.toLowerCase();
+                    const moduleConfig = MODULE_OPTIONS_MAP[module?.moduleCode?.toUpperCase()];
+                    const isActive = module?.moduleCode?.toLowerCase() === moduleCode?.toLowerCase();
                     return (
                         <ListItem
                             key={module.id}
                             button
                             component={Link}
-                            to={`/working/${module.moduleCode.toLowerCase()}/${module.moduleRoles[0].toLowerCase()}`}
+                            to={`/working/${module?.moduleCode?.toLowerCase()}/${module?.moduleRoles[0]?.toLowerCase()}`}
                             sx={{
                                 borderRadius: theme.shape.borderRadius,
                                 color: theme.palette.text.primary,

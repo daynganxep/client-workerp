@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Box, Tabs, Tab, Typography } from '@mui/material';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 
 const TabNavigation = ({ tabs, basePath, sx }) => {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const params = useParams();
     const currentTab = params.tab || tabs[0]?.value;
@@ -45,7 +47,7 @@ const TabNavigation = ({ tabs, basePath, sx }) => {
                 {tabs.map((tab) => (
                     <Tab
                         key={tab.value}
-                        label={tab.label}
+                        label={t(tab.label)}
                         value={tab.value}
                         aria-label={tab.label}
                     />
@@ -60,7 +62,7 @@ const TabNavigation = ({ tabs, basePath, sx }) => {
                         color="text.secondary"
                         sx={{ textAlign: 'center' }}
                     >
-                        Tab không hợp lệ
+                        {t('common.invalid-tab')}
                     </Typography>
                 )}
             </Box>

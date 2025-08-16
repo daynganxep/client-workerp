@@ -22,7 +22,7 @@ import toast from '@hooks/toast';
 import { MODULE_OPTIONS } from '@configs/const.config';
 import { COMMON_CREATE_COMPANY_DEFAULT_VALUES } from '@configs/form-default-values.config';
 
-function CreateCompanyDialog() {
+function CreateCompanyDialog({ refetchCompanies }) {
     const { t } = useTranslation();
     const dialog = useDialog();
     const theme = useTheme();
@@ -44,8 +44,9 @@ function CreateCompanyDialog() {
             return result;
         },
         onSuccess: (result) => {
-            toast.success(result.code);
+            refetchCompanies();
             dialog.close();
+            toast.success(result.code);
         },
     });
 

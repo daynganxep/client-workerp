@@ -176,7 +176,6 @@ function CompanyInfoTab() {
             {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
 
             <Box sx={{ position: 'relative' }}>
-                {/* Cover Image */}
                 <CardMedia
                     component="div"
                     sx={(theme) => ({

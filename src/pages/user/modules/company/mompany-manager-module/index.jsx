@@ -5,9 +5,9 @@ import TabNavigation from '@layouts/user/working-layout/tab-navigation';
 
 const CompanyManagerModule = () => {
     const tabs = [
-        { label: 'Phân quyền', value: 'roles', element: <CompanyModuleRolesTab /> },
-        { label: 'Modules', value: 'modules', element: <CompanyModulesTab /> },
-        { label: 'Thông tin', value: 'info', element: <CompanyInfoTab /> },
+        { label: 'working.company.roles', value: 'roles', element: <CompanyModuleRolesTab /> },
+        { label: 'working.company.modules', value: 'modules', element: <CompanyModulesTab /> },
+        { label: 'working.company.info', value: 'info', element: <CompanyInfoTab /> },
     ];
     const basePath = `/working/company/manager`;
 
