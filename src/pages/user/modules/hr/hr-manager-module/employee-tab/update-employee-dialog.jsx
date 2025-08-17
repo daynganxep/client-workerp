@@ -72,7 +72,7 @@ function UpdateEmployeeDialog({ employee, departments, positions, refetch }) {
                 label={t("model.hr.employee.name")}
                 name="name"
                 error={!!errors.name}
-                helperText={errors.name}
+                helperText={errors?.name?.message}
                 required
                 {...register("name")}
             />
@@ -81,7 +81,7 @@ function UpdateEmployeeDialog({ employee, departments, positions, refetch }) {
                 control={control}
                 label={t("model.hr.employee.dob")}
                 error={!!errors.dob}
-                helperText={errors.dob?.message}
+                helperText={errors?.dob?.message}
             />
 
             <SelectField

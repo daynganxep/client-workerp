@@ -17,7 +17,7 @@ function EmployeeTab() {
     const { t } = useTranslation();
     const { id: companyId } = useSelector((state) => state.company);
 
-    const { data: employees = [], refetch } = useQuery({
+    const { data: employees = [], refetch, isLoading } = useQuery({
         queryKey: ["hr-employees", companyId],
         queryFn: async () => {
             const [res, err] = await EmployeeService.getEmployeesByCompanyId(
@@ -66,6 +66,7 @@ function EmployeeTab() {
                 <InviteEmployeeDialog></InviteEmployeeDialog>
             </Stack>
             <DataGrid
+                loading={isLoading}
                 rowHeight={80}
                 rows={employees}
                 getRowId={(row) => row?.id}

@@ -1,193 +1,94 @@
-import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    Button,
-    TextField,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Box,
     Typography,
+    Stack,
+    Button,
 } from "@mui/material";
 import DepartmentService from "@services/hr-module-service/department.service";
-import useFormValidation from "@hooks/use-form";
-import { departmentSchema } from "@validations/hr-schema";
 import toast from "@hooks/toast";
-import "./.scss";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
+import { DataGrid } from "@mui/x-data-grid";
+import { EMPTY_VALUES } from "@configs/const.config";
+import UpdateDepartmentDialog from "./update-department-dialog";
+import CreateDepartmentDialog from "./create-department-dialog";
+import ConfirmDialog from "@components/dialog/confirm-dialog";
 
 function DepartmentTab() {
+    const { t } = useTranslation();
     const { id: companyId } = useSelector((state) => state.company);
-    const [departments, setDepartments] = useState([]);
-    const [openCreate, setOpenCreate] = useState(false);
-    const [editingId, setEditingId] = useState(null);
 
-    const {
-        data,
-        errors,
-        handleChange,
-        validate,
-        startSubmitting,
-        finishSubmitting,
-        isSubmitting,
-    } = useFormValidation(departmentSchema, { name: "", description: "" });
-
-    const fetchDepartments = async () => {
-        const [res, err] = await DepartmentService.getDepartmentsByCompanyId(
-            companyId,
-        );
-        if (err) return toast.error(err.code);
-        setDepartments(res.data);
-    };
-
-    useEffect(() => {
-        fetchDepartments();
-    }, []);
-
-    const handleCreateOrUpdate = async () => {
-        if (!validate()) return;
-        startSubmitting();
-        const [res, err] = editingId
-            ? await DepartmentService.updateDepartment(editingId, data)
-            : await DepartmentService.createDepartment(data);
-        finishSubmitting();
-        if (err)
-            return toast.error(
-                `Failed to ${editingId ? "update" : "create"} department`,
+    const { data: departments = [], refetch, isLoading } = useQuery({
+        queryKey: ["hr-departments", companyId],
+        queryFn: async () => {
+            const [res, err] = await DepartmentService.getDepartmentsByCompanyId(
+                companyId,
             );
-        toast.success(
-            `${editingId ? "Updated" : "Created"} department successfully`,
-        );
-        setOpenCreate(false);
-        setEditingId(null);
-        fetchDepartments();
-    };
+            if (err) return toast.error(err.code);
+            return res.data
+        },
+        onError: (code) => {
+            toast.error(code);
+        },
+    });
 
-    const handleDelete = async (departmentId) => {
-        const [res, err] = await DepartmentService.deleteDepartment(
-            departmentId,
-        );
+    async function handleDelete(departmentId) {
+        const [res, err] = await DepartmentService.deleteDepartment(departmentId);
         if (err) return toast.error(err.code);
-        toast.success("Deleted department successfully");
-        fetchDepartments();
+        refetch();
+        toast.success(res.code);
     };
 
     return (
-        <div className="department-tab">
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    mb: 2
-                }}
-            >
-                <Typography variant="h6">Danh sách phòng ban</Typography>
-                <Button
-                    variant="contained"
-                    onClick={() => setOpenCreate(true)}
-                >
-                    Thêm phòng ban
-                </Button>
-            </Box>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Tên</TableCell>
-                        <TableCell>Mô tả</TableCell>
-                        <TableCell>Actions</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {departments.map((dept) => (
-                        <TableRow key={dept.id}>
-                            <TableCell>{dept.name}</TableCell>
-                            <TableCell>{dept.description || "N/A"}</TableCell>
-                            <TableCell>
-                                <Button
-                                    onClick={() => {
-                                        setEditingId(dept.id);
-                                        handleChange("name", dept.name);
-                                        handleChange(
-                                            "description",
-                                            dept.description,
-                                        );
-                                        setOpenCreate(true);
-                                    }}
-                                >
-                                    Sửa
-                                </Button>
-                                <Button
-                                    color="error"
-                                    onClick={() => handleDelete(dept.id)}
-                                >
-                                    Xóa
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-
-            <Dialog
-                open={openCreate}
-                onClose={() => {
-                    setOpenCreate(false);
-                    setEditingId(null);
-                }}
-            >
-                <DialogTitle>
-                    {editingId ? "Sửa phòng ban" : "Thêm phòng ban"}
-                </DialogTitle>
-                <DialogContent>
-                    <TextField
-                        fullWidth
-                        label="Tên phòng ban"
-                        value={data.name}
-                        onChange={(e) => handleChange("name", e.target.value)}
-                        error={!!errors.name}
-                        helperText={errors.name}
-                        sx={{ mt: 1 }}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Mô tả"
-                        value={data.description}
-                        onChange={(e) =>
-                            handleChange("description", e.target.value)
-                        }
-                        error={!!errors.description}
-                        helperText={errors.description}
-                        sx={{ mt: 2 }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button
-                        onClick={() => {
-                            setOpenCreate(false);
-                            setEditingId(null);
-                        }}
-                    >
-                        Hủy
-                    </Button>
-                    <Button
-                        onClick={handleCreateOrUpdate}
-                        disabled={isSubmitting}
-                    >
-                        {isSubmitting
-                            ? "Đang xử lý..."
-                            : editingId
-                                ? "Cập nhật"
-                                : "Thêm"}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </div>
+        <Stack spacing={3}>
+            <Stack direction="row" justifyContent="space-between">
+                <Typography variant="h6">{t('working.hr.department.department-list')}</Typography>
+                <CreateDepartmentDialog refetch={refetch} />
+            </Stack>
+            <DataGrid
+                loading={isLoading}
+                rowHeight={80}
+                rows={departments}
+                getRowId={(row) => row?.id}
+                disableRowSelectionOnClick
+                columns={[
+                    {
+                        field: 'name',
+                        headerName: t('model.hr.department.name'),
+                        flex: 1,
+                        valueGetter: (value) => value || EMPTY_VALUES.STRING
+                    },
+                    {
+                        field: 'description',
+                        headerName: t('model.hr.department.description'),
+                        flex: 1,
+                        valueGetter: (value) => value || EMPTY_VALUES.STRING
+                    },
+                    {
+                        field: 'actions',
+                        headerName: t('common.actions'),
+                        flex: 1,
+                        sortable: false,
+                        filterable: false,
+                        renderCell: (params) => (<Stack height="100%" direction="row" justifyContent="start" alignContent="center" gap={2}>
+                            <UpdateDepartmentDialog department={params?.row} refetch={refetch} />
+                            <ConfirmDialog
+                                type="delete"
+                                title="working.hr.department.confirm-delete-department"
+                                cancelTitle="common.cancel"
+                                confirmTitle="common.delete"
+                                action={() => handleDelete(params?.row?.id)}
+                                triggerButton={
+                                    <Button variant="text" color="error">
+                                        {t('common.delete')}
+                                    </Button>
+                                }
+                            />
+                        </Stack>)
+                    }
+                ]}
+            />
+        </Stack >
     );
 }
 

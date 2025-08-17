@@ -7,6 +7,7 @@
         "ok": "OK",
         "confirm": "Xác nhận",
         "save": "Lưu",
+        "create": "Tạo",
         "edit": "Chỉnh sửa",
         "update": "Cập nhật",
         "delete": "Xóa",
@@ -84,19 +85,23 @@
             },
             "department": {
                 "index": "Phòng ban",
+                "update-department-title": "Cập nhật thông tin phòng ban",
                 "create-department": "Tạo phòng ban mới",
                 "edit-department": "Chỉnh sửa phòng ban",
                 "department-name": "Tên phòng ban",
                 "department-description": "Mô tả phòng ban",
-                "department-list": "Danh sách phòng ban"
+                "department-list": "Danh sách phòng ban",
+                "confirm-delete-department": "Xác nhận xóa phòng ban này!"
             },
             "position": {
                 "index": "Vị trí",
+                "update-position-title": "Cập nhật thông tin vị trí",
                 "create-position": "Tạo vị trí mới",
                 "edit-position": "Chỉnh sửa vị trí",
                 "position-name": "Tên vị trí",
                 "position-description": "Mô tả vị trí",
-                "position-list": "Danh sách vị trí"
+                "position-list": "Danh sách vị trí",
+                "confirm-delete-position": "Xác nhận xóa vị trí này!"
             },
             "contract": {
                 "index": "Hợp đồng",
@@ -111,13 +116,23 @@
     "model": {
         "hr": {
             "employee": {
-                "index": "Phòng ban",
+                "index": "Nhân viên",
                 "name": "Tên nhân viên",
                 "dob": "Ngày sinh",
                 "department": "Phòng ban",
                 "position": "Vị trí",
                 "email": "Email",
                 "phone": "Số điện thoại"
+            },
+            "department": {
+                "index": "Phòng ban",
+                "name": "Tên phòng ban",
+                "description": "Mô tả"
+            },
+            "position": {
+                "index": "Vị trí",
+                "name": "Tên vị trí",
+                "description": "Mô tả"
             }
         }
     },

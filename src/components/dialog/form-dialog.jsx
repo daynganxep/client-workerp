@@ -44,7 +44,7 @@ function FormDialog({
             >
                 <form onSubmit={handleSubmit(mutation.mutate)}>
                     <DialogTitle sx={{ color: theme.palette.text.primary, mb: 3 }}>
-                        {title}
+                        {t(title)}
                     </DialogTitle>
 
                     <DialogContent
@@ -62,7 +62,7 @@ function FormDialog({
                     </DialogContent>
 
                     <DialogActions sx={{ px: 3, pb: 3, gap: 2 }}>
-                        <Button onClick={dialog.close} variant="text" color="primary" size="large">
+                        <Button onClick={dialog.close} variant="text" color="inherit" size="large">
                             {t(cancelButtonText)}
                         </Button>
                         <Button
