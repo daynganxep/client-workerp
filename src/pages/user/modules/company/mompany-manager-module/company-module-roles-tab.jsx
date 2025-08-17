@@ -125,7 +125,6 @@ function CompanyModuleRolesTab() {
                 pageSize={5}
                 disableSelectionOnClick
                 sx={{ maxHeight: 600, minHeight: 300 }}
-                rowCount={10}
                 loading={isLoading}
             />
             <Stack direction="row" justifyContent="flex-end" gap={2}>

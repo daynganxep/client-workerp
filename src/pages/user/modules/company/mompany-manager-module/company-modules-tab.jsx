@@ -100,7 +100,7 @@ function CompanyModulesTab() {
 
     return (
         <Stack spacing={3}>
-            <Alert severity="info">Những module Company, HR và PROJECT là bắt buộc và không thể bỏ chọn</Alert>
+            <Alert severity="info">{t('working.company.infor-required-modules')}</Alert>
 
             <FormGroup>
                 <Stack spacing={2}>

@@ -60,7 +60,11 @@
             "info": "Thông tin",
             "user-id": "Mã tài khoản",
             "employee": "Nhân viên",
-            "save-changes": "Lưu thay đổi"
+            "save-changes": "Lưu thay đổi",
+            "infor-required-modules": "Những module Company, HR và PROJECT là bắt buộc và không thể bỏ chọn",
+            "update-infor": "Cập nhật thông tin công ty",
+            "name": "Tên công ty",
+            "domain": "Tên miền"
         }
     },
     "api-code": {

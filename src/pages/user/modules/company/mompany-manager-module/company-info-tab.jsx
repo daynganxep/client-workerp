@@ -1,306 +1,212 @@
-import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-    TextField,
-    Button,
-    Stack,
-    Alert,
-    Switch,
-    FormControlLabel,
-    IconButton,
-    Box,
-    Avatar,
-    CardMedia,
-    alpha,
-} from "@mui/material";
-import toast from "@hooks/toast";
+import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { TextField, Button, Stack, Box, IconButton, Avatar, useTheme } from "@mui/material";
+import ErrorMessage from "@components/form/error-message";
+import UploadsService from "@services/util-service/uploads.service";
 import CompanyService from "@services/compay-module-service/company.service";
 import { updateCompanyInforSchema } from "@validations/company-schema";
 import { companyActions } from "@redux/slices/company.slice";
-import { Edit, PhotoCamera } from "@mui/icons-material";
-import useMessageByApiCode from "@hooks/use-message-by-api-code";
-import useFormValidation from "@hooks/use-form";
-import UploadsService from "@services/util-service/uploads.service";
+import { joiResolver } from "@hookform/resolvers/joi";
+import toast from "@hooks/toast";
+import _ from "lodash";
+import { Cancel, Edit, Save } from "@mui/icons-material";
+import ImageField from "@components/form/image-field";
 
 function CompanyInfoTab() {
-    const [errorMessage, setErrorMessage] = useState("");
-    const getMessage = useMessageByApiCode();
+    const { t } = useTranslation();
     const dispatch = useDispatch();
-    const { name, domain, avatar, active, coverImage } = useSelector(
-        (state) => state.company,
-    );
+    const companyId = useSelector((state) => state.company.id);
+    const theme = useTheme();
 
-    // Refs for file inputs
-    const avatarInputRef = useRef(null);
-    const coverInputRef = useRef(null);
-
-    // States for image handling
-    const [avatarFile, setAvatarFile] = useState(null);
-    const [coverFile, setCoverFile] = useState(null);
-    const [avatarPreview, setAvatarPreview] = useState(avatar);
-    const [coverPreview, setCoverPreview] = useState(coverImage);
-    const [isUploading, setIsUploading] = useState(false);
-
-    // Form validation
     const {
-        data,
-        errors,
-        isSubmitting,
-        handleChange,
-        validate,
-        startSubmitting,
-        finishSubmitting,
-    } = useFormValidation(updateCompanyInforSchema, {
-        name: name || "",
-        domain: domain || "",
-        avatar: avatar || "",
-        coverImage: coverImage || "",
-        active: active !== undefined ? active : true,
+        register,
+        handleSubmit,
+        formState: { errors, isValid, },
+        reset,
+        control
+    } = useForm({ resolver: joiResolver(updateCompanyInforSchema) });
+
+    const { refetch } = useQuery({
+        queryKey: ["company-info", companyId],
+        queryFn: async () => {
+            const [res, err] = await CompanyService.getById(companyId);
+            if (err) throw new Error(err.code);
+            dispatch(companyActions.setCompanyInfo(res.data));
+            reset(_.pick(res.data, ["name", "domain", "avatar", "coverImage"]));
+            return res.data;
+        },
+        onError: (error) => {
+            toast.error(error.message);
+        },
+        enabled: !!companyId,
     });
 
-    // Sync form data with Redux state
-    useEffect(() => {
-        handleChange("name", name || "");
-        handleChange("domain", domain || "");
-        handleChange("avatar", avatar || "");
-        handleChange("coverImage", coverImage || "");
-        handleChange("active", active !== undefined ? active : true);
-    }, [name, domain, avatar, coverImage, active, handleChange]);
-
-    // Handle image selection for preview
-    const handleImageSelect = (file, type) => {
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = () => {
-            if (type === 'avatar') {
-                setAvatarPreview(reader.result);
-                setAvatarFile(file);
-            } else {
-                setCoverPreview(reader.result);
-                setCoverFile(file);
+    const mutation = useMutation({
+        mutationFn: async (formData) => {
+            if (formData.avatar instanceof File) {
+                const [res, err] = await UploadsService.image(formData.avatar);
+                if (err) throw new Error(err.code);
+                formData.avatar = res.data;
             }
-        };
-        reader.readAsDataURL(file);
-    };
-
-    // Helper function to upload single image
-    const uploadImage = async (file) => {
-        if (!file) return null;
-        const [res, error] = await UploadsService.image(file);
-        if (error) {
-            toast.error("Không thể tải ảnh lên");
-            return null;
-        }
-        return res.data;
-    };
-
-    // Handle form submission
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (!validate()) return;
-
-        startSubmitting();
-        setIsUploading(true);
-
-        try {
-            // Upload new images if selected
-            let newAvatarUrl = data.avatar;
-            let newCoverUrl = data.coverImage;
-
-            if (avatarFile) {
-                const uploadedAvatar = await uploadImage(avatarFile);
-                if (uploadedAvatar) {
-                    newAvatarUrl = uploadedAvatar;
-                } else {
-                    return;
-                }
+            if (formData.coverImage instanceof File) {
+                const [res, err] = await UploadsService.image(formData.coverImage);
+                if (err) throw new Error(err.code);
+                formData.coverImage = res.data;
             }
 
-            if (coverFile) {
-                const uploadedCover = await uploadImage(coverFile);
-                if (uploadedCover) {
-                    newCoverUrl = uploadedCover;
-                } else {
-                    return;
-                }
-            }
-
-            // Update company info
-            const [res, error] = await CompanyService.updateCompanyInfo({
-                ...data,
-                avatar: newAvatarUrl,
-                coverImage: newCoverUrl,
-            });
-
-            console.log(res)
-
-            if (error) {
-                setErrorMessage(getMessage(error.code));
-                toast.error(error.code);
-                return;
-            }
-
-            toast.success(res.code);
+            const [res, err] = await CompanyService.updateCompanyInfo(formData);
+            if (err) throw new Error(err.code);
+            return res;
+        },
+        onSuccess: (res) => {
             dispatch(companyActions.setCompanyInfo(res.data));
-
-            // Reset file states
-            setAvatarFile(null);
-            setCoverFile(null);
-
-        } catch (err) {
-            toast.error("Đã xảy ra lỗi không mong muốn");
-        } finally {
-            setIsUploading(false);
-            finishSubmitting();
-        }
-    };
-
-    // Add this helper function inside the component
-    const getCoverBackground = (theme, url) => {
-        if (url) {
-            return {
-                backgroundImage: `url(${url})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-            };
-        }
-        return {
-            background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.1)}, ${alpha(theme.palette.secondary.main, 0.1)})`,
-        };
-    };
+            toast.success(res.code);
+            refetch();
+        },
+    });
 
 
     return (
-        <Stack spacing={4}>
-            {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+        <form form onSubmit={handleSubmit(mutation.mutate)} >
+            <Stack spacing={3}>
 
-            <Box sx={{ position: 'relative' }}>
-                <CardMedia
-                    component="div"
-                    sx={(theme) => ({
-                        height: 300,
-                        bgcolor: theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
-                        ...getCoverBackground(theme, coverPreview),
-                        borderRadius: "8px"
-                    })}
-                />
-                <input
-                    type="file"
-                    ref={coverInputRef}
-                    hidden
-                    accept="image/*"
-                    onChange={(e) => handleImageSelect(e.target.files[0], 'cover')}
-                />
-                <IconButton
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        bgcolor: 'background.paper',
-                        '&:hover': {
-                            bgcolor: 'background.paper',
-                        },
-                    }}
-                    onClick={() => coverInputRef.current?.click()}
-                    disabled={isSubmitting || isUploading}
-                >
-                    <Edit />
-                </IconButton>
+                <ErrorMessage mutation={mutation} />
 
-                {/* Avatar - Updated positioning */}
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        left: '50%',
-                        bottom: 0,
-                        transform: 'translate(-50%, 50%)',
-                        display: 'flex',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <Box sx={{ position: 'relative' }}>
-                        <Avatar
-                            src={avatarPreview}
-                            sx={(theme) => ({
-                                width: 120,
-                                height: 120,
-                                border: 4,
-                                borderColor: 'background.paper',
-                                bgcolor: theme.palette.mode === 'dark' ? 'grey.800' : 'grey.100',
-                            })}
+                <Stack spacing={14}>
+                    <ImageField
+                        name="coverImage"
+                        control={control}
+                        render={(value, open) => (
+                            <Box
+                                sx={{
+                                    position: "relative",
+                                    height: 320,
+                                    mb: 10,
+                                }}
+                            >
+                                <Box
+                                    sx={{
+                                        height: "100%",
+                                        width: "100%",
+                                        borderRadius: 4,
+                                        overflow: "hidden",
+                                        position: "relative",
+                                        backgroundColor: !value ? theme.palette.background.default : undefined,
+                                    }}
+                                >
+                                    <Box
+                                        component="img"
+                                        src={value instanceof File ? URL.createObjectURL(value) : value}
+                                        sx={{
+                                            height: "100%",
+                                            width: "100%",
+                                            objectFit: "cover",
+                                            borderRadius: 4,
+                                            opacity: !value ? 0 : 1,
+                                            transition: "opacity 0.2s",
+                                        }}
+                                    />
+                                </Box>
+                                <IconButton
+                                    onClick={open}
+                                    sx={{
+                                        position: "absolute",
+                                        top: 8,
+                                        right: 8,
+                                    }}
+                                >
+                                    <Edit />
+                                </IconButton>
+
+                                <ImageField
+                                    name="avatar"
+                                    control={control}
+                                    render={(avatarValue, avatarOpen) => (
+                                        <Box
+                                            sx={{
+                                                position: "absolute",
+                                                bottom: -80,
+                                                left: "50%",
+                                                transform: "translateX(-50%)",
+                                                width: 160,
+                                                height: 160,
+                                                backgroundColor: "transparent",
+                                            }}
+                                        >
+                                            <Avatar
+                                                src={
+                                                    avatarValue instanceof File
+                                                        ? URL.createObjectURL(avatarValue)
+                                                        : avatarValue
+                                                }
+                                                sx={{
+                                                    width: 160,
+                                                    height: 160,
+                                                    fontSize: 64,
+                                                }}
+                                            />
+                                            <IconButton
+                                                onClick={avatarOpen}
+                                                sx={{
+                                                    position: "absolute",
+                                                    top: 4,
+                                                    right: 4,
+                                                }}
+                                            >
+                                                <Edit fontSize="small" />
+                                            </IconButton>
+                                        </Box>
+                                    )}
+                                />
+                            </Box>
+                        )}
+                    />
+
+                    <Stack spacing={3} mt={3}>
+                        <TextField
+                            fullWidth
+                            label={t('working.company.name')}
+                            error={!!errors.name}
+                            helperText={errors.name?.message}
+                            required
+                            slotProps={{ inputLabel: { shrink: true } }}
+                            {...register("name")}
                         />
-                        <input
-                            type="file"
-                            ref={avatarInputRef}
-                            hidden
-                            accept="image/*"
-                            onChange={(e) => handleImageSelect(e.target.files[0], 'avatar')}
+                        <TextField
+                            fullWidth
+                            label={t('working.company.domain')}
+                            error={!!errors.domain}
+                            helperText={errors.domain?.message}
+                            slotProps={{ inputLabel: { shrink: true } }}
+                            {...register("domain")}
                         />
-                        <IconButton
-                            sx={{
-                                position: 'absolute',
-                                right: -8,
-                                bottom: -8,
-                                bgcolor: 'background.paper',
-                                '&:hover': {
-                                    bgcolor: 'background.paper',
-                                },
-                            }}
-                            onClick={() => avatarInputRef.current?.click()}
-                            disabled={isSubmitting || isUploading}
-                        >
-                            <PhotoCamera />
-                        </IconButton>
-                    </Box>
-                </Box>
-            </Box>
+                    </Stack>
+                </Stack>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit}>
-                <Stack spacing={3} sx={{ marginTop: "60px" }}>
-                    <TextField
-                        fullWidth
-                        label="Tên công ty"
-                        name="name"
-                        value={data.name}
-                        onChange={(e) => handleChange("name", e.target.value)}
-                        error={!!errors.name}
-                        helperText={errors.name}
-                    />
-
-                    <TextField
-                        fullWidth
-                        label="Domain"
-                        name="domain"
-                        value={data.domain}
-                        onChange={(e) => handleChange("domain", e.target.value)}
-                        error={!!errors.domain}
-                        helperText={errors.domain}
-                    />
-
-                    <FormControlLabel
-                        control={
-                            <Switch
-                                checked={data.active}
-                                onChange={(e) => handleChange("active", e.target.checked)}
-                            />
-                        }
-                        label="Trạng thái hoạt động"
-                    />
-
+                <Stack spacing={3} mt={3} direction="row" justifyContent="flex-end">
                     <Button
-                        fullWidth
-                        size="large"
+                        onClick={refetch}
+                        variant="outlined"
+                        color="info"
+                        startIcon={<Cancel />}
+                    >
+                        {t("common.cancel")}
+                    </Button>
+                    <Button
                         type="submit"
                         variant="contained"
-                        disabled={isSubmitting || isUploading}
+                        color="primary"
+                        disabled={!isValid}
+                        loading={mutation.isPending}
+                        startIcon={<Save />}
                     >
-                        {isSubmitting || isUploading ? "Đang cập nhật..." : "Cập nhật thông tin"}
+                        {t('working.company.update-infor')}
                     </Button>
                 </Stack>
-            </form>
-        </Stack>
+            </Stack >
+        </form >
     );
 }
 
