@@ -26,3 +26,4 @@ export const COMMON_CREATE_COMPANY_DEFAULT_VALUES = {
     domain: "",
     moduleCodes: [MODULE_OPTIONS[0].code, MODULE_OPTIONS[1].code, MODULE_OPTIONS[2].code],
 };
+

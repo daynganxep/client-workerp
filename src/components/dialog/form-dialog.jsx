@@ -70,6 +70,7 @@ function FormDialog({
                             variant="contained"
                             color="primary"
                             disabled={!isValid}
+                            loading={mutation.isPending}
                             size="large"
                         >
                             {t(submitButtonText)}

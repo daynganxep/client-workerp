@@ -17,6 +17,7 @@ import {
     useMediaQuery,
     Tooltip,
     Button,
+    ListItemButton,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -60,7 +61,6 @@ function WorkingLayout() {
             CompanyModuleRolesService.getByEmployee(companyId),
             EmployeeService.getMyEmployeeInfo(),
         ]);
-        console.log({ res2 });
         if (!err1 && !err2 && !err3) {
             dispatch(companyActions.setEmployees(res1.data));
             dispatch(companyActions.setCompanyModuleRoles(res2.data));
@@ -162,47 +162,52 @@ function WorkingLayout() {
                     return (
                         <ListItem
                             key={module.id}
-                            button
-                            component={Link}
-                            to={`/working/${module?.moduleCode?.toLowerCase()}/${module?.moduleRoles[0]?.toLowerCase()}`}
+                            disablePadding
                             sx={{
-                                borderRadius: theme.shape.borderRadius,
-                                color: theme.palette.text.primary,
                                 mb: 1,
-                                transition: 'all 0.3s ease',
-                                bgcolor: isActive ? theme.palette.primary.main : 'transparent',
-                                p: isSidebarOpen ? undefined : '12px',
-                                justifyContent: 'center',
-                                '&:hover': {
-                                    bgcolor: isActive
-                                        ? theme.palette.primary.dark
-                                        : theme.palette.action.hover,
-                                    transform: 'scale(1.02)',
-                                },
                             }}
                         >
-                            <ListItemIcon
+                            <ListItemButton
+                                component={Link}
+                                to={`/working/${module?.moduleCode?.toLowerCase()}/${module?.moduleRoles[0]?.toLowerCase()}`}
                                 sx={{
-                                    color: isActive
-                                        ? theme.palette.primary.contrastText
-                                        : theme.palette.text.primary,
-                                    minWidth: isSidebarOpen ? 40 : 'auto',
-                                    mr: isSidebarOpen ? undefined : 0,
-                                    justifyContent: 'center',
+                                    borderRadius: theme.shape.borderRadius,
+                                    color: theme.palette.text.primary,
+                                    transition: "all 0.3s ease",
+                                    bgcolor: isActive ? theme.palette.primary.main : "transparent",
+                                    p: isSidebarOpen ? undefined : "12px",
+                                    justifyContent: "center",
+                                    "&:hover": {
+                                        bgcolor: isActive
+                                            ? theme.palette.primary.dark
+                                            : theme.palette.action.hover,
+                                        transform: "scale(1.02)",
+                                    },
                                 }}
                             >
-                                {moduleConfig?.icon}
-                            </ListItemIcon>
-                            {isSidebarOpen && (
-                                <ListItemText
-                                    primary={moduleConfig?.label}
-                                    primaryTypographyProps={{
+                                <ListItemIcon
+                                    sx={{
                                         color: isActive
                                             ? theme.palette.primary.contrastText
                                             : theme.palette.text.primary,
+                                        minWidth: isSidebarOpen ? 40 : "auto",
+                                        mr: isSidebarOpen ? undefined : 0,
+                                        justifyContent: "center",
                                     }}
-                                />
-                            )}
+                                >
+                                    {moduleConfig?.icon}
+                                </ListItemIcon>
+                                {isSidebarOpen && (
+                                    <ListItemText
+                                        primary={moduleConfig?.label}
+                                        primaryTypographyProps={{
+                                            color: isActive
+                                                ? theme.palette.primary.contrastText
+                                                : theme.palette.text.primary,
+                                        }}
+                                    />
+                                )}
+                            </ListItemButton>
                         </ListItem>
                     );
                 })}

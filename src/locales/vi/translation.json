@@ -8,11 +8,13 @@
         "confirm": "Xác nhận",
         "save": "Lưu",
         "edit": "Chỉnh sửa",
+        "update": "Cập nhật",
         "delete": "Xóa",
         "search": "Tìm kiếm",
         "no-data": "Không có dữ liệu",
         "common-error": "Đã xảy ra lỗi",
         "invalid-tab": "Tab không hợp lệ",
+        "actions": "Hành động",
         "company": {
             "list-company": "Công ty của tôi",
             "create-company": "Tạo công ty mới",
@@ -65,6 +67,58 @@
             "update-infor": "Cập nhật thông tin công ty",
             "name": "Tên công ty",
             "domain": "Tên miền"
+        },
+        "hr": {
+            "employee": {
+                "index": "Nhân viên",
+                "invite-employee-button": "Mời nhân viên mới",
+                "invite-employee-title": "Mời nhân viên",
+                "invite-employee-email": "Email nhân viên",
+                "invite-employee-role": "Vai trò",
+                "invite-employee-code": "Mã xác nhận",
+                "invite-employee-submit": "Gửi lời mời",
+                "invite-employee-success": "Lời mời đã được gửi thành công",
+                "user-id": "Mã tài khoản",
+                "update-employee-title": "Cập nhật thông tin nhân viên",
+                "employee-list": "Danh sách nhân viên"
+            },
+            "department": {
+                "index": "Phòng ban",
+                "create-department": "Tạo phòng ban mới",
+                "edit-department": "Chỉnh sửa phòng ban",
+                "department-name": "Tên phòng ban",
+                "department-description": "Mô tả phòng ban",
+                "department-list": "Danh sách phòng ban"
+            },
+            "position": {
+                "index": "Vị trí",
+                "create-position": "Tạo vị trí mới",
+                "edit-position": "Chỉnh sửa vị trí",
+                "position-name": "Tên vị trí",
+                "position-description": "Mô tả vị trí",
+                "position-list": "Danh sách vị trí"
+            },
+            "contract": {
+                "index": "Hợp đồng",
+                "create-contract": "Tạo hợp đồng mới",
+                "edit-contract": "Chỉnh sửa hợp đồng",
+                "contract-name": "Tên hợp đồng",
+                "contract-description": "Mô tả hợp đồng",
+                "contract-list": "Danh sách hợp đồng"
+            }
+        }
+    },
+    "model": {
+        "hr": {
+            "employee": {
+                "index": "Phòng ban",
+                "name": "Tên nhân viên",
+                "dob": "Ngày sinh",
+                "department": "Phòng ban",
+                "position": "Vị trí",
+                "email": "Email",
+                "phone": "Số điện thoại"
+            }
         }
     },
     "api-code": {

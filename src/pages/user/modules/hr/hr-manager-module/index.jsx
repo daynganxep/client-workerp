@@ -3,14 +3,13 @@ import DepartmentTab from "./department-tab";
 import PositionTab from "./position-tab";
 import ContractTab from "./contract-tab";
 import TabNavigation from "@layouts/user/working-layout/tab-navigation";
-import "./.scss";
 
 function HRManagerModule() {
     const tabs = [
-        { label: "Nhân viên", value: 'employee', element: <EmployeeTab /> },
-        { label: "Phòng ban", value: 'department', element: <DepartmentTab /> },
-        { label: "Vị trí", value: 'position', element: <PositionTab /> },
-        { label: "Hợp đồng", value: 'contract', element: <ContractTab /> },
+        { label: "working.hr.employee.index", value: 'employee', element: <EmployeeTab /> },
+        { label: "working.hr.department.index", value: 'department', element: <DepartmentTab /> },
+        { label: "working.hr.position.index", value: 'position', element: <PositionTab /> },
+        { label: "working.hr.contract.index", value: 'contract', element: <ContractTab /> },
     ];
 
     return (

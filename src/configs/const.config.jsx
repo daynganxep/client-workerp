@@ -5,6 +5,11 @@ import ForumIcon from '@mui/icons-material/Forum';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
+export const EMPTY_VALUES = {
+    STRING: "- - -",
+    DATE: "-/-/-",
+}
+
 export const THEMES = {
     LIGHT: "LIGHT",
     DARK: "DARK",

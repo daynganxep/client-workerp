@@ -1,290 +1,123 @@
-import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    Button,
-    TextField,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Select,
-    MenuItem,
-    Typography,
-    Box,
-} from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { Typography, Stack } from "@mui/material";
+import { DataGrid } from '@mui/x-data-grid';
+import Employee from "@components/working/employee";
+import UpdateEmployeeDialog from "./update-employee-dialog";
 import EmployeeService from "@services/hr-module-service/employee.service";
 import DepartmentService from "@services/hr-module-service/department.service";
 import PositionService from "@services/hr-module-service/position.service";
-import useFormValidation from "@hooks/use-form";
-import { employeeSchema, inviteEmployeeSchema } from "@validations/hr-schema";
 import toast from "@hooks/toast";
-import Employee from "@components/working/employee";
 import { formatDateForUI } from "@tools/date.tool";
-import DateField from "@components/form/date-field";
+import InviteEmployeeDialog from "./invite-employee-dialog";
+import { useQuery } from "@tanstack/react-query";
+import { EMPTY_VALUES } from "@configs/const.config";
 
 function EmployeeTab() {
+    const { t } = useTranslation();
     const { id: companyId } = useSelector((state) => state.company);
-    const [employees, setEmployees] = useState([]);
-    const [departments, setDepartments] = useState([]);
-    const [positions, setPositions] = useState([]);
-    const [openInvite, setOpenInvite] = useState(false);
-    const [openEdit, setOpenEdit] = useState(false);
-    const [editingEmployee, setEditingEmployee] = useState(null);
 
-    const {
-        data: inviteData,
-        errors: inviteErrors,
-        handleChange: handleInviteChange,
-        validate: validateInvite,
-        startSubmitting: startInviteSubmitting,
-        finishSubmitting: finishInviteSubmitting,
-        isSubmitting: isInviteSubmitting,
-    } = useFormValidation(inviteEmployeeSchema, { userId: "" });
-
-    const {
-        data: editData,
-        errors: editErrors,
-        handleChange: handleEditChange,
-        validate: validateEdit,
-        startSubmitting: startEditSubmitting,
-        finishSubmitting: finishEditSubmitting,
-        isSubmitting: isEditSubmitting,
-    } = useFormValidation(employeeSchema, {
-        name: "",
-        dob: "",
-        department: null,
-        position: null,
+    const { data: employees = [], refetch } = useQuery({
+        queryKey: ["hr-employees", companyId],
+        queryFn: async () => {
+            const [res, err] = await EmployeeService.getEmployeesByCompanyId(
+                companyId,
+            );
+            if (err) return toast.error(err.code);
+            return res.data
+        },
+        onError: (code) => {
+            toast.error(code);
+        },
     });
 
-    const fetchEmployees = async () => {
-        const [res, err] = await EmployeeService.getEmployeesByCompanyId(
-            companyId,
-        );
-        if (err) return toast.error(err.code);
-        setEmployees(res.data);
-    };
+    const { data: departments = [] } = useQuery({
+        queryKey: ["hr-departments", companyId],
+        queryFn: async () => {
+            const [res, err] = await DepartmentService.getDepartmentsByCompanyId(
+                companyId,
+            );
+            if (err) return toast.error(err.code);
+            return res.data
+        },
+        onError: (code) => {
+            toast.error(code);
+        },
+    });
 
-    const fetchDepartments = async () => {
-        const [res, err] = await DepartmentService.getDepartmentsByCompanyId(
-            companyId,
-        );
-        if (err) return toast.error(err.code);
-        setDepartments(res.data);
-    };
-
-    const fetchPositions = async () => {
-        const [res, err] = await PositionService.getPositionsByCompanyId(
-            companyId,
-        );
-        if (err) return toast.error(err.code);
-        setPositions(res.data);
-    };
-
-    useEffect(() => {
-        fetchEmployees();
-        fetchDepartments();
-        fetchPositions();
-    }, []);
-
-    const handleInvite = async () => {
-        if (!validateInvite()) return;
-        startInviteSubmitting();
-        const [res, err] = await EmployeeService.inviteToCompany(inviteData);
-        finishInviteSubmitting();
-        if (err) return toast.error(err.code);
-        toast.success(res.code);
-        setOpenInvite(false);
-    };
-
-    const handleEdit = async () => {
-        if (!validateEdit()) return;
-        startEditSubmitting();
-        const requestData = {
-            name: editData.name,
-            dob: editData.dob,
-            departmentId: editData.department || null,
-            positionId: editData.position || null,
-        };
-        const [res, err] = await EmployeeService.updateEmployee(
-            editingEmployee.id,
-            requestData,
-        );
-        finishEditSubmitting();
-        if (err) return toast.error(err.code);
-        toast.success(res.code);
-        setOpenEdit(false);
-        fetchEmployees();
-    };
-
-    const openEditDialog = (employee) => {
-        setEditingEmployee(employee);
-        handleEditChange("name", employee.name);
-        handleEditChange("dob", employee.dob);
-        handleEditChange("department", employee.department?.id || null);
-        handleEditChange("position", employee.position?.id || null);
-        setOpenEdit(true);
-    };
+    const { data: positions = [] } = useQuery({
+        queryKey: ["hr-positions", companyId],
+        queryFn: async () => {
+            const [res, err] = await PositionService.getPositionsByCompanyId(
+                companyId,
+            );
+            if (err) return toast.error(err.code);
+            return res.data
+        },
+        onError: (code) => {
+            toast.error(code);
+        },
+    });
 
     return (
-        <div className="employee-tab">
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    mb: 2
-                }}
-            >
-                <Typography variant="h6">Danh sách nhân viên</Typography>
-                <Button
-                    variant="contained"
-                    onClick={() => setOpenInvite(true)}
-                >
-                    Mời nhân viên mới
-                </Button>
-            </Box>
-            <Table>
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Tên</TableCell>
-                        <TableCell>Ngày sinh</TableCell>
-                        <TableCell>Phòng ban</TableCell>
-                        <TableCell>Vị trí</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Số điện thoại</TableCell>
-                        <TableCell>Actions</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {employees.map((employee) => (
-                        <TableRow key={employee.id}>
-                            <TableCell><Employee employeeId={employee.id} size={1.2} showName></Employee></TableCell>
-                            <TableCell>
-                                {formatDateForUI(employee.dob)}
-                            </TableCell>
-                            <TableCell>
-                                {employee?.department?.name || "N/A"}
-                            </TableCell>
-                            <TableCell>
-                                {employee?.position?.name || "N/A"}
-                            </TableCell>
-                            <TableCell>
-                                {employee?.email || "N/A"}
-                            </TableCell>
-                            <TableCell>
-                                {employee?.phone || "N/A"}
-                            </TableCell>
-                            <TableCell>
-                                <Button
-                                    onClick={() => openEditDialog(employee)}
-                                >
-                                    Sửa
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-
-            {/* Invite Dialog */}
-            <Dialog open={openInvite} onClose={() => setOpenInvite(false)}>
-                <DialogTitle>Mời nhân viên</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        fullWidth
-                        label="UserId nhân viên mới"
-                        value={inviteData.userId}
-                        onChange={(e) =>
-                            handleInviteChange("userId", e.target.value)
-                        }
-                        error={!!inviteErrors.userId}
-                        helperText={inviteErrors.userId}
-                        sx={{ mt: 1 }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenInvite(false)}>Hủy</Button>
-                    <Button
-                        onClick={handleInvite}
-                        disabled={isInviteSubmitting}
-                    >
-                        {isInviteSubmitting ? "Đang gửi..." : "Gửi"}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Edit Dialog */}
-            <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
-                <DialogTitle>Chỉnh sửa nhân viên</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        fullWidth
-                        label="Tên"
-                        value={editData.name}
-                        onChange={(e) =>
-                            handleEditChange("name", e.target.value)
-                        }
-                        error={!!editErrors.name}
-                        helperText={editErrors.name}
-                        sx={{ mt: 1 }}
-                    />
-                    <DateField
-                        fullWidth
-                        label="Ngày sinh"
-                        value={editData.dob}
-                        onChange={(e) =>
-                            handleEditChange("dob", e.target.value)
-                        }
-                        error={!!editErrors.dob}
-                        helperText={editErrors.dob}
-                        sx={{ mt: 2 }}
-                    />
-                    <Select
-                        fullWidth
-                        value={editData.department || ""}
-                        onChange={(e) =>
-                            handleEditChange("department", e.target.value)
-                        }
-                        displayEmpty
-                        sx={{ mt: 2 }}
-                    >
-                        <MenuItem value="">Không chọn</MenuItem>
-                        {departments.map((dept) => (
-                            <MenuItem key={dept.id} value={dept.id}>
-                                {dept.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                    <Select
-                        fullWidth
-                        value={editData.position || ""}
-                        onChange={(e) =>
-                            handleEditChange("position", e.target.value)
-                        }
-                        displayEmpty
-                        sx={{ mt: 2 }}
-                    >
-                        <MenuItem value="">Không chọn</MenuItem>
-                        {positions.map((pos) => (
-                            <MenuItem key={pos.id} value={pos.id}>
-                                {pos.name}
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenEdit(false)}>Hủy</Button>
-                    <Button onClick={handleEdit} disabled={isEditSubmitting}>
-                        {isEditSubmitting ? "Đang cập nhật..." : "Cập nhật"}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </div>
+        <Stack spacing={3}>
+            <Stack direction="row" justifyContent="space-between">
+                <Typography variant="h6">{t('working.hr.employee.employee-list')}</Typography>
+                <InviteEmployeeDialog></InviteEmployeeDialog>
+            </Stack>
+            <DataGrid
+                rowHeight={80}
+                rows={employees}
+                getRowId={(row) => row?.id}
+                disableRowSelectionOnClick
+                columns={[
+                    {
+                        field: 'name',
+                        headerName: t('model.hr.employee.name'),
+                        flex: 2,
+                        renderCell: (params) => <Employee employeeId={params?.row?.id} size={1.2} showName />
+                    },
+                    {
+                        field: 'dob',
+                        headerName: t('model.hr.employee.dob'),
+                        flex: 1,
+                        valueGetter: (value) => value ? formatDateForUI(value) : EMPTY_VALUES.DATE
+                    },
+                    {
+                        field: 'department',
+                        headerName: t('model.hr.employee.department'),
+                        flex: 1,
+                        valueGetter: (value) => value?.name || EMPTY_VALUES.STRING
+                    },
+                    {
+                        field: 'position',
+                        headerName: t('model.hr.employee.position'),
+                        flex: 1,
+                        valueGetter: (value) => value?.name || EMPTY_VALUES.STRING
+                    },
+                    {
+                        field: 'email',
+                        headerName: t('model.hr.employee.email'),
+                        flex: 1,
+                        valueGetter: (value) => value || EMPTY_VALUES.STRING
+                    },
+                    {
+                        field: 'phone',
+                        headerName: t('model.hr.employee.phone'),
+                        flex: 1,
+                        valueGetter: (value) => value || EMPTY_VALUES.STRING
+                    },
+                    {
+                        field: 'actions',
+                        headerName: t('common.actions'),
+                        flex: 1,
+                        sortable: false,
+                        filterable: false,
+                        renderCell: (params) => <UpdateEmployeeDialog employee={params?.row} departments={departments} positions={positions} refetch={refetch} />
+                    }
+                ]}
+            />
+        </Stack >
     );
 }
 

@@ -114,7 +114,7 @@ function Employee({ employeeId, size = 1, tollTipSize = 1, showName = false, ...
     const delayHide = () => {
         timeoutRef.current = setTimeout(() => {
             setVisible(false);
-        }, 200); // delay tránh bị tắt tooltip khi chuột di chuyển giữa trigger và tooltip
+        }, 200);
     };
 
     return (
@@ -148,7 +148,7 @@ function Employee({ employeeId, size = 1, tollTipSize = 1, showName = false, ...
                     setVisible(true);
                 }}
                 onMouseLeave={delayHide}
-                sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
+                sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', height: "100%" }}
                 {...props}
             >
                 <Avatar

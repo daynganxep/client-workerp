@@ -70,6 +70,18 @@ export const employeeSchema = Joi.object({
     position: Joi.string().allow(null, "").optional(),
 });
 
+export const employeeUpdateSchema = Joi.object({
+    name: Joi.string().required().messages({
+        "string.empty": "Tên không được để trống",
+        "any.required": "Tên là bắt buộc",
+    }),
+    dob: Joi.date().optional().messages({
+        "date.base": "Ngày sinh không hợp lệ",
+    }),
+    departmentId: Joi.string().allow(null, "").optional(),
+    positionId: Joi.string().allow(null, "").optional(),
+});
+
 export const employeeUpdateMyInfoSchema = Joi.object({
     name: Joi.string().required().messages({
         "string.empty": "Tên không được để trống",
