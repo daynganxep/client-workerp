@@ -18,7 +18,7 @@ function PositionTab() {
     const { t } = useTranslation();
     const { id: companyId } = useSelector((state) => state.company);
 
-    const { data: position = [], refetch, isLoading } = useQuery({
+    const { data: positions = [], refetch, isLoading } = useQuery({
         queryKey: ["hr-position", companyId],
         queryFn: async () => {
             const [res, err] = await PositionService.getPositionsByCompanyId(
@@ -48,7 +48,7 @@ function PositionTab() {
             <DataGrid
                 loading={isLoading}
                 rowHeight={80}
-                rows={position}
+                rows={positions}
                 getRowId={(row) => row?.id}
                 disableRowSelectionOnClick
                 columns={[

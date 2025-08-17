@@ -109,7 +109,8 @@
                 "edit-contract": "Chỉnh sửa hợp đồng",
                 "contract-name": "Tên hợp đồng",
                 "contract-description": "Mô tả hợp đồng",
-                "contract-list": "Danh sách hợp đồng"
+                "contract-list": "Danh sách hợp đồng",
+                "confirm-delete-contract": "Xác nhận xóa hợp đồng này!"
             }
         }
     },
@@ -133,6 +134,15 @@
                 "index": "Vị trí",
                 "name": "Tên vị trí",
                 "description": "Mô tả"
+            },
+            "contract": {
+                "index": "Hợp đồng",
+                "employee": "Nhân viên",
+                "start-date": "Ngày bắt đầu",
+                "end-date": "Ngày kết thúc",
+                "type": "Loại",
+                "salary": "Lương",
+                "status": "Trạng thái"
             }
         }
     },
