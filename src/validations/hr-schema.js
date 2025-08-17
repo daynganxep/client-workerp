@@ -87,14 +87,7 @@ export const employeeUpdateMyInfoSchema = Joi.object({
         "string.empty": "Tên không được để trống",
         "any.required": "Tên là bắt buộc",
     }),
-    avatar: Joi.string()
-        .uri({ scheme: ["http", "https"] })
-        .allow(null, "")
-        .optional()
-        .messages({
-            "string.uri": "Avatar phải là một URL hợp lệ (http hoặc https)",
-            "string.base": "Avatar phải là chuỗi ký tự",
-        }),
+    avatar: Joi.any().optional(),
     dob: Joi.date().optional().messages({
         "date.base": "Ngày sinh không hợp lệ",
     }),
