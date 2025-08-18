@@ -47,7 +47,6 @@ import useIsDark from "@hooks/use-is-dark";
 import DateField from "@components/form/date-field";
 import { Link } from "react-router-dom";
 import ReactQuill from "react-quill";
-import "./project-tasks.scss";
 
 function ProjectTasks({ projectId, isManager = false, isMyTasks = false }) {
     const theme = useTheme();

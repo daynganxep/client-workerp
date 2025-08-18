@@ -36,7 +36,7 @@ function ProjectCard({ project, linkPath = "/" }) {
                     }}
                 >
                     <Typography
-                        variant="h6"
+                        variant="body1"
                         sx={{
                             display: "-webkit-box",
                             WebkitLineClamp: 2,
@@ -49,7 +49,7 @@ function ProjectCard({ project, linkPath = "/" }) {
                     </Typography>
                 </Box>
 
-                <Typography color="text.secondary">
+                <Typography color="text.secondary" fontSize="small">
                     {project.description || EMPTY_VALUES.STRING}
                 </Typography>
             </CardContent>

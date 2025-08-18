@@ -39,7 +39,8 @@ function ProjectDashboard() {
                     display: "grid",
                     gridTemplateColumns: {
                         xs: "1fr",
-                        md: "1fr 1fr"
+                        md: "1fr 1fr",
+                        lg: "1fr 1fr 1fr"
                     },
                     gap: 3,
                 }}

@@ -119,6 +119,19 @@
             "dashboard": {
                 "all-projects": "Tất cả dự án",
                 "create-project": "Tạo dự án mới"
+            },
+            "detail": {
+                "tabs": {
+                    "task": "Nhiệm vụ",
+                    "member": "Thành viên",
+                    "overview": "Thông tin"
+                },
+                "member": {
+                    "add-member": "Thêm thành viên",
+                    "add-member-title": "Thêm thành viên vào dự án",
+                    "update-member-title": "Sửa vai trò thành viên",
+                    "delete-member-title": "Xóa thành viên khỏi dự án"
+                }
             }
         }
     },
@@ -162,7 +175,9 @@
                 "start-date": "Ngày bắt đầu",
                 "end-date": "Ngày kết thúc",
                 "members": "Thành viên",
-                "tags": "Thẻ"
+                "tags": "Thẻ",
+                "member": "Thành viên",
+                "role": "Vai trò"
             }
         }
     },
