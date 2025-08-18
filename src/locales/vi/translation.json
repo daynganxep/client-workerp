@@ -114,6 +114,12 @@
                 "confirm-delete-contract": "Xác nhận xóa hợp đồng này!",
                 "my-contracts": "Hợp đồng của tôi"
             }
+        },
+        "project": {
+            "dashboard": {
+                "all-projects": "Tất cả dự án",
+                "create-project": "Tạo dự án mới"
+            }
         }
     },
     "model": {
@@ -145,6 +151,18 @@
                 "type": "Loại",
                 "salary": "Lương",
                 "status": "Trạng thái"
+            }
+        },
+        "project": {
+            "project": {
+                "index": "Dự án",
+                "name": "Tên dự án",
+                "description": "Mô tả dự án",
+                "status": "Trạng thái",
+                "start-date": "Ngày bắt đầu",
+                "end-date": "Ngày kết thúc",
+                "members": "Thành viên",
+                "tags": "Thẻ"
             }
         }
     },

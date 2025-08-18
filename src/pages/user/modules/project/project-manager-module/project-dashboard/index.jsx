@@ -1,153 +1,58 @@
-import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import ProjectService from "@services/project-module-service/project.service";
 import {
     Typography,
-    Button,
-    Grid,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    Box,
+    Stack,
 } from "@mui/material";
-import DateField from "@components/form/date-field";
-import { Add, } from "@mui/icons-material";
-import ProjectCard from "@components/working/project-card";
-import useFormValidation from "@hooks/use-form";
-import { projectSchema } from "@validations/project-schema";
+import Grid2 from "@mui/material/Grid2";
 import toast from "@hooks/toast";
-import ".scss";
+import { useTranslation } from "react-i18next";
+import CreateProjectDialog from "./create-project-dialog";
+import { useQuery } from "@tanstack/react-query";
+import ProjectCard from "@components/working/project-card";
 
 function ProjectDashboard() {
-    const [projects, setProjects] = useState([]);
-    const [openCreate, setOpenCreate] = useState(false);
+    const { t } = useTranslation();
     const { id: companyId } = useSelector((state) => state.company);
 
-    const {
-        data,
-        errors,
-        handleChange,
-        validate,
-        startSubmitting,
-        finishSubmitting,
-        isSubmitting,
-    } = useFormValidation(projectSchema, {
-        name: "",
-        description: "",
-        startDate: "",
-        endDate: "",
-        companyId,
+    const { data: projects = [], refetch } = useQuery({
+        queryKey: ["project-all-projects", companyId],
+        queryFn: async () => {
+            const [res, err] = await ProjectService.getProjectsByCompanyId(companyId);
+            if (err) return toast.error(err.code);
+            return res.data
+        },
+        onError: (code) => {
+            toast.error(code);
+        },
     });
 
-    const fetchProjects = async () => {
-        const [res, err] = await ProjectService.getProjectsByCompanyId(
-            companyId,
-        );
-        if (err) return toast.error(err.code);
-        setProjects(res.data);
-    };
-
-    const handleCreate = async () => {
-        if (!validate()) return;
-        startSubmitting();
-        const [res, err] = await ProjectService.createProject(data);
-        finishSubmitting();
-        if (err) return toast.error(err.code);
-        toast.success(res.code);
-        setOpenCreate(false);
-        fetchProjects();
-    };
-
-    useEffect(() => {
-        fetchProjects();
-        handleChange("companyId", companyId);
-    }, [companyId]);
-
     return (
-        <div className="project-dashboard">
-            <Box
+        <Stack spacing={3}>
+            <Stack direction="row" justifyContent="space-between">
+                <Typography variant="h6">{t('working.project.dashboard.all-projects')}</Typography>
+                <CreateProjectDialog refetch={refetch} />
+            </Stack>
+            <Grid2
+                container
                 sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    mb: 2
+                    display: "grid",
+                    gridTemplateColumns: {
+                        xs: "1fr",
+                        md: "1fr 1fr"
+                    },
+                    gap: 3,
                 }}
             >
-                <Typography variant="h6">Tất cả dự án của công ty</Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<Add />}
-                    onClick={() => setOpenCreate(true)}
-                    sx={{ mb: 2 }}
-                >
-                    Tạo dự án mới
-                </Button>
-            </Box>
-            <Grid container spacing={3}>
                 {projects.map((project) => (
-                    <Grid item xs={12} sm={6} md={4} key={project.id}>
-                        <ProjectCard
-                            project={project}
-                            linkPath={`/working/project/manager/${project.id}`}
-                        />
-                    </Grid>
+                    <ProjectCard
+                        key={project.id}
+                        project={project}
+                        linkPath={`/working/project/manager/${project.id}`}
+                    />
                 ))}
-            </Grid>
-
-            {/* Create Dialog */}
-            <Dialog open={openCreate} onClose={() => setOpenCreate(false)}>
-                <DialogTitle>Tạo dự án mới</DialogTitle>
-                <DialogContent>
-                    <TextField
-                        fullWidth
-                        label="Tên dự án"
-                        value={data.name}
-                        onChange={(e) => handleChange("name", e.target.value)}
-                        error={!!errors.name}
-                        helperText={errors.name}
-                        sx={{ mt: 1 }}
-                    />
-                    <TextField
-                        fullWidth
-                        label="Mô tả"
-                        value={data.description}
-                        onChange={(e) =>
-                            handleChange("description", e.target.value)
-                        }
-                        sx={{ mt: 2 }}
-                    />
-                    <DateField
-                        fullWidth
-                        label="Ngày bắt đầu"
-                        value={data.startDate}
-                        onChange={(e) =>
-                            handleChange("startDate", e.target.value)
-                        }
-                        InputLabelProps={{ shrink: true }}
-                        sx={{ mt: 2 }}
-                    />
-                    <DateField
-                        fullWidth
-                        label="Ngày kết thúc"
-                        type="date"
-                        value={data.endDate}
-                        onChange={(e) =>
-                            handleChange("endDate", e.target.value)
-                        }
-                        InputLabelProps={{ shrink: true }}
-                        sx={{ mt: 2 }}
-                    />
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenCreate(false)}>Hủy</Button>
-                    <Button onClick={handleCreate} disabled={isSubmitting}>
-                        {isSubmitting ? "Đang tạo..." : "Tạo"}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </div >
+            </Grid2>
+        </Stack >
     );
 }
 

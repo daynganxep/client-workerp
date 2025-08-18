@@ -14,6 +14,7 @@ const DateField2 = ({
     helperText,
     sx,
     InputLabelProps,
+    required = false,
     ...props
 }) => {
     return (
@@ -23,7 +24,7 @@ const DateField2 = ({
                 control={control}
                 render={({ field }) => (
                     <DatePicker
-                        label={label}
+                        label={`${label || ""}${required ? " *" : ""}`}
                         value={field.value ? new Date(field.value) : null}
                         onChange={field.onChange}
                         format={format}

@@ -1,15 +1,9 @@
-export const stringToColor = (string) => {
-    let hash = 0;
-    for (let i = 0; i < string.length; i++) {
-        hash = string.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    let color = "#";
-    for (let i = 0; i < 3; i++) {
-        const value = (hash >> (i * 8)) & 0xff;
-        color += `00${value.toString(16)}`.slice(-2);
-    }
-    return color;
-};
+import stc from "string-to-color";
+import Color from "color";
+
+export function stringToColor(str, opacity = 1) {
+    return Color(stc(str)).alpha(opacity).string();
+}
 export const currencyFormat = (string) => {
     return new Intl.NumberFormat("vi-VN", {
         style: "currency",

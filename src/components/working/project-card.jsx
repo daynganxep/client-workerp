@@ -1,94 +1,74 @@
 import { Card, CardContent, CardActions, Typography, Button, Box } from '@mui/material';
-import { Folder, CalendarToday, AccessTime } from '@mui/icons-material';
-import { Link } from 'react-router-dom';
 import { formatDateForUI } from '@tools/date.tool';
-import { PROJECT_STATUSES_MAP } from '@configs/const.config';
+import { EMPTY_VALUES } from '@configs/const.config';
+import { Link } from 'react-router-dom';
+import { stringToColor } from '@tools/string.tool';
 
-function ProjectCard({ project, linkPath }) {
+function ProjectCard({ project, linkPath = "/" }) {
     return (
         <Card
+            variant="outlined"
             sx={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: (theme) => theme.shadows[4],
-                },
+                p: 0,
+                borderRadius: 3,
+                borderColor: "divider",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                boxSizing: "border-box",
+                height: "100%",
+                boxShadow: "none",
+                backgroundColor: (theme) => theme.palette.background.default,
             }}
         >
-            <CardContent sx={{ flexGrow: 1, p: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                    <Folder
+            <CardContent
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                }}
+            >
+                <Box
+                    sx={{
+                        p: 2,
+                        borderRadius: 2,
+                        backgroundColor: stringToColor(project.id, 0.5),
+                    }}
+                >
+                    <Typography
+                        variant="h6"
                         sx={{
-                            color: 'primary.main',
-                            fontSize: 32,
-                            mr: 2
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
                         }}
-                    />
-                    <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
-                        {project.name}
+                    >
+                        {project.name || EMPTY_VALUES.STRING}
                     </Typography>
                 </Box>
 
-                <Typography
-                    color="text.secondary"
-                    sx={{ mb: 2, minHeight: '40px' }}
-                >
-                    {project.description || 'Chưa có mô tả'}
+                <Typography color="text.secondary">
+                    {project.description || EMPTY_VALUES.STRING}
                 </Typography>
-
-                <Box sx={{ mt: 'auto' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <CalendarToday
-                            sx={{
-                                fontSize: 20,
-                                mr: 1,
-                                color: 'text.secondary'
-                            }}
-                        />
-                        <Typography variant="body2" color="text.secondary">
-                            {formatDateForUI(project.startDate)} - {formatDateForUI(project.endDate)}
-                        </Typography>
-                    </Box>
-
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <AccessTime
-                            sx={{
-                                fontSize: 20,
-                                mr: 1,
-                                color: 'text.secondary'
-                            }}
-                        />
-                        <Typography
-                            variant="body2"
-                            sx={{
-                                color: "primary.main",
-                                fontWeight: 'medium',
-                                px: 1,
-                                py: 0.5,
-                                bgcolor: 'action.hover',
-                                borderRadius: 1
-                            }}
-                        >
-                            {PROJECT_STATUSES_MAP[project.status]?.label}
-                        </Typography>
-                    </Box>
-                </Box>
             </CardContent>
 
-            <CardActions sx={{ p: 2, pt: 0 }}>
+            <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography variant="caption" color="textDisabled">
+                    {`${formatDateForUI(project.startDate) || EMPTY_VALUES.DATE} - ${formatDateForUI(project.endDate) || EMPTY_VALUES.DATE}`}
+                </Typography>
                 <Button
+                    size="small"
+                    variant="text"
                     component={Link}
                     to={linkPath}
-                    size="small"
-                    sx={{ ml: 'auto' }}
+                    sx={{ fontWeight: "bold" }}
                 >
-                    Xem chi tiết
+                    CHI TIẾT
                 </Button>
             </CardActions>
-        </Card>
+        </Card >
     );
 }
 

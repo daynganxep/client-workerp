@@ -11,10 +11,10 @@
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.2.1",
     "@mui/icons-material": "^6.4.7",
-    "@mui/material": "^6.4.7",
+    "@mui/material": "^6.5.0",
     "@mui/x-data-grid": "^7.28.0",
     "@mui/x-date-pickers": "^8.0.0",
     "@reduxjs/toolkit": "^2.2.7",
@@ -24,6 +24,7 @@
     "axios": "^1.7.7",
     "chomoi-fe": "file:",
     "client-workerp": "file:",
+    "color": "^5.0.0",
     "date-fns": "^4.1.0",
     "dompurify": "^3.2.5",
     "i18next": "^25.3.4",
@@ -48,6 +49,7 @@
     "react-router-dom": "^6.26.2",
     "react-scroll": "^1.9.0",
     "reselect": "^5.1.1",
+    "string-to-color": "^2.2.2",
     "uuid": "^10.0.0"
   },
   "devDependencies": {
