@@ -40,7 +40,7 @@ function ProjectMembers() {
     return (
         <Stack spacing={3}>
             <Stack direction="row" justifyContent="space-between">
-                <Typography variant="h6">{t('working.hr.position.position-list')}</Typography>
+                <Typography variant="h6">{t('working.project.detail.member.list-member')}</Typography>
                 <AddMemberDialog projectId={projectId} refetch={refetch} />
             </Stack>
             <DataGrid

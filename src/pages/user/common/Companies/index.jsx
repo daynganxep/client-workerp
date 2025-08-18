@@ -44,11 +44,17 @@ function Companies() {
                 <CreateCompany refetchCompanies={refetch} />
             </Box>
 
-            <Grid2 container spacing={3}>
+            <Grid2 container sx={{
+                display: "grid",
+                gridTemplateColumns: {
+                    xs: "1fr",
+                    md: "1fr 1fr",
+                    lg: "1fr 1fr 1fr"
+                },
+                gap: 3,
+            }}>
                 {companies.map((company) => (
-                    <Grid2 item xs={12} sm={6} md={4} key={company.id}>
-                        <CompanyCard company={company} />
-                    </Grid2>
+                    <CompanyCard key={company.id} company={company} />
                 ))}
             </Grid2>
         </Stack >

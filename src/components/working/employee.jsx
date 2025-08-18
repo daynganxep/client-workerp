@@ -3,6 +3,8 @@ import { useSelector } from "react-redux";
 import { Avatar, Box, Typography, Stack, Divider, useTheme } from "@mui/material";
 import { formatDateForUI } from "@tools/date.tool";
 import Tippy from '@tippyjs/react/headless';
+import { stringToColor } from "@tools/string.tool";
+import { EMPTY_VALUES } from "@configs/const.config";
 
 function EmployeeTooltip({ employee, size = 1 }) {
     return (
@@ -20,7 +22,9 @@ function EmployeeTooltip({ employee, size = 1 }) {
                     sx={{
                         width: 40 * size,
                         height: 40 * size,
-                        fontSize: 12 * size
+                        fontSize: 12 * size,
+                        bgcolor: stringToColor(employee.id)
+
                     }}
                 >
                     {employee?.name?.charAt(0)}
@@ -34,14 +38,14 @@ function EmployeeTooltip({ employee, size = 1 }) {
                             lineHeight: 1.2
                         }}
                     >
-                        {employee.name}
+                        {employee.name || EMPTY_VALUES.STRING}
                     </Typography>
                     <Typography
                         variant="caption"
                         color="text.secondary"
                         sx={{ fontSize: `${0.75 * size}rem` }}
                     >
-                        {employee.position?.name}
+                        {employee.position?.name || EMPTY_VALUES.STRING}
                     </Typography>
                 </Box>
             </Stack>
@@ -68,7 +72,7 @@ function EmployeeTooltip({ employee, size = 1 }) {
                             color: 'text.primary'
                         }}
                     >
-                        {employee.department?.name}
+                        {employee?.department?.name || EMPTY_VALUES.STRING}
                     </Typography>
                 </Box>
 
@@ -91,7 +95,7 @@ function EmployeeTooltip({ employee, size = 1 }) {
                             color: 'text.primary'
                         }}
                     >
-                        {formatDateForUI(employee.dob)}
+                        {employee.dob ? formatDateForUI(employee.dob) : EMPTY_VALUES.DATE}
                     </Typography>
                 </Box>
             </Stack>
@@ -163,6 +167,7 @@ function Employee({ employeeId, size = 1, tollTipSize = 1, showName = false, ...
                             boxShadow: theme.shadows[4],
                         },
                         transition: 'all 0.2s ease-in-out',
+                        bgcolor: stringToColor(employee.id)
                     }}
                 >
                     {employee?.name?.charAt(0)}
@@ -177,7 +182,7 @@ function Employee({ employeeId, size = 1, tollTipSize = 1, showName = false, ...
                             color: theme.palette.text.primary,
                         }}
                     >
-                        {employee.name}
+                        {employee.name || EMPTY_VALUES.STRING}
                     </Typography>
                 )}
             </Box>

@@ -127,6 +127,7 @@
                     "overview": "Thông tin"
                 },
                 "member": {
+                    "list-member": "Danh sách thành viên",
                     "add-member": "Thêm thành viên",
                     "add-member-title": "Thêm thành viên vào dự án",
                     "update-member-title": "Sửa vai trò thành viên",

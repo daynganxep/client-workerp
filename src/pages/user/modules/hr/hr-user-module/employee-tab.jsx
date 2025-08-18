@@ -13,6 +13,7 @@ import { employeeUpdateMyInfoSchema } from "@validations/hr-schema";
 import DateField2 from "@components/form/date-field-2";
 import IconButtonEdit from "@components/ui/icon-button-edit";
 import _ from "lodash";
+import { stringToColor } from "@tools/string.tool";
 
 function EmployeeTab() {
     const { t } = useTranslation();
@@ -116,12 +117,16 @@ function EmployeeTab() {
                                                 ? URL.createObjectURL(avatarValue)
                                                 : avatarValue
                                         }
+                                        alt={data.name}
                                         sx={{
                                             width: 160,
                                             height: 160,
                                             fontSize: 64,
+                                            bgcolor: stringToColor(data.id)
                                         }}
-                                    />
+                                    >
+                                        {data?.name?.charAt(0)}
+                                    </Avatar>
                                     <IconButtonEdit onClick={avatarOpen} top={4} right={4} />
                                 </Box>
                             )}

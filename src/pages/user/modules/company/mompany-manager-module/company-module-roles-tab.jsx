@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { DataGrid } from "@mui/x-data-grid";
 import { Checkbox, Button, Select, MenuItem, Stack } from "@mui/material";
@@ -8,10 +7,10 @@ import CompanyModuleRolesService from "@services/compay-module-service/company-m
 import { MODULE_OPTIONS_MAP, MODULE_ROLES_MAP } from "@configs/const.config";
 import toast from "@hooks/toast";
 import { Cancel, Save } from "@mui/icons-material";
+import Employee from "@components/working/employee";
 
 function CompanyModuleRolesTab() {
     const { t } = useTranslation();
-    const employeesMap = useSelector((state) => state.company.employeesMap);
     const [cmrs, setCmrs] = useState([]);
     const users = [...new Set(cmrs.map((item) => item.userId))];
     const modules = [...new Set(cmrs.map((item) => item.moduleCode))];
@@ -79,10 +78,7 @@ function CompanyModuleRolesTab() {
             field: "userId",
             headerName: t("working.company.employee"),
             width: 200,
-            renderCell: (params) => {
-                const employee = employeesMap[params.value];
-                return employee ? `${employee.name}` : params.value;
-            },
+            renderCell: (params) => <Employee employeeId={params?.row?.id} showName />
         },
         ...modules.map((module) => ({
             field: module,
