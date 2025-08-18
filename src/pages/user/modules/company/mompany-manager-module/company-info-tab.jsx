@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { TextField, Button, Stack, Box, IconButton, Avatar, useTheme } from "@mui/material";
+import { TextField, Button, Stack, Box, Avatar, useTheme } from "@mui/material";
 import ErrorMessage from "@components/form/error-message";
 import UploadsService from "@services/util-service/uploads.service";
 import CompanyService from "@services/compay-module-service/company.service";
@@ -11,8 +11,9 @@ import { companyActions } from "@redux/slices/company.slice";
 import { joiResolver } from "@hookform/resolvers/joi";
 import toast from "@hooks/toast";
 import _ from "lodash";
-import { Cancel, Edit, Save } from "@mui/icons-material";
+import { Cancel, Save } from "@mui/icons-material";
 import ImageField from "@components/form/image-field";
+import IconButtonEdit from "@components/ui/icon-button-edit";
 
 function CompanyInfoTab() {
     const { t } = useTranslation();
@@ -109,16 +110,7 @@ function CompanyInfoTab() {
                                         }}
                                     />
                                 </Box>
-                                <IconButton
-                                    onClick={open}
-                                    sx={{
-                                        position: "absolute",
-                                        top: 8,
-                                        right: 8,
-                                    }}
-                                >
-                                    <Edit />
-                                </IconButton>
+                                <IconButtonEdit onClick={open} top={8} right={8} />
 
                                 <ImageField
                                     name="avatar"
@@ -147,16 +139,7 @@ function CompanyInfoTab() {
                                                     fontSize: 64,
                                                 }}
                                             />
-                                            <IconButton
-                                                onClick={avatarOpen}
-                                                sx={{
-                                                    position: "absolute",
-                                                    top: 4,
-                                                    right: 4,
-                                                }}
-                                            >
-                                                <Edit fontSize="small" />
-                                            </IconButton>
+                                            <IconButtonEdit onClick={avatarOpen} top={4} right={4} />
                                         </Box>
                                     )}
                                 />

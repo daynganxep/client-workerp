@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { TextField, Button, Stack, Box, IconButton, Avatar, useTheme } from "@mui/material";
-import { Cancel, Edit, Save } from "@mui/icons-material";
+import { TextField, Button, Stack, Box, Avatar, useTheme } from "@mui/material";
+import { Cancel, Save } from "@mui/icons-material";
 import ErrorMessage from "@components/form/error-message";
 import UploadsService from "@services/util-service/uploads.service";
 import { joiResolver } from "@hookform/resolvers/joi";
@@ -10,8 +10,9 @@ import toast from "@hooks/toast";
 import ImageField from "@components/form/image-field";
 import EmployeeService from "@services/hr-module-service/employee.service";
 import { employeeUpdateMyInfoSchema } from "@validations/hr-schema";
-import _ from "lodash";
 import DateField2 from "@components/form/date-field-2";
+import IconButtonEdit from "@components/ui/icon-button-edit";
+import _ from "lodash";
 
 function EmployeeTab() {
     const { t } = useTranslation();
@@ -121,16 +122,7 @@ function EmployeeTab() {
                                             fontSize: 64,
                                         }}
                                     />
-                                    <IconButton
-                                        onClick={avatarOpen}
-                                        sx={{
-                                            position: "absolute",
-                                            top: 4,
-                                            right: 4,
-                                        }}
-                                    >
-                                        <Edit fontSize="small" />
-                                    </IconButton>
+                                    <IconButtonEdit onClick={avatarOpen} top={4} right={4} />
                                 </Box>
                             )}
                         />
