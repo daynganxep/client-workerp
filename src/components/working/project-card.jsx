@@ -54,7 +54,7 @@ function ProjectCard({ project, linkPath = "/" }) {
                 </Typography>
             </CardContent>
 
-            <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
+            <CardActions sx={{ display: "flex", justifyContent: "space-between", borderTop: 1, borderColor: "divider", }}>
                 <Typography variant="caption" color="textDisabled">
                     {`${formatDateForUI(project.startDate) || EMPTY_VALUES.DATE} - ${formatDateForUI(project.endDate) || EMPTY_VALUES.DATE}`}
                 </Typography>
