@@ -132,6 +132,9 @@
                     "add-member-title": "Thêm thành viên vào dự án",
                     "update-member-title": "Sửa vai trò thành viên",
                     "delete-member-title": "Xóa thành viên khỏi dự án"
+                },
+                "task": {
+                    "create-task": "Tạo nhiệm vụ mới"
                 }
             }
         }
@@ -179,6 +182,24 @@
                 "tags": "Thẻ",
                 "member": "Thành viên",
                 "role": "Vai trò"
+            },
+            "task": {
+                "index": "Nhiệm vụ",
+                "title": "Tên nhiệm vụ",
+                "description": "Mô tả",
+                "project-id": "Dự án",
+                "assignees": "Người thực hiện",
+                "priority": "Ưu tiên",
+                "priority-low": "Thấp",
+                "priority-medium": "Trung bình",
+                "priority-high": "Cao",
+                "status": "Trạng thái",
+                "status-to-do": "Cần làm",
+                "status-in-progress": "Đang làm",
+                "status-done": "Hoàn thành",
+                "estimated-time": "Thời gian ước tính",
+                "due-date": "Hạn",
+                "tags": "Thẻ"
             }
         }
     },

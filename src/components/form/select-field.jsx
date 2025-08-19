@@ -15,6 +15,7 @@ const SelectField = ({
     options = [],
     fullWidth = true,
     sx,
+    multiple = false,
     ...props
 }) => {
     return (
@@ -34,8 +35,8 @@ const SelectField = ({
                         {...field}
                         labelId={`${name}-label`}
                         label={label}
-                        displayEmpty
-                        value={field.value || ""}
+                        multiple={multiple}
+                        value={multiple ? field.value || [] : field.value || ""}
                         onChange={(e) => field.onChange(e.target.value)}
                         {...props}
                     >
