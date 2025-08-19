@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import TabNavigation from "@layouts/user/working-layout/tab-navigation";
-import ProjectTasks from "../../project-manager-module/project-detail/project-tasks";
+import ProjectTasks from "../project-manager-module/project-detail/project-tasks";
 
 function UserProjectDetail() {
     const { projectId } = useParams();
@@ -15,9 +15,7 @@ function UserProjectDetail() {
     ];
 
     return (
-        <div className="project-detail">
-            <TabNavigation tabs={tabs} basePath={`/working/project/user/${projectId}`}></TabNavigation>
-        </div>
+        <TabNavigation tabs={tabs} basePath={`/working/project/user/${projectId}`}></TabNavigation>
     );
 }
 

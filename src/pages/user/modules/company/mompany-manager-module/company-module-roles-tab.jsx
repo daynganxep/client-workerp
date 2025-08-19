@@ -119,6 +119,7 @@ function CompanyModuleRolesTab() {
                 rows={rows}
                 columns={columns}
                 pageSize={5}
+                rowHeight={80}
                 disableSelectionOnClick
                 sx={{ maxHeight: 600, minHeight: 300 }}
                 loading={isLoading}

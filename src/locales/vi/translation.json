@@ -118,6 +118,7 @@
         "project": {
             "dashboard": {
                 "all-projects": "Tất cả dự án",
+                "my-projects": "Các dự án đang tham gia",
                 "create-project": "Tạo dự án mới"
             },
             "detail": {

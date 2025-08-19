@@ -1,60 +1,53 @@
-import { useState, useEffect } from "react";
-import { Typography, Grid, Box } from "@mui/material";
+import { Typography, Stack, Grid2 } from "@mui/material";
 import ProjectService from "@services/project-module-service/project.service";
 import ProjectCard from "@components/working/project-card";
 import toast from "@hooks/toast";
+import { useSelector } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 
 function UserProjectDashboard() {
-    const [projects, setProjects] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { t } = useTranslation();
+    const { id: companyId } = useSelector((state) => state.company);
 
-    const fetchProjects = async () => {
-        setIsLoading(true);
-        const [res, err] = await ProjectService.getMyProjects();
-        setIsLoading(false);
-        if (err) return toast.error(err.code);
-        setProjects(res.data);
-    };
-
-    useEffect(() => {
-        fetchProjects();
-    }, []);
-
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
+    const { data: projects = [] } = useQuery({
+        queryKey: ["project-me", companyId],
+        queryFn: async () => {
+            const [res, err] = await ProjectService.getMyProjects();
+            if (err) return toast.error(err.code);
+            return res.data
+        },
+        onError: (code) => {
+            toast.error(code);
+        },
+    });
 
     return (
-        <div className="user-project-dashboard">
-            <Box sx={{ mb: 3 }}>
-                <Typography variant="h5" sx={{ fontWeight: 'medium' }}>
-                    Dự án đang tham gia ({projects.length})
-                </Typography>
-            </Box>
-
-            <Grid container spacing={3}>
+        <Stack spacing={3}>
+            <Stack direction="row" justifyContent="space-between">
+                <Typography variant="h6">{t('working.project.dashboard.my-projects')}</Typography>
+            </Stack>
+            <Grid2
+                container
+                sx={{
+                    display: "grid",
+                    gridTemplateColumns: {
+                        xs: "1fr",
+                        md: "1fr 1fr",
+                        lg: "1fr 1fr 1fr"
+                    },
+                    gap: 3,
+                }}
+            >
                 {projects.map((project) => (
-                    <Grid item xs={12} sm={6} md={4} key={project.id}>
-                        <ProjectCard
-                            project={project}
-                            linkPath={`/working/project/user/${project.id}`}
-                        />
-                    </Grid>
+                    <ProjectCard
+                        key={project.id}
+                        project={project}
+                        linkPath={`/working/project/user/${project.id}`}
+                    />
                 ))}
-            </Grid>
-
-            {projects.length === 0 && (
-                <Box sx={{
-                    textAlign: 'center',
-                    py: 8,
-                    color: 'text.secondary'
-                }}>
-                    <Typography>
-                        Bạn chưa tham gia dự án nào
-                    </Typography>
-                </Box>
-            )}
-        </div>
+            </Grid2>
+        </Stack >
     );
 }
 
