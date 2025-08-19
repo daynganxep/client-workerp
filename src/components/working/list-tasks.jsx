@@ -1,132 +1,129 @@
-import { TASK_PRIORITY_MAP, TASK_STATUSES_MAP } from "@configs/const.config";
-import { useTheme } from "@emotion/react";
-import useIsDark from "@hooks/use-is-dark";
-import { Assignment, CalendarToday, Delete, Edit } from "@mui/icons-material";
-import { Box, Button, Card, CardActions, CardContent, Chip, Divider, Grid, IconButton, List, ListItem, Typography } from "@mui/material";
+import { Box, Button, Chip, Stack } from "@mui/material";
 import { formatDateForUI } from "@tools/date.tool";
-import Employee from "./employee";
+import { EMPTY_VALUES, TASK_PRIORITY_MAP, TASK_STATUSES_MAP } from "@configs/const.config";
 import { Link } from "react-router-dom";
+import Employee from "./employee";
+import { DataGrid } from "@mui/x-data-grid";
+import { useTranslation } from "react-i18next";
+import ConfirmDialog from "@components/dialog/confirm-dialog";
+import TaskService from "@services/project-module-service/task.service";
+import toast from "@hooks/toast";
 
-function ListTasks({ tasks, isManager, isMyTasks }) {
-    const isDarkMode = useIsDark();
-    const theme = useTheme();
 
-    const getStatusColor = (status) => {
-        const baseColor = TASK_STATUSES_MAP[status]?.color || 'default';
-        return isDarkMode
-            ? theme.palette[baseColor].dark
-            : theme.palette[baseColor].light;
-    };
+function ListTasks({ tasks, isManager, isMyTasks, refetch }) {
+    const { t } = useTranslation();
 
-    return (
-        <List sx={{ bgcolor: 'background.paper', borderRadius: 2, p: 0 }}>
-            {tasks.map((task, index) => (
-                <>
-                    <ListItem
-                        key={task.id}
-                        sx={{
-                            display: 'flex',
-                            flexDirection: { xs: 'column', sm: 'row' },
-                            alignItems: { xs: 'stretch', sm: 'center' },
-                            gap: 2,
-                            py: 2,
-                            px: 3,
-                            '&:hover': {
-                                bgcolor: 'action.hover'
-                            }
-                        }}
-                    >
-                        <Box sx={{ flex: 1 }}>
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    fontSize: '1rem',
-                                    mb: 1
-                                }}
+    async function deleteTask(taskId) {
+        const [res, err] = await TaskService.deleteTask(taskId);
+        if (err) return toast.error(err.code);
+        toast.success(res.code);
+        refetch();
+    }
+
+    const columns = [
+        {
+            field: 'title',
+            headerName: t('model.project.task.title'),
+            flex: 2,
+            valueGetter: (value) => value || EMPTY_VALUES.STRING
+        },
+        {
+            field: 'assignees',
+            headerName: t('model.project.task.assignees'),
+            flex: 1,
+            renderCell: (params) => (<Box sx={{ height: "100%", display: "flex", alignItems: "center", flexDirection: "row", columnGap: 4, rowGap: 1, flexWrap: "wrap" }}>
+                {params?.row?.assignees.map((assignee) => (
+                    <Employee
+                        key={assignee}
+                        employeeId={assignee}
+                        size={0.5}
+                        tooltipSize={10}
+                        showName
+                    />
+                ))}
+            </Box>)
+        },
+        {
+            field: 'status',
+            headerName: t('model.project.task.status'),
+            flex: 1,
+            renderCell: (params) => (<Chip
+                size="small"
+                label={TASK_STATUSES_MAP[params?.row?.status]?.label || EMPTY_VALUES.STRING}
+                color={TASK_STATUSES_MAP[params?.row?.status]?.color}
+                variant="outlined"
+                sx={{ borderRadius: 2 }}
+            />)
+        },
+        {
+            field: 'priority',
+            headerName: t('model.project.task.priority'),
+            flex: 1,
+            renderCell: (params) => (<Chip
+                size="small"
+                label={TASK_PRIORITY_MAP[params?.row?.priority]?.label || EMPTY_VALUES.STRING}
+                color={TASK_PRIORITY_MAP[params?.row?.priority]?.color}
+                variant="outlined"
+                sx={{ borderRadius: 2 }}
+            />)
+        },
+        {
+            field: 'dueDate',
+            headerName: t('model.project.task.due-date'),
+            flex: 1,
+            valueGetter: (value) => formatDateForUI(value) || EMPTY_VALUES.DATE
+        }
+    ];
+
+    if (isManager || isMyTasks) {
+        columns.push({
+            field: 'actions',
+            headerName: t('common.actions'),
+            flex: 1,
+            sortable: false,
+            filterable: false,
+            renderCell: (params) => (
+                <Stack height="100%" direction="row" justifyContent="start" alignContent="center" gap={2}>
+                    {(isManager) &&
+                        <ConfirmDialog
+                            title="Xác nhận xóa nhiệm vụ này!"
+                            description={params?.row?.title}
+                            type="delete"
+                            action={() => deleteTask(params?.row?.id)}
+                            triggerButton={<Button
+                                size="small"
+                                variant="text"
+                                sx={{ fontWeight: "bold" }}
+                                color="error"
                             >
-                                <Assignment sx={{ mr: 1 }} />
-                                {task.title}
-                            </Typography>
-
-                            <Grid container spacing={2} sx={{ color: 'text.secondary', mb: 1 }}>
-                                <Grid item xs={12} sm={6}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                        <Chip
-                                            label={TASK_STATUSES_MAP[task.status]?.label}
-                                            size="small"
-                                            color={TASK_STATUSES_MAP[task.status]?.color}
-                                        />
-                                        <Chip
-                                            label={TASK_PRIORITY_MAP[task.priority]?.label}
-                                            size="small"
-                                            color={TASK_PRIORITY_MAP[task.priority]?.color}
-                                        />
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                    <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center' }}>
-                                        <CalendarToday sx={{ fontSize: 16, mr: 1 }} />
-                                        {formatDateForUI(task.dueDate) || "Chưa có hạn"}
-                                    </Typography>
-                                </Grid>
-                            </Grid>
-
-                            {task.assignees?.length > 0 && (
-                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                    {task.assignees.map(assignee => (
-                                        <Employee key={assignee} employeeId={assignee} showName></Employee>
-                                    ))}
-                                </Box>
-                            )}
-                        </Box>
-
-                        {(isManager || isMyTasks) &&
-                            <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 2, py: 1, gap: 6 }}>
-
-                                {(isManager || isMyTasks) &&
-                                    <Button
-                                        size="small"
-                                        component={Link}
-                                        to={`/working/project/${isManager ? "manager" : "user"}/task/${task.id}`}
-                                        sx={{ mr: 'auto' }}
-                                    >
-                                        Chi tiết
-                                    </Button>
-                                }
-                                {isManager &&
-                                    <Box>
-                                        <IconButton size="small" onClick={() => {
-                                            // setValues({
-                                            //     title: task.title,
-                                            //     description: task.description || "",
-                                            //     projectId,
-                                            //     assignees: task.assignees || [],
-                                            //     priority: task.priority,
-                                            //     status: task.status,
-                                            //     dueDate: formatDateForInput(task.dueDate),
-                                            // });
-                                            // setEditTask(task);
-                                        }}>
-                                            <Edit fontSize="small" />
-                                        </IconButton>
-                                        <IconButton
-                                            size="small"
-                                        // onClick={() => setDeleteConfirm({ open: true, taskId: task.id })}
-                                        >
-                                            <Delete fontSize="small" />
-                                        </IconButton>
-                                    </Box>
-                                }
-                            </CardActions>
-                        }
-                    </ListItem>
-                    {index < tasks.length - 1 && <Divider />}
-                </>
-            ))}
-        </List>
+                                XÓA
+                            </Button>}
+                        />
+                    }
+                    {(isManager || isMyTasks) &&
+                        <Button
+                            size="small"
+                            variant="text"
+                            component={Link}
+                            to={`/working/project/${isManager ? "manager" : "user"}/task/${params.row?.id}`}
+                            sx={{ fontWeight: "bold" }}
+                        >
+                            CHI TIẾT
+                        </Button>
+                    }
+                </Stack>
+            )
+        });
+    }
+    return (
+        <DataGrid
+            rowHeight={80}
+            rows={tasks}
+            getRowId={(row) => row?.id}
+            columns={columns}
+            disableRowSelectionOnClick
+        />
     );
-};
+}
 
 export default ListTasks;

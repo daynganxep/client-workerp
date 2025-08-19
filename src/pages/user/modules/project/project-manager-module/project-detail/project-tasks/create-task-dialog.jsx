@@ -41,7 +41,7 @@ function CreateTaskDialog({ projectId, refetch }) {
     } = form;
 
     const { data: members = [] } = useQuery({
-        queryKey: ["project", projectId],
+        queryKey: ["project-members", projectId],
         queryFn: async () => {
             const [res, err] = await ProjectService.getProjectById(projectId);
             if (err) throw new Error(err.code);

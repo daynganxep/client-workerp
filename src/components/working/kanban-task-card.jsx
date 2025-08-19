@@ -4,8 +4,18 @@ import { Link } from "react-router-dom";
 import { stringToColor } from "@tools/string.tool";
 import { EMPTY_VALUES, TASK_PRIORITY_MAP } from "@configs/const.config";
 import Employee from "./employee";
+import ConfirmDialog from "@components/dialog/confirm-dialog";
+import TaskService from "@services/project-module-service/task.service";
+import toast from "@hooks/toast";
 
-function KanbanTaskCard({ task, isManager, isMyTasks }) {
+function KanbanTaskCard({ task, isManager, isMyTasks, refetch }) {
+
+    async function deleteTask() {
+        const [res, err] = await TaskService.deleteTask(task.id);
+        if (err) return toast.error(err.code);
+        toast.success(res.code);
+        refetch();
+    }
 
     return (<Card
         key={task.id}
@@ -65,6 +75,22 @@ function KanbanTaskCard({ task, isManager, isMyTasks }) {
             <Typography variant="caption" color="textDisabled">
                 {formatDateForUI(task.dueDate) || EMPTY_VALUES.DATE}
             </Typography>
+            {(isManager) &&
+                <ConfirmDialog
+                    title="Xác nhận xóa nhiệm vụ này!"
+                    description={task.title}
+                    type="delete"
+                    action={deleteTask}
+                    triggerButton={<Button
+                        size="small"
+                        variant="text"
+                        sx={{ fontWeight: "bold" }}
+                        color="error"
+                    >
+                        XÓA
+                    </Button>}
+                />
+            }
             {(isManager || isMyTasks) &&
                 <Button
                     size="small"

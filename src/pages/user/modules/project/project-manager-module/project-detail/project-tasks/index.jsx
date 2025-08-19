@@ -24,7 +24,7 @@ function ProjectTasks({ projectId, isManager = false, isMyTasks = false }) {
     const [viewMode, setViewMode] = useState("kanban");
 
     const { data: tasks = [], refetch } = useQuery({
-        queryKey: ["task", projectId, sortBy, order],
+        queryKey: ["tasks", projectId, sortBy, order],
         queryFn: async () => {
             const [res, err] = await TaskService.getTasksByProjectId(projectId, { sortBy, order });
             if (err) return toast.error(err.code);
@@ -74,8 +74,8 @@ function ProjectTasks({ projectId, isManager = false, isMyTasks = false }) {
                 {isManager && <CreateTaskDialog projectId={projectId} refetch={refetch} />}
             </Stack>
             {viewMode === "kanban" ?
-                <KanbanTasks tasks={tasks} isManager={isManager} isMyTasks={isMyTasks} /> :
-                <ListTasks tasks={tasks} isManager={isManager} isMyTasks={isMyTasks} />
+                <KanbanTasks tasks={tasks} isManager={isManager} isMyTasks={isMyTasks} refetch={refetch} /> :
+                <ListTasks tasks={tasks} isManager={isManager} isMyTasks={isMyTasks} refetch={refetch} />
             }
         </Stack >
     );

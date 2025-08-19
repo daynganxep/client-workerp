@@ -4,10 +4,9 @@ import { Chip, Grid2, Stack, Typography } from "@mui/material";
 import { TASK_STATUSES_MAP } from "@configs/const.config";
 import KanbanTaskCard from "./kanban-task-card";
 
-function KanbanTasks({ tasks, isManager, isMyTasks }) {
+function KanbanTasks({ tasks, isManager, isMyTasks, refetch }) {
     const isDarkMode = useIsDark();
     const theme = useTheme();
-
 
     const getStatusColor = (status) => {
         const baseColor = TASK_STATUSES_MAP[status]?.color || 'default';
@@ -48,7 +47,7 @@ function KanbanTasks({ tasks, isManager, isMyTasks }) {
 
                     <Stack gap={3}>
                         {tasks.filter(task => task.status === status).map((task) => (
-                            <KanbanTaskCard key={task.id} task={task} isManager={isManager} isMyTasks={isMyTasks} />
+                            <KanbanTaskCard key={task.id} task={task} isManager={isManager} isMyTasks={isMyTasks} refetch={refetch} />
                         ))}
                     </Stack>
                 </Stack>
