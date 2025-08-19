@@ -12,7 +12,7 @@ import {
     ListItemText,
     Breadcrumbs,
     Container,
-    Avatar,
+    // Avatar,
     useTheme,
     useMediaQuery,
     Tooltip,
@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import NotificationsIcon from '@mui/icons-material/Notifications';
+// import NotificationsIcon from '@mui/icons-material/Notifications';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import CompanyModuleRolesService from '@services/compay-module-service/company-module-roles.service';
 import EmployeeService from '@services/hr-module-service/employee.service';
@@ -238,13 +238,13 @@ function WorkingLayout() {
                     gap: 1,
                 }}
             >
-                <IconButton sx={{ color: theme.palette.text.primary }}>
+                {/* <IconButton sx={{ color: theme.palette.text.primary }}>
                     <NotificationsIcon />
-                </IconButton>
-                {isSidebarOpen && <ThemeToggleButton />}
-                {isSidebarOpen && (
+                </IconButton> */}
+                <ThemeToggleButton />
+                {/* {isSidebarOpen && (
                     <Avatar alt="Employee Name" src="/path/to/avatar.jpg" />
-                )}
+                )} */}
             </Box>
         </Box >
     );

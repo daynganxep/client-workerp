@@ -12,8 +12,8 @@ import EmployeeService from "@services/hr-module-service/employee.service";
 import { employeeUpdateMyInfoSchema } from "@validations/hr-schema";
 import DateField2 from "@components/form/date-field-2";
 import IconButtonEdit from "@components/ui/icon-button-edit";
-import _ from "lodash";
 import { stringToColor } from "@tools/string.tool";
+import _ from "lodash";
 
 function EmployeeTab() {
     const { t } = useTranslation();
@@ -24,7 +24,7 @@ function EmployeeTab() {
         handleSubmit,
         formState: { errors, isValid, },
         reset,
-        control
+        control,
     } = useForm({ resolver: joiResolver(employeeUpdateMyInfoSchema) });
 
     const { refetch, data } = useQuery({
@@ -48,7 +48,7 @@ function EmployeeTab() {
                 formData.avatar = res.data;
             }
 
-            const [res, err] = await EmployeeService.updateMyEmployeeInfo(data.id, formData);
+            const [res, err] = await EmployeeService.updateMyEmployeeInfo(data?.id, formData);
             if (err) throw new Error(err.code);
             return res;
         },
@@ -117,12 +117,12 @@ function EmployeeTab() {
                                                 ? URL.createObjectURL(avatarValue)
                                                 : avatarValue
                                         }
-                                        alt={data.name}
+                                        alt={data?.name}
                                         sx={{
                                             width: 160,
                                             height: 160,
                                             fontSize: 64,
-                                            bgcolor: stringToColor(data.id)
+                                            bgcolor: stringToColor(data?.id)
                                         }}
                                     >
                                         {data?.name?.charAt(0)}

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import {
     TextField,
     Button,
+    Stack,
 } from '@mui/material';
 import FormDialog from '@components/dialog/form-dialog';
 import { joiResolver } from '@hookform/resolvers/joi';
@@ -78,22 +79,22 @@ function CreateProjectDialog({ refetch }) {
                 helperText={errors?.description?.message}
                 {...register("description")}
             />
-            <DateField2
-                name="startDate"
-                control={control}
-                label={t("model.project.project.start-date")}
-                error={!!errors.startDate}
-                helperText={errors?.startDate?.message}
-                required
-            />
-            <DateField2
-                name="endDate"
-                control={control}
-                label={t("model.project.project.end-date")}
-                error={!!errors.endDate}
-                helperText={errors?.endDate?.message}
-                required
-            />
+            <Stack direction="row" gap={3}>
+                <DateField2
+                    name="startDate"
+                    control={control}
+                    label={t("model.project.project.start-date")}
+                    error={!!errors.startDate}
+                    helperText={errors?.startDate?.message}
+                />
+                <DateField2
+                    name="endDate"
+                    control={control}
+                    label={t("model.project.project.start-date")}
+                    error={!!errors.endDate}
+                    helperText={errors?.endDate?.message}
+                />
+            </Stack>
         </ FormDialog>
     );
 }
