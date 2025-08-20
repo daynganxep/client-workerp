@@ -135,7 +135,8 @@
                     "delete-member-title": "Xóa thành viên khỏi dự án"
                 },
                 "task": {
-                    "create-task": "Tạo nhiệm vụ mới"
+                    "create-task": "Tạo nhiệm vụ mới",
+                    "update-task": "Cập nhật nhiệm vụ"
                 }
             }
         }
