@@ -16,6 +16,8 @@
         "common-error": "Đã xảy ra lỗi",
         "invalid-tab": "Tab không hợp lệ",
         "actions": "Hành động",
+        "comment": "Bình luận",
+        "content": "Nội dung",
         "company": {
             "list-company": "Công ty của tôi",
             "create-company": "Tạo công ty mới",
@@ -136,7 +138,9 @@
                 },
                 "task": {
                     "create-task": "Tạo nhiệm vụ mới",
-                    "update-task": "Cập nhật nhiệm vụ"
+                    "update-task": "Cập nhật nhiệm vụ",
+                    "comment": "Bình luận",
+                    "delete-comment": "Xóa bình luận"
                 }
             }
         }

@@ -102,3 +102,10 @@ export const taskUpdateSchema = Joi.object({
         )
         .optional(),
 }).options({ stripUnknown: true });
+
+export const commentSchema = Joi.object({
+    content: Joi.string().required().messages({
+        "string.empty": "Bình luận không được để trống",
+        "any.required": "Bình luận là bắt buộc",
+    }),
+})

@@ -24,9 +24,9 @@ function ProjectTasks({ projectId, isManager = false, isMyTasks = false }) {
     const [viewMode, setViewMode] = useState("kanban");
 
     const { data: tasks = [], refetch } = useQuery({
-        queryKey: ["tasks", projectId, sortBy, order],
+        queryKey: ["tasks", projectId, isMyTasks ? "my-tasks" : "all-tasks", sortBy, order],
         queryFn: async () => {
-            const [res, err] = await TaskService.getTasksByProjectId(projectId, { sortBy, order });
+            const [res, err] = await (isMyTasks ? TaskService.getMyTasks : TaskService.getTasksByProjectId)(projectId, { sortBy, order });
             if (err) return toast.error(err.code);
             return res.data
         },

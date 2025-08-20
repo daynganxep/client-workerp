@@ -1,3 +1,4 @@
+import { EMPTY_VALUES } from "@configs/const.config";
 import { format } from "date-fns";
 import vi from "date-fns/locale/vi";
 
@@ -14,5 +15,6 @@ export const formatDateForBackend = (dateString) => {
 };
 
 export const formatDateForUI = (date, formatString = "dd/MM/yyyy") => {
+    if (!date) return EMPTY_VALUES.DATE;
     return format(new Date(date), formatString, { locale: vi });
 };
